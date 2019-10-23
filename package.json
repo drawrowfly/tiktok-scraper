@@ -1,0 +1,41 @@
+{
+  "name": "tiktok-scraper",
+  "version": "1.0.0",
+  "description": "TikTok Scraper & Downloader. Scrape information from User, Trending and HashTag pages and download video posts",
+  "main": "index.js",
+  "bin": {
+    "tiktok-scraper": "bin/cli.js"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "archiver": "^3.1.1",
+    "async": "^3.1.0",
+    "bluebird": "^3.7.1",
+    "json2csv": "^4.5.4",
+    "ora": "^4.0.2",
+    "progress": "^2.0.3",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "yargs": "^14.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drawrowfly/tiktok-scraper.git"
+  },
+  "keywords": [
+    "TikTok",
+    "Scraper"
+  ],
+  "author": "drawflyrow",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/drawrowfly/tiktok-scraper/issues"
+  },
+  "homepage": "https://github.com/drawrowfly/tiktok-scraper#readme"
+}
