@@ -34,7 +34,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 *   Unknown. Report them if you will hit any
 
 ## Installation
-tiktok-scraper requires [Node.js](https://nodejs.org/) v8.6.0+ to run.
+tiktok-scraper requires [Node.js](https://nodejs.org/) v10+ to run.
 
 **Install from NPM**
 ```sh
