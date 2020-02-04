@@ -137,9 +137,30 @@ let options = {
     number: 100,
 };
 
+// User
 (async () => {
     try{
         let posts = await TikTokScraper.user({USERNAME}, options);
+        console.log(posts)
+    } catch(error){
+        console.log(error)
+    }
+})()
+
+// Trend
+(async () => {
+    try{
+        let posts = await TikTokScraper.trend("", options);
+        console.log(posts)
+    } catch(error){
+        console.log(error)
+    }
+})()
+
+// Hashtag
+(async () => {
+    try{
+        let posts = await TikTokScraper.hashtag({HASHTAG}, options);
         console.log(posts)
     } catch(error){
         console.log(error)

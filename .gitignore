@@ -2,3 +2,5 @@ node_modules/
 .DS_Store
 test.js
 .prettierrc.js
+*.csv
+*.zip
