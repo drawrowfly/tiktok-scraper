@@ -133,14 +133,21 @@ Downloading 6748048372625689861 [==============================] 100%
 ```
 const TikTokScraper = require('tiktok-scraper');
 
-let options = {
-    number: 100,
-};
 
-// User
+// User feed by username
 (async () => {
     try{
-        let posts = await TikTokScraper.user({USERNAME}, options);
+        let posts = await TikTokScraper.user({USERNAME},  { number: 100 });
+        console.log(posts)
+    } catch(error){
+        console.log(error)
+    }
+})()
+
+// User feed by user id
+(async () => {
+    try{
+        let posts = await TikTokScraper.user({USER_ID}, { number: 100, by_user_id: true });
         console.log(posts)
     } catch(error){
         console.log(error)
@@ -150,7 +157,7 @@ let options = {
 // Trend
 (async () => {
     try{
-        let posts = await TikTokScraper.trend("", options);
+        let posts = await TikTokScraper.trend("", { number: 100 });
         console.log(posts)
     } catch(error){
         console.log(error)
@@ -160,7 +167,7 @@ let options = {
 // Hashtag
 (async () => {
     try{
-        let posts = await TikTokScraper.hashtag({HASHTAG}, options);
+        let posts = await TikTokScraper.hashtag({HASHTAG}, { number: 100 });
         console.log(posts)
     } catch(error){
         console.log(error)
@@ -220,9 +227,10 @@ let options = {
     event: false,
 
     // Timeout between requests. If 'rate limit' error received then this option can be useful: {int default: 0}
-    timeout: 0
+    timeout: 0,
     
-    
+    // Set to {true} to search by user id: {boolean default: false}
+    by_user_id: false,
     
     // Download posts or not. If true ZIP archive in {filepath} will be created: {boolean default: false}
     download: false,

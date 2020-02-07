@@ -15,6 +15,7 @@
     "bluebird": "^3.7.1",
     "jsdom": "^16.0.1",
     "json2csv": "^4.5.4",
+    "node-webcrypto-ossl": "^1.0.48",
     "ora": "^4.0.2",
     "progress": "^2.0.3",
     "request": "^2.88.0",
