@@ -240,6 +240,13 @@ let options = {
 
     // File path where all files will be saved: {string default: 'CURRENT_DIR'}
     filepath: `CURRENT_DIR`,
+
+    // Output with information can be saved to a CSV or JSON files: {string default: 'na'}
+    // 'csv' to save in csv
+    // 'json' to save in json
+    // 'all' to save in json and csv
+    // 'na' to skip this step
+    filetype: `na`,
 };
 ```
 
