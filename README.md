@@ -148,6 +148,7 @@ const TikTokScraper = require('tiktok-scraper');
 })()
 
 // User feed by user id
+// Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
 (async () => {
     try{
         let posts = await TikTokScraper.user({USER_ID}, { number: 100, by_user_id: true });
