@@ -7,6 +7,9 @@ Scrape and download useful information from TikTok.
 
 This is not an official API support and etc. This is just a scraper that is using TikTok Web API to scrape media.
 
+***
+<a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+***
 
 ## Features
 *   Scrape video posts from username, hashtag, trends, or music-id
@@ -148,14 +151,22 @@ Downloading 6748048372625689861 [==============================] 100%
 ```
 const TikTokScraper = require('tiktok-scraper');
 
-let options = {
-    number: 100,
-};
 
-// User
+// User feed by username
 (async () => {
     try{
-        let posts = await TikTokScraper.user({USERNAME}, options);
+        let posts = await TikTokScraper.user({USERNAME},  { number: 100 });
+        console.log(posts)
+    } catch(error){
+        console.log(error)
+    }
+})()
+
+// User feed by user id
+// Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
+(async () => {
+    try{
+        let posts = await TikTokScraper.user({USER_ID}, { number: 100, by_user_id: true });
         console.log(posts)
     } catch(error){
         console.log(error)
@@ -165,7 +176,7 @@ let options = {
 // Trend
 (async () => {
     try{
-        let posts = await TikTokScraper.trend("", options);
+        let posts = await TikTokScraper.trend("", { number: 100 });
         console.log(posts)
     } catch(error){
         console.log(error)
@@ -175,7 +186,7 @@ let options = {
 // Hashtag
 (async () => {
     try{
-        let posts = await TikTokScraper.hashtag({HASHTAG}, options);
+        let posts = await TikTokScraper.hashtag({HASHTAG}, { number: 100 });
         console.log(posts)
     } catch(error){
         console.log(error)
@@ -235,9 +246,10 @@ let options = {
     event: false,
 
     // Timeout between requests. If 'rate limit' error received then this option can be useful: {int default: 0}
-    timeout: 0
+    timeout: 0,
     
-    
+    // Set to {true} to search by user id: {boolean default: false}
+    by_user_id: false,
     
     // Download posts or not. If true ZIP archive in {filepath} will be created: {boolean default: false}
     download: false,
@@ -247,6 +259,13 @@ let options = {
 
     // File path where all files will be saved: {string default: 'CURRENT_DIR'}
     filepath: `CURRENT_DIR`,
+
+    // Output with information can be saved to a CSV or JSON files: {string default: 'na'}
+    // 'csv' to save in csv
+    // 'json' to save in json
+    // 'all' to save in json and csv
+    // 'na' to skip this step
+    filetype: `na`,
 };
 ```
 
