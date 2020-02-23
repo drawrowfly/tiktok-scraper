@@ -789,37 +789,10 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.8.tgz#857fcabfc3397d2625b8228262e86aa7a011b05d"
-  integrity sha1-hX/Kv8M5fSYluCKCYuhqp6ARsF0=
-
-mkdirp@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
-  integrity sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
-  dependencies:
-    minimist "0.0.8"
-
 mute-stream@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
-
-nan@^2.13.2:
-  version "2.14.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
-  integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
-
-node-webcrypto-ossl@^1.0.48:
-  version "1.0.48"
-  resolved "https://registry.yarnpkg.com/node-webcrypto-ossl/-/node-webcrypto-ossl-1.0.48.tgz#640e9547f8ae1d0becc8374a65e1d0e11ab385ea"
-  integrity sha512-MWUkQ/5wrs7lpAr+fhsLMfjdxKGd3dQFVqWbNMkyYyCMRW8E7ScailqtCZYDLTnJtU6B+91rXxCJNyZvbYaSOg==
-  dependencies:
-    mkdirp "^0.5.1"
-    nan "^2.13.2"
-    tslib "^1.9.3"
-    webcrypto-core "^0.1.26"
 
 normalize-path@^3.0.0:
   version "3.0.0"
@@ -1198,11 +1171,6 @@ tr46@^2.0.0:
   dependencies:
     punycode "^2.1.1"
 
-tslib@^1.7.1, tslib@^1.9.3:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
-  integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
-
 tunnel-agent@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd"
@@ -1268,13 +1236,6 @@ wcwidth@^1.0.1:
   integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
   dependencies:
     defaults "^1.0.3"
-
-webcrypto-core@^0.1.26:
-  version "0.1.26"
-  resolved "https://registry.yarnpkg.com/webcrypto-core/-/webcrypto-core-0.1.26.tgz#977e5cdd9173db6ac8b18414d66ee3759a8b1024"
-  integrity sha512-BZVgJZkkHyuz8loKvsaOKiBDXDpmMZf5xG4QAOlSeYdXlFUl9c1FRrVnAXcOdb4fTHMG+TRu81odJwwSfKnWTA==
-  dependencies:
-    tslib "^1.7.1"
 
 webidl-conversions@^5.0.0:
   version "5.0.0"
