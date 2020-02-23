@@ -12,7 +12,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 ***
 
 ## Features
-*   Scrape video posts from username, hashtag or trends
+*   Scrape video posts from username, hashtag, trends, or music-id
 *   Download and save media to a ZIP archive
 *   Create JSON/CSV files with a post information
 
@@ -62,6 +62,7 @@ Commands:
   tiktok-scraper user [id]     Scrape videos from username. Enter only username
   tiktok-scraper hashtag [id]  Scrape videos from hashtag. Enter hashtag without #
   tiktok-scraper trend         Scrape posts from current trends
+  tiktok-scraper music [id]    Scrape posts from a music id number
 
 Options:
   --help, -h              help                                         [boolean]
@@ -85,6 +86,7 @@ Examples:
   tiktok-scraper user USERNAME -d -n 100
   tiktok-scraper hashtag HASHTAG_NAME -d -n 100
   tiktok-scraper trend -d -n 100
+  tiktok-scraper music MUSICID -n 100
 ```
 
 **Example 1:**
@@ -112,10 +114,23 @@ Scrape 50 posts from trends section, download them to a ZIP and save info to a c
 ```
 $ tiktok-scraper trend -n 50 -d -t csv
 
+
 Output:
 ZIP path: /{CURRENT_PATH}/trend_1552945659138.zip
 CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 ```
+
+**Example 4:**
+Scrape 100 posts from a particular music ID (numberical ID from TikTok URL)
+
+```
+$ tiktok-scraper music MUSICID -n 100
+
+Output:
+ZIP path: /{CURRENT_PATH}/music_1552945659138.zip
+CSV path: /{CURRENT_PATH}/music_1552945659138.csv
+```
+
 **To make it look better, when downloading posts the progress will be shown in terminal**
 ```
 Downloading 6750670497744309509 [==============================] 100%

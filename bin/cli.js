@@ -39,6 +39,9 @@ require('yargs')
     .command('trend', 'Scrape posts from current trends', {}, argv => {
         startScraper(argv);
     })
+    .command('music [id]', 'Scrape videos from music id. Enter only music id', {}, argv => {
+        startScraper(argv);
+    })
     .options({
         help: {
             alias: 'h',
