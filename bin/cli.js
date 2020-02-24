@@ -8,6 +8,7 @@ const startScraper = async argv => {
         argv.type = argv._[0];
         argv.cli = true;
         argv.input = argv.id;
+        argv.user_data = argv.userdata;
 
         let scraper = await TikTokScraper(argv)._scrape();
 
@@ -66,6 +67,12 @@ require('yargs')
             boolean: true,
             default: false,
             describe: 'Download and archive all scraped videos to a ZIP file',
+        },
+        userdata: {
+            alias: 'u',
+            boolean: true,
+            default: false,
+            describe: 'Scrape user profile information Followers, Followings and etc',
         },
         filepath: {
             default: process.cwd(),

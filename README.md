@@ -12,29 +12,42 @@ This is not an official API support and etc. This is just a scraper that is usin
 ***
 
 ## Features
-*   Scrape video posts from username, hashtag, trends, or music-id
+*   Scrape video posts information from username, hashtag, trends, or music-id
+*   Scrape user profile information **Following, Followers, Heart, Video count, Digg and Verified or Not**
 *   Download and save media to a ZIP archive
 *   Create JSON/CSV files with a post information
 
 **Note:**
 *   If you need to download all video posts then set {number} to 0
+*   **When scraping user profile information you can recieve a Rate Limit error, everything depends from the number of profiles that you scrape. It means that all user profile metrics will be 0 or false**
 
 **Posts - JSON/CSV output:**
 ```
-    id: '6748606789551410438',
-    text:'TEXT',
-    createTime: '1571282470',
-    authorId: '123123',
-    musicId: '123123',
+    id: 'POST_ID',
+    text: 'POST_DESCRIPTION',
+    createTime: '1577735724',
+    authorId: 'AUTHOR_ID',
+    authorName: 'USERNAME',
+    authorFollowing: 615,
+    authorFans: 63179,
+    authorHeart: 744827,
+    authorVideo: 12,
+    authorDigg: 6718,
+    authorVerified: false,
+    musicId: 'MUSIC_ID',
+    musicName: 'Why School Is Like This',
+    musicAuthor: 'Comedy',
+    musicOriginal: true,
     videoUrl: 'VIDEO_URL',
-    diggCount: 485,
-    shareCount: 1,
-    commentCount: 24 
+    diggCount: 728529,
+    shareCount: 99053,
+    playCount: 8310028,
+    commentCount: 6885
 ```
-![Demo](https://i.imgur.com/JXJgYs6.png)
+![Demo](https://i.imgur.com/6gIbBzo.png)
 
 **Possible errors**
-*   Unknown. Report them if you will hit any
+*   Unknown. Report them if you will receive any
 
 ## Installation
 tiktok-scraper requires [Node.js](https://nodejs.org/) v10+ to run.
@@ -75,6 +88,8 @@ Options:
                                                                     [default: 0]
   --download, -d          Download and archive all scraped videos to a ZIP file
                                                       [boolean] [default: false]
+  --userdata, -u          Scrape user profile information Followers, Followings
+                          and etc                     [boolean] [default: false]
   --filepath              Directory to save all output files.
                 [default: "/Users/jackass/Documents/lang/NodeJs/tiktok-scraper"]
   --filetype, --type, -t  Type of output file where post information will be
@@ -131,6 +146,17 @@ ZIP path: /{CURRENT_PATH}/music_1552945659138.zip
 CSV path: /{CURRENT_PATH}/music_1552945659138.csv
 ```
 
+**Example 5:**
+Scrape 50 posts from trends section **with user profile information**
+```
+$ tiktok-scraper trend -n 50 -u
+
+
+Output:
+ZIP path: /{CURRENT_PATH}/trend_1552945659138.zip
+CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
+```
+
 **To make it look better, when downloading posts the progress will be shown in terminal**
 ```
 Downloading 6750670497744309509 [==============================] 100%
@@ -176,7 +202,17 @@ const TikTokScraper = require('tiktok-scraper');
 // Trend
 (async () => {
     try{
-        let posts = await TikTokScraper.trend("", { number: 100 });
+        let posts = await TikTokScraper.trend("", { number: 100});
+        console.log(posts)
+    } catch(error){
+        console.log(error)
+    }
+})()
+
+// Trends with the user profile information: Followers, Following, Hearts, Digg, Videos and Verified or not
+(async () => {
+    try{
+        let posts = await TikTokScraper.trend("", { number: 100, user_data: true });
         console.log(posts)
     } catch(error){
         console.log(error)
@@ -259,6 +295,11 @@ let options = {
 
     // File path where all files will be saved: {string default: 'CURRENT_DIR'}
     filepath: `CURRENT_DIR`,
+    
+    // Scrape user profile information: {boolean default: false}
+    // Is very usefull when scraping posts from a thrends
+    // If you will make to many requests you can receive Rate Limit
+    user_data: false,
 
     // Output with information can be saved to a CSV or JSON files: {string default: 'na'}
     // 'csv' to save in csv
