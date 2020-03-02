@@ -1,6 +1,8 @@
 
 # TikTok Scraper & Downloader
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b3ef17f5a8504600931abfa60ac01006)](https://app.codacy.com/manual/drawrowfly/tiktok-scraper?utm_source=github.com&utm_medium=referral&utm_content=drawrowfly/tiktok-scraper&utm_campaign=Badge_Grade_Dashboard)
+
 Scrape and download useful information from TikTok.
 
 **No login or password are required.**
