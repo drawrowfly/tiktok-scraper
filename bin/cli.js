@@ -1,7 +1,11 @@
 #!/usr/bin/env node
-'use strict';
+
+/* eslint-disable no-unused-expressions */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-param-reassign */
 
 const TikTokScraper = require('../lib/instance');
+const CONST = require('../lib/constant');
 
 const startScraper = async argv => {
     try {
@@ -9,8 +13,8 @@ const startScraper = async argv => {
         argv.cli = true;
         argv.input = argv.id;
         argv.user_data = argv.userdata;
-
-        let scraper = await TikTokScraper(argv)._scrape();
+        argv.store_history = argv.store;
+        const scraper = await TikTokScraper(argv).scrape();
 
         if (scraper.zip) {
             console.log(`ZIP path: ${scraper.zip}`);
@@ -84,5 +88,23 @@ require('yargs')
             choices: ['csv', 'json', 'all'],
             describe: "Type of output file where post information will be saved. 'all' - save information about all posts to a 'json' and 'csv' ",
         },
+        store: {
+            alias: ['s'],
+            boolean: true,
+            default: false,
+            describe: 'Scraper will save the progress in the OS TMP folder and in the future usage will only download new videos avoiding duplicates',
+        },
+    })
+    .check(argv => {
+        if (CONST.scrape.indexOf(argv._[0]) === -1) {
+            throw new Error('Wrong command');
+        }
+
+        if (argv.store) {
+            if (!argv.download) {
+                throw new Error('--store, -s flag only works in combination with the download flag. Add -d to your command');
+            }
+        }
+        return true;
     })
     .demandCommand().argv;

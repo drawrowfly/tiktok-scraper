@@ -1,8 +1,8 @@
 node_modules/
 .DS_Store
 test.js
-test_2.js
 .prettierrc.js
 *.csv
 *.zip
 reverse_eng/
+.eslintrc.js

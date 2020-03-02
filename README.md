@@ -15,10 +15,17 @@ This is not an official API support and etc. This is just a scraper that is usin
 *   Scrape video posts information from username, hashtag, trends, or music-id
 *   Scrape user profile information **Following, Followers, Heart, Video count, Digg and Verified or Not**
 *   Download and save media to a ZIP archive
+*   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and if only if download flag is on.
 *   Create JSON/CSV files with a post information
 
+## To Do
+*   [x] CLI: save progress to avoid downloading same videos
+*   [ ] **Rewrite everything in TypeScript**
+*   [ ] Add tests
+*   [ ] Web interface
+
+
 **Note:**
-*   If you need to download all video posts then set {number} to 0
 *   **When scraping user profile information you can recieve a Rate Limit error, everything depends from the number of profiles that you scrape. It means that all user profile metrics will be 0 or false**
 
 **Posts - JSON/CSV output:**
@@ -54,12 +61,12 @@ tiktok-scraper requires [Node.js](https://nodejs.org/) v10+ to run.
 
 **Install from NPM**
 ```sh
-$ npm i -g tiktok-scraper
+npm i -g tiktok-scraper
 ```
 
 **Install from YARN**
 ```sh
-$ yarn global add tiktok-scraper
+yarn global add tiktok-scraper
 ```
 
 ## USAGE
@@ -96,6 +103,9 @@ Options:
                           saved. 'all' - save information about all posts to a
                           'json' and 'csv'
                                 [choices: "csv", "json", "all"] [default: "csv"]
+  --store, -s             Scraper will save the progress in the OS TMP folder
+                          and in the future usage will only download new videos
+                          avoiding duplicates         [boolean] [default: false]
 
 Examples:
   tiktok-scraper user USERNAME -d -n 100
@@ -107,7 +117,7 @@ Examples:
 **Example 1:**
 Scrape 300 video posts from user {USERNAME}. Save post info in to a CSV file (by default) 
 ```sh
-$ tiktok-scraper user USERNAME -n 300
+tiktok-scraper user USERNAME -n 300
 
 Output:
 CSV path: /{CURRENT_PATH}/user_1552945544582.csv
@@ -115,8 +125,8 @@ CSV path: /{CURRENT_PATH}/user_1552945544582.csv
 
 **Example 2:**
 Scrape 100 posts from hashtag {HASHTAG_NAME}, download and save them to a ZIP archive. Save post info in to a JSON and CSV files (--filetype all)
-```
-$ tiktok-scraper hashtag HASHTAG_NAME -n 100 -d -t all
+```sh
+tiktok-scraper hashtag HASHTAG_NAME -n 100 -d -t all
 
 Output:
 ZIP path: /{CURRENT_PATH}/hashtag_1552945659138.zip
@@ -126,8 +136,8 @@ CSV path: /{CURRENT_PATH}/hashtag_1552945659138.csv
 
 **Example 3:**
 Scrape 50 posts from trends section, download them to a ZIP and save info to a csv file
-```
-$ tiktok-scraper trend -n 50 -d -t csv
+```sh
+tiktok-scraper trend -n 50 -d -t csv
 
 
 Output:
@@ -138,8 +148,8 @@ CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 **Example 4:**
 Scrape 100 posts from a particular music ID (numberical ID from TikTok URL)
 
-```
-$ tiktok-scraper music MUSICID -n 100
+```sh
+tiktok-scraper music MUSICID -n 100
 
 Output:
 ZIP path: /{CURRENT_PATH}/music_1552945659138.zip
@@ -148,8 +158,21 @@ CSV path: /{CURRENT_PATH}/music_1552945659138.csv
 
 **Example 5:**
 Scrape 50 posts from trends section **with user profile information**
+```sh
+tiktok-scraper trend -n 50 -u
+
+
+Output:
+ZIP path: /{CURRENT_PATH}/trend_1552945659138.zip
+CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 ```
-$ tiktok-scraper trend -n 50 -u
+
+**Example 6:**
+Download 20 latest video post from the user {USERNAME} and save the progress to avoid downloading the same videos in the future
+* **NOTE** Progress can only be saved if **download** flag is on
+* When executing same command next time scraper will only download newly posted videos
+```sh
+tiktok-scraper user USERNAME -n 20 -d -store
 
 
 Output:
@@ -174,9 +197,8 @@ Downloading 6748048372625689861 [==============================] 100%
 ## Module
 
 ### Promise
-```
+```javascript
 const TikTokScraper = require('tiktok-scraper');
-
 
 // User feed by username
 (async () => {
@@ -241,14 +263,10 @@ const TikTokScraper = require('tiktok-scraper');
 ```
 
 ### Event
-```
+```javascript
 const TikTokScraper = require('tiktok-scraper');
-let options = {
-    count: 100,
-    event: true, // Enable event emitter, you won't be able to use promises
-};
 
-let posts = TikTokScraper.user({USERNAME}, options);
+let posts = TikTokScraper.user({USERNAME}, { event: true, number: 30 });
 
 posts.on('data', (json) => {
   //data in JSON format
@@ -260,17 +278,18 @@ posts.on('done', () => {
 posts.on('error', (error) => {
   //error message
 })
+posts.scrape();
 ```
 
 **Functions**
-```
+```javascript
 .user(id, options) //Scrape posts from a specific user
 .hashtag(id, options) //Scrape posts from hashtag section
 .trend('', options) // Scrape posts from a trends section
 ```
 
 **Options**
-```
+```javascript
 let options = {
     // Number of posts to scrape: {int default: 20}
     number: 50,
