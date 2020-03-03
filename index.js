@@ -13,26 +13,24 @@ const INIT_OPTIONS = {
     progress: false,
 };
 
-const startScraper = options => {
-    return new Promise(async (resolve, reject) => {
-        if (!options.filetype) {
-            options.filetype = INIT_OPTIONS.filetype;
-        }
+const startScraper = async options => {
+    if (!options.filetype) {
+        options.filetype = INIT_OPTIONS.filetype;
+    }
 
-        if (!parseInt(options.number, 10)) {
-            options.number = INIT_OPTIONS.number;
-        }
+    if (!parseInt(options.number, 10)) {
+        options.number = INIT_OPTIONS.number;
+    }
 
-        if (!options.asyncDownload) {
-            options.asyncDownload = INIT_OPTIONS.asyncDownload;
-        }
+    if (!options.asyncDownload) {
+        options.asyncDownload = INIT_OPTIONS.asyncDownload;
+    }
 
-        try {
-            return resolve(await TikTokScraper(options).scrape());
-        } catch (error) {
-            return reject(error);
-        }
-    });
+    try {
+        return await TikTokScraper(options).scrape();
+    } catch (error) {
+        throw new Error(error);
+    }
 };
 
 exports.user = (id, options) => {
@@ -99,6 +97,25 @@ exports.music = (id, options) => {
     }
     options = Object.assign(INIT_OPTIONS, options);
     options.type = 'music';
+    options.input = id;
+    if (options.event) {
+        return TikTokScraper(options);
+    }
+    return new Promise(async (resolve, reject) => {
+        try {
+            return resolve(await startScraper(options));
+        } catch (error) {
+            return reject(error);
+        }
+    });
+};
+
+exports.trendingHashtag = (id, options) => {
+    if (typeof options !== 'object') {
+        throw new Error('Object is expected');
+    }
+    options = Object.assign(INIT_OPTIONS, options);
+    options.type = 'trending_hashtag';
     options.input = id;
     if (options.event) {
         return TikTokScraper(options);

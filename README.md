@@ -1,9 +1,8 @@
-
 # TikTok Scraper & Downloader
 
 Scrape and download useful information from TikTok.
 
-**No login or password are required.**
+## No login or password are required
 
 This is not an official API support and etc. This is just a scraper that is using TikTok Web API to scrape media.
 
@@ -23,7 +22,6 @@ This is not an official API support and etc. This is just a scraper that is usin
 *   [ ] **Rewrite everything in TypeScript**
 *   [ ] Add tests
 *   [ ] Web interface
-
 
 **Note:**
 *   **When scraping user profile information you can recieve a Rate Limit error, everything depends from the number of profiles that you scrape. It means that all user profile metrics will be 0 or false**
@@ -169,8 +167,8 @@ CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 
 **Example 6:**
 Download 20 latest video post from the user {USERNAME} and save the progress to avoid downloading the same videos in the future
-* **NOTE** Progress can only be saved if **download** flag is on
-* When executing same command next time scraper will only download newly posted videos
+*   **NOTE** Progress can only be saved if **download** flag is on
+*   When executing same command next time scraper will only download newly posted videos
 ```sh
 tiktok-scraper user USERNAME -n 20 -d -store
 
@@ -181,7 +179,7 @@ CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 ```
 
 **To make it look better, when downloading posts the progress will be shown in terminal**
-```
+```sh
 Downloading 6750670497744309509 [==============================] 100%
 Downloading 6749962264020782342 [==============================] 100%
 Downloading 6749433991113264390 [==============================] 100%
@@ -281,14 +279,15 @@ posts.on('error', (error) => {
 posts.scrape();
 ```
 
-**Functions**
+### Methods
 ```javascript
 .user(id, options) //Scrape posts from a specific user
 .hashtag(id, options) //Scrape posts from hashtag section
 .trend('', options) // Scrape posts from a trends section
+.music(id, options) // Scrape posts by music id
 ```
 
-**Options**
+### Options
 ```javascript
 let options = {
     // Number of posts to scrape: {int default: 20}
@@ -329,12 +328,11 @@ let options = {
 };
 ```
 
-***
 <a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-----
+***
 License
-----
+***
 
 **MIT**
 
