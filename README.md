@@ -222,79 +222,79 @@ const TikTokScraper = require('tiktok-scraper');
 // User feed by username
 (async () => {
     try {
-        let posts = await TikTokScraper.user({ USERNAME }, { number: 100 });
+        const posts = await TikTokScraper.user({ USERNAME }, { number: 100 });
         console.log(posts);
     } catch (error) {
         console.log(error);
     }
-})()(
-    // User feed by user id
-    // Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
-    async () => {
-        try {
-            let posts = await TikTokScraper.user({ USER_ID }, { number: 100, by_user_id: true });
-            console.log(posts);
-        } catch (error) {
-            console.log(error);
-        }
-    },
-)()(
-    // Trend
-    async () => {
-        try {
-            let posts = await TikTokScraper.trend('', { number: 100 });
-            console.log(posts);
-        } catch (error) {
-            console.log(error);
-        }
-    },
-)()(
-    // Trends with the user profile information: Followers, Following, Hearts, Digg, Videos and Verified or not
-    async () => {
-        try {
-            let posts = await TikTokScraper.trend('', { number: 100, user_data: true });
-            console.log(posts);
-        } catch (error) {
-            console.log(error);
-        }
-    },
-)()(
-    // Hashtag
-    async () => {
-        try {
-            let posts = await TikTokScraper.hashtag({ HASHTAG }, { number: 100 });
-            console.log(posts);
-        } catch (error) {
-            console.log(error);
-        }
-    },
-)()(
-    // Get single user profile information: Number of followers and etc
-    // Method is accepting an object with only 2 properties:
-    // input - USERNAME
-    // proxy - in case you need to use proxy
-    async () => {
-        try {
-            let user = await TikTokScraper.getUserProfileInfo({ input: 'USERNAME', proxy: '' });
-            console.log(user);
-        } catch (error) {
-            console.log(error);
-        }
-    },
-)()(
-    // Get single hashtag information: Number of views and etc
-    // Method is accepting an object with only 2 properties:
-    // input - HASHTAG NAME
-    // proxy - in case you need to use proxy
-    async () => {
-        try {
-            let hashtag = await TikTokScraper.getHashtagInfo({ input: 'HASHTAG', proxy: '' });
-            console.log(hashtag);
-        } catch (error) {
-            console.log(error);
-        }
-    },
-)();
+})();
+
+// User feed by user id
+// Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
+(async () => {
+    try {
+        const posts = await TikTokScraper.user({ USER_ID }, { number: 100, by_user_id: true });
+        console.log(posts);
+    } catch (error) {
+        console.log(error);
+    }
+})();
+
+// Trend
+(async () => {
+    try {
+        const posts = await TikTokScraper.trend('', { number: 100 });
+        console.log(posts);
+    } catch (error) {
+        console.log(error);
+    }
+})();
+
+// Trends with the user profile information: Followers, Following, Hearts, Digg, Videos and Verified or not
+(async () => {
+    try {
+        const posts = await TikTokScraper.trend('', { number: 100, user_data: true });
+        console.log(posts);
+    } catch (error) {
+        console.log(error);
+    }
+})();
+
+// Hashtag
+(async () => {
+    try {
+        const posts = await TikTokScraper.hashtag({ HASHTAG }, { number: 100 });
+        console.log(posts);
+    } catch (error) {
+        console.log(error);
+    }
+})();
+
+// Get single user profile information: Number of followers and etc
+// Method is accepting an object with only 2 properties:
+// input - USERNAME
+// proxy - in case you need to use proxy
+(async () => {
+    try {
+        const user = await TikTokScraper.getUserProfileInfo({ input: 'USERNAME', proxy: '' });
+        console.log(user);
+    } catch (error) {
+        console.log(error);
+    }
+})();
+
+// Get single hashtag information: Number of views and etc
+// Method is accepting an object with only 2 properties:
+// input - HASHTAG NAME
+// proxy - in case you need to use proxy
+(async () => {
+    try {
+        const hashtag = await TikTokScraper.getHashtagInfo({ input: 'HASHTAG', proxy: '' });
+        console.log(hashtag);
+    } catch (error) {
+        console.log(error);
+    }
+})();
 ```
 
 **Promise will return current result**
