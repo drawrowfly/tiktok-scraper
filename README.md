@@ -8,27 +8,33 @@ Scrape and download useful information from TikTok.
 
 This is not an official API support and etc. This is just a scraper that is using TikTok Web API to scrape media.
 
-***
+---
+
 <a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-***
+
+---
 
 ## Features
-*   Scrape video posts information from username, hashtag, trends, or music-id
-*   Scrape user profile information **Following, Followers, Heart, Video count, Digg and Verified or Not**
-*   Download and save media to a ZIP archive
-*   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and if only if download flag is on.
-*   Create JSON/CSV files with a post information
+
+-   Scrape video posts information from username, hashtag, trends, or music-id
+-   Scrape user profile information **Following, Followers, Heart, Video count, Digg and Verified or Not**
+-   Download and save media to a ZIP archive
+-   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and if only if download flag is on.
+-   Create JSON/CSV files with a post information
 
 ## To Do
-*   [x] CLI: save progress to avoid downloading same videos
-*   [ ] **Rewrite everything in TypeScript**
-*   [ ] Add tests
-*   [ ] Web interface
+
+-   [x] CLI: save progress to avoid downloading same videos
+-   [ ] **Rewrite everything in TypeScript**
+-   [ ] Add tests
+-   [ ] Web interface
 
 **Note:**
-*   **When scraping user profile information you can recieve a Rate Limit error, everything depends from the number of profiles that you scrape. It means that all user profile metrics will be 0 or false**
+
+-   **When scraping user profile information you can recieve a Rate Limit error, everything depends from the number of profiles that you scrape. It means that all user profile metrics will be 0 or false**
 
 **Posts - JSON/CSV output:**
+
 ```
     id: 'POST_ID',
     text: 'POST_DESCRIPTION',
@@ -51,20 +57,25 @@ This is not an official API support and etc. This is just a scraper that is usin
     playCount: 8310028,
     commentCount: 6885
 ```
+
 ![Demo](https://i.imgur.com/6gIbBzo.png)
 
 **Possible errors**
-*   Unknown. Report them if you will receive any
+
+-   Unknown. Report them if you will receive any
 
 ## Installation
+
 tiktok-scraper requires [Node.js](https://nodejs.org/) v10+ to run.
 
 **Install from NPM**
+
 ```sh
 npm i -g tiktok-scraper
 ```
 
 **Install from YARN**
+
 ```sh
 yarn global add tiktok-scraper
 ```
@@ -115,7 +126,8 @@ Examples:
 ```
 
 **Example 1:**
-Scrape 300 video posts from user {USERNAME}. Save post info in to a CSV file (by default) 
+Scrape 300 video posts from user {USERNAME}. Save post info in to a CSV file (by default)
+
 ```sh
 tiktok-scraper user USERNAME -n 300
 
@@ -125,6 +137,7 @@ CSV path: /{CURRENT_PATH}/user_1552945544582.csv
 
 **Example 2:**
 Scrape 100 posts from hashtag {HASHTAG_NAME}, download and save them to a ZIP archive. Save post info in to a JSON and CSV files (--filetype all)
+
 ```sh
 tiktok-scraper hashtag HASHTAG_NAME -n 100 -d -t all
 
@@ -136,6 +149,7 @@ CSV path: /{CURRENT_PATH}/hashtag_1552945659138.csv
 
 **Example 3:**
 Scrape 50 posts from trends section, download them to a ZIP and save info to a csv file
+
 ```sh
 tiktok-scraper trend -n 50 -d -t csv
 
@@ -158,6 +172,7 @@ CSV path: /{CURRENT_PATH}/music_1552945659138.csv
 
 **Example 5:**
 Scrape 50 posts from trends section **with user profile information**
+
 ```sh
 tiktok-scraper trend -n 50 -u
 
@@ -169,8 +184,10 @@ CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 
 **Example 6:**
 Download 20 latest video post from the user {USERNAME} and save the progress to avoid downloading the same videos in the future
-*   **NOTE** Progress can only be saved if **download** flag is on
-*   When executing same command next time scraper will only download newly posted videos
+
+-   **NOTE** Progress can only be saved if **download** flag is on
+-   When executing same command next time scraper will only download newly posted videos
+
 ```sh
 tiktok-scraper user USERNAME -n 20 -d -store
 
@@ -181,6 +198,7 @@ CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 ```
 
 **To make it look better, when downloading posts the progress will be shown in terminal**
+
 ```sh
 Downloading 6750670497744309509 [==============================] 100%
 Downloading 6749962264020782342 [==============================] 100%
@@ -197,104 +215,139 @@ Downloading 6748048372625689861 [==============================] 100%
 ## Module
 
 ### Promise
+
 ```javascript
 const TikTokScraper = require('tiktok-scraper');
 
 // User feed by username
 (async () => {
-    try{
-        let posts = await TikTokScraper.user({USERNAME},  { number: 100 });
-        console.log(posts)
-    } catch(error){
-        console.log(error)
+    try {
+        let posts = await TikTokScraper.user({ USERNAME }, { number: 100 });
+        console.log(posts);
+    } catch (error) {
+        console.log(error);
     }
-})()
-
-// User feed by user id
-// Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
-(async () => {
-    try{
-        let posts = await TikTokScraper.user({USER_ID}, { number: 100, by_user_id: true });
-        console.log(posts)
-    } catch(error){
-        console.log(error)
-    }
-})()
-
-// Trend
-(async () => {
-    try{
-        let posts = await TikTokScraper.trend("", { number: 100});
-        console.log(posts)
-    } catch(error){
-        console.log(error)
-    }
-})()
-
-// Trends with the user profile information: Followers, Following, Hearts, Digg, Videos and Verified or not
-(async () => {
-    try{
-        let posts = await TikTokScraper.trend("", { number: 100, user_data: true });
-        console.log(posts)
-    } catch(error){
-        console.log(error)
-    }
-})()
-
-// Hashtag
-(async () => {
-    try{
-        let posts = await TikTokScraper.hashtag({HASHTAG}, { number: 100 });
-        console.log(posts)
-    } catch(error){
-        console.log(error)
-    }
-})()
+})()(
+    // User feed by user id
+    // Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
+    async () => {
+        try {
+            let posts = await TikTokScraper.user({ USER_ID }, { number: 100, by_user_id: true });
+            console.log(posts);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+)()(
+    // Trend
+    async () => {
+        try {
+            let posts = await TikTokScraper.trend('', { number: 100 });
+            console.log(posts);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+)()(
+    // Trends with the user profile information: Followers, Following, Hearts, Digg, Videos and Verified or not
+    async () => {
+        try {
+            let posts = await TikTokScraper.trend('', { number: 100, user_data: true });
+            console.log(posts);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+)()(
+    // Hashtag
+    async () => {
+        try {
+            let posts = await TikTokScraper.hashtag({ HASHTAG }, { number: 100 });
+            console.log(posts);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+)()(
+    // Get single user profile information: Number of followers and etc
+    // Method is accepting an object with only 2 properties:
+    // input - USERNAME
+    // proxy - in case you need to use proxy
+    async () => {
+        try {
+            let user = await TikTokScraper.getUserProfileInfo({ input: 'USERNAME', proxy: '' });
+            console.log(user);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+)()(
+    // Get single hashtag information: Number of views and etc
+    // Method is accepting an object with only 2 properties:
+    // input - HASHTAG NAME
+    // proxy - in case you need to use proxy
+    async () => {
+        try {
+            let hashtag = await TikTokScraper.getHashtagInfo({ input: 'HASHTAG', proxy: '' });
+            console.log(hashtag);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+)();
 ```
+
 **Promise will return current result**
+
 ```javascript
 {
     collector:[ARRAY_OF_DATA]
     //If {filetype} and {download} options are enbabled then:
     zip: '/{CURRENT_PATH}/user_1552963581094.zip',
     json: '/{CURRENT_PATH}/user_1552963581094.json',
-    csv: '/{CURRENT_PATH}/user_1552963581094.csv' 
+    csv: '/{CURRENT_PATH}/user_1552963581094.csv'
 }
 ```
 
 ### Event
+
 ```javascript
 const TikTokScraper = require('tiktok-scraper');
 
-let posts = TikTokScraper.user({USERNAME}, { event: true, number: 30 });
+let posts = TikTokScraper.user({ USERNAME }, { event: true, number: 30 });
 
-posts.on('data', (json) => {
-  //data in JSON format
-})
+posts.on('data', json => {
+    //data in JSON format
+});
 
 posts.on('done', () => {
-  //completed
-})
-posts.on('error', (error) => {
-  //error message
-})
+    //completed
+});
+posts.on('error', error => {
+    //error message
+});
 posts.scrape();
 ```
 
 ### Methods
+
 ```javascript
 .user(id, options) //Scrape posts from a specific user
 .hashtag(id, options) //Scrape posts from hashtag section
 .trend('', options) // Scrape posts from a trends section
 .music(id, options) // Scrape posts by music id
+
+.getUserProfileInfo({ input: 'USERNAME', proxy: '' }) // Get user profile information
+.getHashtagInfo({ input: 'HASHTAG_NAME', proxy: '' }) // Get hashtag information
 ```
 
 ### Options
+
 ```javascript
 let options = {
     // Number of posts to scrape: {int default: 20}
     number: 50,
-    
+
     // Set proxy, example: 127.0.0.1:8080: {string default: ''}
     proxy: '',
 
@@ -303,10 +356,10 @@ let options = {
 
     // Timeout between requests. If 'rate limit' error received then this option can be useful: {int default: 0}
     timeout: 0,
-    
+
     // Set to {true} to search by user id: {boolean default: false}
     by_user_id: false,
-    
+
     // Download posts or not. If true ZIP archive in {filepath} will be created: {boolean default: false}
     download: false,
 
@@ -315,7 +368,7 @@ let options = {
 
     // File path where all files will be saved: {string default: 'CURRENT_DIR'}
     filepath: `CURRENT_DIR`,
-    
+
     // Scrape user profile information: {boolean default: false}
     // Is very usefull when scraping posts from a thrends
     // If you will make to many requests you can receive Rate Limit
@@ -332,9 +385,11 @@ let options = {
 
 <a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-***
+---
+
 License
-***
+
+---
 
 **MIT**
 

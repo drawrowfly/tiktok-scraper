@@ -1,5 +1,6 @@
 /* eslint-disable */
 const TikTokScraper = require('./lib/instance');
+const TikTokScraperStatic = require('./lib/index');
 
 const INIT_OPTIONS = {
     count: 0,
@@ -110,21 +111,6 @@ exports.music = (id, options) => {
     });
 };
 
-exports.trendingHashtag = (id, options) => {
-    if (typeof options !== 'object') {
-        throw new Error('Object is expected');
-    }
-    options = Object.assign(INIT_OPTIONS, options);
-    options.type = 'trending_hashtag';
-    options.input = id;
-    if (options.event) {
-        return TikTokScraper(options);
-    }
-    return new Promise(async (resolve, reject) => {
-        try {
-            return resolve(await startScraper(options));
-        } catch (error) {
-            return reject(error);
-        }
-    });
-};
+exports.getUserProfileInfo = input => TikTokScraperStatic.getUserProfileInfo(input);
+
+exports.getHashtagInfo = input => TikTokScraperStatic.getHashtagInfo(input);
