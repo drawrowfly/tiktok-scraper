@@ -295,6 +295,35 @@ const TikTokScraper = require('tiktok-scraper');
         console.log(error);
     }
 })();
+
+// Sign tiktok Web Api URL
+// Method is accepting an object with 4 properties:
+// url - full url
+// proxy - in case you need to use proxy
+// referer - set referer value in the headers
+// userAgent - set user-agent value in the headers
+(async () => {
+    try {
+        const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
+        const referer = 'https://google.com';
+        const signature = await TikTokScraper.signUrl({
+            url: 'https://www.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=1&shareUid=&lang=en',
+            referer,
+            userAgent,
+        });
+        const response = await rp({
+            uri: `https://www.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=1&shareUid=&lang=en&_signature=${signature}`,
+            headers: {
+                'user-agent': userAgent,
+                referer,
+            },
+            json: true,
+        });
+        console.log(response);
+    } catch (error) {
+        console.log(error);
+    }
+})();
 ```
 
 **Promise will return current result**
@@ -339,6 +368,7 @@ posts.scrape();
 
 .getUserProfileInfo({ input: 'USERNAME', proxy: '' }) // Get user profile information
 .getHashtagInfo({ input: 'HASHTAG_NAME', proxy: '' }) // Get hashtag information
+.signUrl({ url: 'tiktok request url', proxy: '', referer: 'set referer in the headers', userAgent: 'set user-agent in the headers' }) // Get signature for the request
 ```
 
 ### Options
