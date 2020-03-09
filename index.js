@@ -114,3 +114,5 @@ exports.music = (id, options) => {
 exports.getUserProfileInfo = input => TikTokScraperStatic.getUserProfileInfo(input);
 
 exports.getHashtagInfo = input => TikTokScraperStatic.getHashtagInfo(input);
+
+exports.signUrl = input => TikTokScraperStatic.signUrl(input);
