@@ -51,6 +51,7 @@ This is not an official API support and etc. This is just a scraper that is usin
     musicName: 'Why School Is Like This',
     musicAuthor: 'Comedy',
     musicOriginal: true,
+    imageUrl: 'IMAGE_URL',
     videoUrl: 'VIDEO_URL',
     diggCount: 728529,
     shareCount: 99053,
