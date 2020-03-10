@@ -26,6 +26,9 @@ This is not an official API support and etc. This is just a scraper that is usin
 
 -   [x] CLI: save progress to avoid downloading same videos
 -   [ ] **Rewrite everything in TypeScript**
+-   [ ] Improve proxy support
+-   [ ] Scrape users/hashtag
+-   [ ] Download video without the watermak
 -   [ ] Add tests
 -   [ ] Web interface
 
@@ -222,7 +225,7 @@ const TikTokScraper = require('tiktok-scraper');
 // User feed by username
 (async () => {
     try {
-        const posts = await TikTokScraper.user({ USERNAME }, { number: 100 });
+        const posts = await TikTokScraper.user('USERNAME', { number: 100 });
         console.log(posts);
     } catch (error) {
         console.log(error);
@@ -233,7 +236,7 @@ const TikTokScraper = require('tiktok-scraper');
 // Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
 (async () => {
     try {
-        const posts = await TikTokScraper.user({ USER_ID }, { number: 100, by_user_id: true });
+        const posts = await TikTokScraper.user(`USER_ID`, { number: 100, by_user_id: true });
         console.log(posts);
     } catch (error) {
         console.log(error);
@@ -263,7 +266,7 @@ const TikTokScraper = require('tiktok-scraper');
 // Hashtag
 (async () => {
     try {
-        const posts = await TikTokScraper.hashtag({ HASHTAG }, { number: 100 });
+        const posts = await TikTokScraper.hashtag('HASHTAG', { number: 100 });
         console.log(posts);
     } catch (error) {
         console.log(error);
