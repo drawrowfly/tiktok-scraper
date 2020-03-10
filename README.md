@@ -39,27 +39,35 @@ This is not an official API support and etc. This is just a scraper that is usin
 **Posts - JSON/CSV output:**
 
 ```
-    id: 'POST_ID',
-    text: 'POST_DESCRIPTION',
-    createTime: '1577735724',
+    id: 'VIDEO_ID',
+    text: 'CAPTION',
+    createTime: '1583870600',
     authorId: 'AUTHOR_ID',
-    authorName: 'USERNAME',
-    authorFollowing: 615,
-    authorFans: 63179,
-    authorHeart: 744827,
-    authorVideo: 12,
-    authorDigg: 6718,
-    authorVerified: false,
+    authorName: 'AUTHOR_USERNAME',
+    authorFollowing: 208,
+    authorFans: 2273771,
+    authorHeart: 79791624,
+    authorVideo: 1149,
+    authorDigg: 8922,
+    authorVerified: true,
+    authorPrivate: false,
+    authorSignature: 'AUTHOR_DESCRIPTION(BIO)',
     musicId: 'MUSIC_ID',
-    musicName: 'Why School Is Like This',
-    musicAuthor: 'Comedy',
-    musicOriginal: true,
-    imageUrl: 'IMAGE_URL',
-    videoUrl: 'VIDEO_URL',
-    diggCount: 728529,
-    shareCount: 99053,
-    playCount: 8310028,
-    commentCount: 6885
+    musicName: 'AUTHOR_NICK',
+    musicAuthor: 'AUTHOR_NAME',
+    musicOriginal: '',
+    imageUrl:'IMAGE_URL',
+    videoUrl:'VIDEO_URL',
+    diggCount: 2104,
+    shareCount: 1,
+    playCount: 9007,
+    commentCount: 50,
+    hashtags:
+    [{ id: '69573911',
+       name: 'PlayWithLife',
+       title: 'HASHTAG_TITLE',
+       cover: [Array]
+    }...]
 ```
 
 ![Demo](https://i.imgur.com/6gIbBzo.png)
