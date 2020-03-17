@@ -27,11 +27,7 @@ const startScraper = async options => {
         options.asyncDownload = INIT_OPTIONS.asyncDownload;
     }
 
-    try {
-        return await TikTokScraper(options).scrape();
-    } catch (error) {
-        throw new Error(error);
-    }
+    return await TikTokScraper(options).scrape();
 };
 
 exports.user = (id, options) => {
@@ -111,8 +107,8 @@ exports.music = (id, options) => {
     });
 };
 
-exports.getUserProfileInfo = input => TikTokScraperStatic.getUserProfileInfo(input);
+exports.getHashtagInfo = input => new TikTokScraperStatic(input).getHashtagInfo();
 
-exports.getHashtagInfo = input => TikTokScraperStatic.getHashtagInfo(input);
+exports.getUserProfileInfo = input => new TikTokScraperStatic(input).getUserProfileInfo();
 
-exports.signUrl = input => TikTokScraperStatic.signUrl(input);
+exports.signUrl = input => new TikTokScraperStatic(input).signUrl();
