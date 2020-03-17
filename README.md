@@ -26,7 +26,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 
 -   [x] CLI: save progress to avoid downloading same videos
 -   [ ] **Rewrite everything in TypeScript**
--   [ ] Improve proxy support
+-   [x] Improve proxy support
 -   [ ] Scrape users/hashtag
 -   [ ] Download video without the watermak
 -   [ ] Add tests
@@ -283,7 +283,6 @@ const TikTokScraper = require('tiktok-scraper');
 })();
 
 // Get single user profile information: Number of followers and etc
-// Method is accepting an object with only 2 properties:
 // input - USERNAME
 // proxy - in case you need to use proxy
 (async () => {
@@ -296,7 +295,6 @@ const TikTokScraper = require('tiktok-scraper');
 })();
 
 // Get single hashtag information: Number of views and etc
-// Method is accepting an object with only 2 properties:
 // input - HASHTAG NAME
 // proxy - in case you need to use proxy
 (async () => {
@@ -309,29 +307,24 @@ const TikTokScraper = require('tiktok-scraper');
 })();
 
 // Sign tiktok Web Api URL
-// Method is accepting an object with 4 properties:
 // url - full url
 // proxy - in case you need to use proxy
-// referer - set referer value in the headers
-// userAgent - set user-agent value in the headers
+const rp = require('request-promise');
+
 (async () => {
     try {
         const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
-        const referer = 'https://google.com';
-        const signature = await TikTokScraper.signUrl({
-            url: 'https://www.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=1&shareUid=&lang=en',
-            referer,
-            userAgent,
-        });
-        const response = await rp({
-            uri: `https://www.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=1&shareUid=&lang=en&_signature=${signature}`,
+        const url = 'https://m.tiktok.com/share/item/list?secUid=&id=355503&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&lang=';
+
+        const signature = await TikTokScraper.signUrl({ userAgent, url });
+
+        const result = await rp({
+            uri: `${url}&_signature=${signature}`,
             headers: {
                 'user-agent': userAgent,
-                referer,
             },
-            json: true,
         });
-        console.log(response);
+        console.log(result);
     } catch (error) {
         console.log(error);
     }
@@ -390,7 +383,9 @@ let options = {
     // Number of posts to scrape: {int default: 20}
     number: 50,
 
-    // Set proxy, example: 127.0.0.1:8080: {string default: ''}
+    // Set proxy {string default: ''}
+    // http proxy: 127.0.0.1:8080
+    // socks proxy: socks5://127.0.0.1:8080
     proxy: '',
 
     // Enable or Disable event emitter. If true then you can accept data through events: {boolean default: false}
