@@ -1,7 +1,9 @@
-/* eslint-disable */
-const ProgressBar = require('progress');
+/* eslint-disable no-shadow */
+/* eslint-disable no-param-reassign */
+// @ts-nocheck
+import ProgressBar from 'progress';
 
-class Multibar {
+export class MultipleBar {
     constructor() {
         this.stream = process.stderr;
         this.cursor = 1;
@@ -18,18 +20,18 @@ class Multibar {
         // alloc line
         this.move(index);
         this.stream.write('\n');
-        this.cursor++;
+        this.cursor += 1;
 
         // replace original
         const self = this;
         bar.otick = bar.tick;
         bar.oterminate = bar.terminate;
-        bar.tick = function(value, options) {
+        bar.tick = (value, options) => {
             self.tick(index, value, options);
         };
-        bar.terminate = function() {
-            self.terminates++;
-            if (self.terminates == self.bars.length) {
+        bar.terminate = () => {
+            self.terminates += 1;
+            if (self.terminates === self.bars.length) {
                 self.terminate();
             }
         };
@@ -58,5 +60,3 @@ class Multibar {
         }
     }
 }
-
-module.exports = Multibar;

@@ -1,8 +1,11 @@
 node_modules/
+coverage/
+src/
+reverse_eng/
+
 .DS_Store
 test.js
 .prettierrc.js
 *.csv
 *.zip
-reverse_eng/
 .eslintrc.js

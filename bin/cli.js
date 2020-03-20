@@ -4,17 +4,17 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 
-const TikTokScraper = require('../lib/instance');
-const CONST = require('../lib/constant');
+const TikTokScraper = require('../build');
+const CONST = require('../build/constant');
 
 const startScraper = async argv => {
     try {
         argv.type = argv._[0];
         argv.cli = true;
         argv.input = argv.id;
-        argv.user_data = argv.userdata;
         argv.store_history = argv.store;
-        const scraper = await TikTokScraper(argv).scrape();
+
+        const scraper = await TikTokScraper[argv.type](argv.input, argv);
 
         if (scraper.zip) {
             console.log(`ZIP path: ${scraper.zip}`);
@@ -62,21 +62,11 @@ require('yargs')
             default: '',
             describe: 'Set proxy',
         },
-        timeout: {
-            default: 0,
-            describe: "If you will receive 'rate limit' error , you can try to set timeout. Timeout is in mls: 1000 mls = 1 second",
-        },
         download: {
             alias: 'd',
             boolean: true,
             default: false,
             describe: 'Download and archive all scraped videos to a ZIP file',
-        },
-        userdata: {
-            alias: 'u',
-            boolean: true,
-            default: false,
-            describe: 'Scrape user profile information Followers, Followings and etc',
         },
         filepath: {
             default: process.cwd(),

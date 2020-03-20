@@ -1,51 +1,82 @@
 {
-  "name": "tiktok-scraper",
-  "version": "1.0.14",
-  "description": "TikTok Scraper & Downloader. Scrape information from User, Trending and HashTag pages and download video posts",
-  "main": "index.js",
-  "bin": {
-    "tiktok-scraper": "bin/cli.js"
-  },
-  "directories": {
-    "lib": "lib"
-  },
-  "dependencies": {
-    "archiver": "^3.1.1",
-    "async": "^3.1.0",
-    "bluebird": "^3.7.1",
-    "jsdom": "^16.0.1",
-    "json2csv": "^4.5.4",
-    "ora": "^4.0.2",
-    "progress": "^2.0.3",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.4",
-    "socks-proxy-agent": "^5.0.0",
-    "yargs": "^14.2.0"
-  },
-  "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-prettier": "^3.1.2",
-    "prettier": "^1.19.1"
-  },
-  "scripts": {
-    "format": "prettier --config ./.prettierrc.js --write './lib/**/*.js'",
-    "lint": "eslint ./lib"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/drawrowfly/tiktok-scraper.git"
-  },
-  "keywords": [
-    "TikTok",
-    "Scraper"
-  ],
-  "author": "drawflyrow",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/drawrowfly/tiktok-scraper/issues"
-  },
-  "homepage": "https://github.com/drawrowfly/tiktok-scraper#readme"
+    "name": "tiktok-scraper",
+    "version": "1.0.14",
+    "description": "TikTok Scraper & Downloader. Scrape information from User, Trending and HashTag pages and download video posts",
+    "main": "./build/index.js",
+    "types": "./build/index.d.ts",
+    "bin": {
+        "tiktok-scraper": "bin/cli.js"
+    },
+    "files": [
+        "build"
+    ],
+    "dependencies": {
+        "archiver": "^3.1.1",
+        "async": "^3.1.0",
+        "bluebird": "^3.7.1",
+        "jsdom": "^16.0.1",
+        "json2csv": "^4.5.4",
+        "ora": "^4.0.2",
+        "progress": "^2.0.3",
+        "request": "^2.88.0",
+        "request-promise": "^4.2.4",
+        "socks-proxy-agent": "^5.0.0",
+        "yargs": "^14.2.0"
+    },
+    "devDependencies": {
+        "@types/archiver": "^3.1.0",
+        "@types/bluebird": "^3.5.30",
+        "@types/jest": "^25.1.4",
+        "@types/json2csv": "^4.5.1",
+        "@types/ora": "^3.2.0",
+        "@types/progress": "^2.0.3",
+        "@types/request": "^2.48.4",
+        "@types/request-promise": "^4.1.45",
+        "@typescript-eslint/eslint-plugin": "^2.24.0",
+        "@typescript-eslint/parser": "^2.24.0",
+        "eslint": "^6.8.0",
+        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-config-prettier": "^6.10.0",
+        "eslint-plugin-import": "^2.20.1",
+        "eslint-plugin-prettier": "^3.1.2",
+        "jest": "^25.1.0",
+        "prettier": "^1.19.1",
+        "ts-jest": "^25.2.1",
+        "typescript": "^3.8.3"
+    },
+    "scripts": {
+        "build": "rimraf build && tsc && prettier --config ./.prettierrc.js --write './build/**/*.js'",
+        "format": "prettier --config ./.prettierrc.js --write './src/**/*.ts'",
+        "lint": "eslint ./src/**/*.ts",
+        "test": "jest --coverage --verbose"
+    },
+    "jest": {
+        "verbose": true,
+        "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+        },
+        "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "json",
+            "node"
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/drawrowfly/tiktok-scraper.git"
+    },
+    "keywords": [
+        "TikTok",
+        "Scraper"
+    ],
+    "author": "drawflyrow",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/drawrowfly/tiktok-scraper/issues"
+    },
+    "homepage": "https://github.com/drawrowfly/tiktok-scraper#readme"
 }
