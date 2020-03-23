@@ -28,7 +28,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] CLI: save progress to avoid downloading same videos
 -   [x] **Rewrite everything in TypeScript**
 -   [x] Improve proxy support
--   [ ] Add tests
+-   [x] Add tests
 -   [ ] Scrape users/hashtag
 -   [ ] Download video without the watermark
 -   [ ] Web interface

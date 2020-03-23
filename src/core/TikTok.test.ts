@@ -136,7 +136,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
         expect(instance.input).toContain('summer');
     });
 
-    it('getHashTagId should return valid Object', async () => {
+    it('getHashTagId should return a valid Object', async () => {
         const hashtag = await instance.getHashTagId();
         expect(hashtag).toEqual({ id: '4100', secUid: '', type: 3, count: 48, minCursor: 0, lang: '' });
     });
@@ -162,7 +162,7 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
             number: 5,
         });
     });
-    it('signUrl should return valid signature', async () => {
+    it('signUrl should return a valid signature', async () => {
         const signature = await instance.signUrl();
         expect(signature).toEqual('TYYDvAAgEBosHbdFdlDDM02GA6AABQA');
     });
@@ -189,7 +189,7 @@ describe('TikTok Scraper MODULE(promise): getHashtagInfo', () => {
             number: 5,
         });
     });
-    it('getHashtagInfo should return a valid object', async () => {
+    it('getHashtagInfo should return a valid Object', async () => {
         const hashtag = await instance.getHashtagInfo();
         expect(hashtag).toEqual({
             challengeId: '4100',
@@ -231,7 +231,7 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
             number: 5,
         });
     });
-    it('getUserProfileInfo should return a valid object', async () => {
+    it('getUserProfileInfo should return a valid Object', async () => {
         const user = await instance.getUserProfileInfo();
         expect(user).toEqual({
             secUid: 'MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s',
@@ -259,5 +259,46 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
     it(`Throw error if username doesn't exist`, () => {
         instance.input = 'na';
         expect(instance.getUserProfileInfo()).rejects.toEqual(`Can't find user: na`);
+    });
+});
+
+describe('TikTok Scraper CLI: user(save progress)', () => {
+    let instance;
+    let posts;
+    beforeAll(async () => {
+        jest.spyOn(fs, 'writeFile').mockImplementation((file, option, cb) => cb(null));
+        jest.spyOn(fs, 'readFile').mockImplementation((file, cb) => cb(null, Buffer.from('0')));
+
+        instance = new TikTokScraper({
+            download: true,
+            cli: true,
+            store_history: true,
+            test: true,
+            asyncDownload: 5,
+            filetype: '',
+            filepath: '',
+            input: 'tiktok',
+            type: 'user',
+            userAgent: 'http',
+            proxy: '',
+            number: 5,
+        });
+        posts = await instance.scrape();
+    });
+
+    afterAll(() => {
+        jest.restoreAllMocks();
+    });
+
+    it('fs.readFile should be called once', async () => {
+        expect(fs.readFile).toHaveBeenCalledTimes(1);
+    });
+
+    it('fs.writeFile should be called once', async () => {
+        expect(fs.writeFile).toHaveBeenCalledTimes(1);
+    });
+
+    it('result should contain a valid file name for the Zip file', async () => {
+        expect(posts.zip).toMatch(/^(\w+)_([0-9]{13}).zip$/);
     });
 });

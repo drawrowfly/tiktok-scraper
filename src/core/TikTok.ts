@@ -68,6 +68,8 @@ export class TikTokScraper extends EventEmitter {
 
     private storeValue: string = '';
 
+    private test: boolean = false;
+
     constructor({
         download,
         filepath,
@@ -109,6 +111,7 @@ export class TikTokScraper extends EventEmitter {
         this.tmpFolder = tmpdir();
         this.fileName = `${this.scrapeType}_${this.date}`;
         this.idStore = '';
+        this.test = test;
         this.Downloader = new Downloader({
             progress,
             proxy,
@@ -335,7 +338,7 @@ export class TikTokScraper extends EventEmitter {
             if (this.cli) {
                 this.spinner.stop();
             }
-            if (this.collector.length) {
+            if (this.collector.length && !this.test) {
                 await this.Downloader.zipIt({
                     collector: this.collector,
                     filepath: this.filepath,
