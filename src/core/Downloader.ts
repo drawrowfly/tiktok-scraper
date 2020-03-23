@@ -20,9 +20,12 @@ export class Downloader {
 
     public agent: Agent | string;
 
-    constructor({ progress, proxy }: DownloaderConstructor) {
+    public test: boolean;
+
+    constructor({ progress, proxy, test }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
+        this.test = test;
         this.mbars = new MultipleBar();
         this.agent = proxy && proxy.indexOf('socks') > -1 ? new SocksProxyAgent(proxy) : '';
         this.proxy = proxy && proxy.indexOf('socks') === -1 ? proxy : '';
@@ -62,13 +65,13 @@ export class Downloader {
             }
             r.get(item.videoUrl)
                 .on('response', response => {
-                    if (this.progress) {
+                    if (this.progress && !this.test) {
                         barIndex = this.addBar(parseInt(response.headers['content-length'] as string, 10));
                     }
                 })
                 .on('data', chunk => {
                     buffer = Buffer.concat([buffer, chunk as Buffer]);
-                    if (this.progress) {
+                    if (this.progress && !this.test) {
                         barIndex.tick(chunk.length, { id: item.id });
                     }
                 })

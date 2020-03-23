@@ -3,6 +3,7 @@ import { PostCollector } from '.';
 export interface DownloaderConstructor {
     progress: boolean;
     proxy: string;
+    test: boolean;
 }
 
 export interface ZipValues {

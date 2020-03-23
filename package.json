@@ -34,6 +34,7 @@
         "@types/request-promise": "^4.1.45",
         "@typescript-eslint/eslint-plugin": "^2.24.0",
         "@typescript-eslint/parser": "^2.24.0",
+        "canvas": "^2.6.1",
         "eslint": "^6.8.0",
         "eslint-config-airbnb-base": "^14.0.0",
         "eslint-config-prettier": "^6.10.0",
@@ -42,10 +43,11 @@
         "jest": "^25.1.0",
         "prettier": "^1.19.1",
         "ts-jest": "^25.2.1",
+        "ts-node": "^8.8.1",
         "typescript": "^3.8.3"
     },
     "scripts": {
-        "build": "rimraf build && tsc && prettier --config ./.prettierrc.js --write './build/**/*.js'",
+        "build": "rimraf build && tsc",
         "format": "prettier --config ./.prettierrc.js --write './src/**/*.ts'",
         "lint": "eslint ./src/**/*.ts",
         "test": "jest --coverage --verbose"
@@ -73,7 +75,7 @@
         "TikTok",
         "Scraper"
     ],
-    "author": "drawflyrow",
+    "author": "Andrew Nord <andrew.nord.flow@gmail.com>",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/drawrowfly/tiktok-scraper/issues"

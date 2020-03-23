@@ -1,6 +1,5 @@
-/* eslint-disable no-shadow */
-/* eslint-disable no-param-reassign */
 // @ts-nocheck
+/* eslint-disable */
 import ProgressBar from 'progress';
 
 export class MultipleBar {

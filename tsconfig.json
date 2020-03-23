@@ -13,9 +13,9 @@
         "declaration": true,
         "noUnusedLocals": true,
         "outDir": "./build",
-        "baseUrl": ".",
+        "baseUrl": "src",
         "strict": true
     },
     "include": ["src/**/*.*"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "src/**/*.test.ts", "**/__mocks__/*", "**/__mockData__/"]
 }

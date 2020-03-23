@@ -10,15 +10,15 @@ import { EventEmitter } from 'events';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 
 import CONST from '../constant';
+
 import { generateSignature } from '../helpers';
+
 import { PostCollector, ScrapeType, TikTokConstructor, Result, ItemListData, ApiResponse, Challenge, UserData, RequestQuery, Item } from '../types';
 
-import { Downloader } from '.';
+import { Downloader } from '../core';
 
 export class TikTokScraper extends EventEmitter {
     private mainHost: string;
-
-    private mHost: string;
 
     private userAgent: string;
 
@@ -83,11 +83,12 @@ export class TikTokScraper extends EventEmitter {
         by_user_id = false,
         store_history = false,
         userAgent,
+        test = false,
     }: TikTokConstructor) {
         super();
-        this.mainHost = 'https://www.tiktok.com/';
-        this.mHost = 'https://m.tiktok.com/';
-        this.userAgent = userAgent;
+        this.mainHost = 'https://m.tiktok.com/';
+        this.userAgent =
+            userAgent || 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
         this.download = download;
         this.filepath = '' || filepath;
         this.json2csvParser = new Parser();
@@ -111,6 +112,7 @@ export class TikTokScraper extends EventEmitter {
         this.Downloader = new Downloader({
             progress,
             proxy,
+            test,
         });
     }
 
@@ -460,8 +462,9 @@ export class TikTokScraper extends EventEmitter {
     private async scrapeData(qs: RequestQuery, maxCursor: string): Promise<ItemListData> {
         const shareUid = qs.type === 4 || qs.type === 5 ? '&shareUid=' : '';
         const signature = generateSignature(
-            `${this.mHost}share/item/list?secUid=${qs.secUid}&id=${qs.id}&type=${qs.type}&count=${qs.count}&minCursor=${qs.minCursor}&maxCursor=${maxCursor ||
-                0}${shareUid}&lang=${qs.lang}`,
+            `${this.mainHost}share/item/list?secUid=${qs.secUid}&id=${qs.id}&type=${qs.type}&count=${qs.count}&minCursor=${
+                qs.minCursor
+            }&maxCursor=${maxCursor || 0}${shareUid}&lang=${qs.lang}`,
             this.userAgent,
             this.tacValue,
         );
@@ -469,7 +472,7 @@ export class TikTokScraper extends EventEmitter {
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id;
 
         const query = {
-            uri: `${this.mHost}share/item/list`,
+            uri: `${this.mainHost}share/item/list`,
             method: 'GET',
             qs: {
                 ...qs,
@@ -561,7 +564,7 @@ export class TikTokScraper extends EventEmitter {
             throw `Username is missing`;
         }
         const query = {
-            uri: `https://www.tiktok.com/node/share/user/@${this.input}`,
+            uri: `${this.mainHost}node/share/user/@${this.input}`,
             method: 'GET',
             json: true,
         };
@@ -585,7 +588,7 @@ export class TikTokScraper extends EventEmitter {
             throw `Hashtag is missing`;
         }
         const query = {
-            uri: `https://www.tiktok.com/node/share/tag/${this.input}`,
+            uri: `${this.mainHost}node/share/tag/${this.input}`,
             method: 'GET',
             json: true,
         };

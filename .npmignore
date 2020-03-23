@@ -4,8 +4,9 @@ src/
 reverse_eng/
 
 .DS_Store
-test.js
 .prettierrc.js
 *.csv
 *.zip
 .eslintrc.js
+ex.js
+ex.ts

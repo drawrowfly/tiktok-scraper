@@ -35,9 +35,9 @@ export interface TikTokConstructor {
     number: number;
     type: ScrapeType;
     by_user_id?: boolean;
-    user_data?: boolean;
     store_history?: boolean;
     userAgent: string;
+    test?: boolean;
 }
 
 export interface Hashtags {

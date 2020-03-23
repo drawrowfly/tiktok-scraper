@@ -4,6 +4,7 @@ build/
 coverage/
 
 .DS_Store
-test.js
 *.csv
 *.zip
+ex.js
+ex.ts
