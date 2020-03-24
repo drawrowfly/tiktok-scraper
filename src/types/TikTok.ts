@@ -21,6 +21,7 @@ export interface Options {
     progress?: boolean;
     number?: number;
     userAgent?: string;
+    noWaterMark?: boolean;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -38,6 +39,7 @@ export interface TikTokConstructor {
     store_history?: boolean;
     userAgent: string;
     test?: boolean;
+    noWaterMark?: boolean;
 }
 
 export interface Hashtags {
@@ -67,6 +69,7 @@ export interface PostCollector {
     musicOriginal: boolean;
     imageUrl: string;
     videoUrl: string;
+    videoUrlNoWaterMark: string;
     diggCount: number;
     shareCount: number;
     playCount: number;

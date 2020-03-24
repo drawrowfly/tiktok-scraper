@@ -29,8 +29,8 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] **Rewrite everything in TypeScript**
 -   [x] Improve proxy support
 -   [x] Add tests
+-   [x] Download video without the watermark
 -   [ ] Scrape users/hashtag
--   [ ] Download video without the watermark
 -   [ ] Web interface
 
 ## Contribution
@@ -68,6 +68,7 @@ yarn build
     musicOriginal: '',
     imageUrl:'IMAGE_URL',
     videoUrl:'VIDEO_URL',
+    videoUrlNoWaterMark:'VIDEO_URL_WITHOUT_THE_WATERMARK',
     diggCount: 2104,
     shareCount: 1,
     playCount: 9007,
@@ -123,11 +124,10 @@ Options:
   --number, -n            Number of posts to scrape. If you will set 0 then all
                           posts will be scraped                    [default: 20]
   --proxy, -p             Set proxy                                [default: ""]
-                                                                    [default: 0]
   --download, -d          Download and archive all scraped videos to a ZIP file
                                                       [boolean] [default: false]
   --filepath              Directory to save all output files.
-                [default: "/Users/jackass/Documents/lang/NodeJs/tiktok-scraper"]
+      [default: "/Users/karl.wint/Documents/projects/javascript/tiktok-scraper"]
   --filetype, --type, -t  Type of output file where post information will be
                           saved. 'all' - save information about all posts to a
                           'json' and 'csv'
@@ -135,6 +135,8 @@ Options:
   --store, -s             Scraper will save the progress in the OS TMP folder
                           and in the future usage will only download new videos
                           avoiding duplicates         [boolean] [default: false]
+  --noWaterMark, -w       Download video without the watermark. This option will
+                          affect the execution speed  [boolean] [default: false]
 
 Examples:
   tiktok-scraper user USERNAME -d -n 100
@@ -196,6 +198,18 @@ Download 20 latest video post from the user {USERNAME} and save the progress to 
 
 ```sh
 tiktok-scraper user USERNAME -n 20 -d -store
+
+
+Output:
+ZIP path: /{CURRENT_PATH}/trend_1552945659138.zip
+CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
+```
+
+**Example 6:**
+Download 20 latest video post without the watermark from the trending feed
+
+```sh
+tiktok-scraper user USERNAME -n 20 -d -w
 
 
 Output:
@@ -390,9 +404,6 @@ let options = {
     // Set to {true} to search by user id: {boolean default: false}
     by_user_id: false,
 
-    // Download posts or not. If true ZIP archive in {filepath} will be created: {boolean default: false}
-    download: false,
-
     // How many post should be downloaded asynchronously. Only if {download:true}: {int default: 5}
     asyncDownload: 5,
 
@@ -409,6 +420,11 @@ let options = {
     // Custom User-Agent
     // {string default: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36' }
     userAgent: '',
+
+    // Download video without the watermark: {boolean default: false}
+    // Set to true to download without the watermark
+    // This option will affect the execution speed
+    noWaterMark: false,
 };
 ```
 

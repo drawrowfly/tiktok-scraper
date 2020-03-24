@@ -8,6 +8,7 @@ import ora, { Ora } from 'ora';
 import { fromCallback } from 'bluebird';
 import { EventEmitter } from 'events';
 import { SocksProxyAgent } from 'socks-proxy-agent';
+import { forEachLimit } from 'async';
 
 import CONST from '../constant';
 
@@ -70,6 +71,8 @@ export class TikTokScraper extends EventEmitter {
 
     private test: boolean = false;
 
+    private noWaterMark: boolean;
+
     constructor({
         download,
         filepath,
@@ -86,11 +89,11 @@ export class TikTokScraper extends EventEmitter {
         store_history = false,
         userAgent,
         test = false,
+        noWaterMark = false,
     }: TikTokConstructor) {
         super();
-        this.mainHost = 'https://www.tiktok.com/';
-        this.userAgent =
-            userAgent || 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
+        this.mainHost = 'https://m.tiktok.com/';
+        this.userAgent = userAgent || CONST.userAgent;
         this.download = download;
         this.filepath = '' || filepath;
         this.json2csvParser = new Parser();
@@ -112,10 +115,13 @@ export class TikTokScraper extends EventEmitter {
         this.fileName = `${this.scrapeType}_${this.date}`;
         this.idStore = '';
         this.test = test;
+        this.noWaterMark = noWaterMark;
         this.Downloader = new Downloader({
             progress,
             proxy,
             test,
+            noWaterMark,
+            userAgent,
         });
     }
 
@@ -163,7 +169,7 @@ export class TikTokScraper extends EventEmitter {
      * Extract new Tac value
      * @param {*} uri
      */
-    private async extractTac(uri = 'https://www.tiktok.com/trending') {
+    private async extractTac(uri = 'https://www.tiktok.com/discover') {
         const query = {
             uri,
             method: 'GET',
@@ -217,6 +223,10 @@ export class TikTokScraper extends EventEmitter {
                 await this.storeDownlodProgress();
             }
 
+            if (this.noWaterMark) {
+                await this.withoutWatermark();
+            }
+
             const [json, csv, zip] = await this.saveCollectorData();
 
             return {
@@ -227,6 +237,38 @@ export class TikTokScraper extends EventEmitter {
                 ...(this.filetype === 'csv' ? { csv } : {}),
             };
         }
+    }
+
+    /**
+     * Extract uniq video id and create the url to the video without the watermark
+     */
+    private withoutWatermark() {
+        return new Promise(resolve => {
+            forEachLimit(
+                this.collector,
+                5,
+                (item: PostCollector, cb) => {
+                    rp({
+                        uri: item.videoUrl,
+                    })
+                        .then(result => {
+                            const position = Buffer.from(result).indexOf('vid:', 0);
+                            const id = Buffer.from(result)
+                                .slice(position + 4, position + 36)
+                                .toString();
+                            // eslint-disable-next-line no-param-reassign
+                            item.videoUrlNoWaterMark = `https://api2.musical.ly/aweme/v1/playwm/?video_id=${id}`;
+                            cb(null);
+                        })
+                        .catch(() => {
+                            cb('Error');
+                        });
+                },
+                () => {
+                    resolve();
+                },
+            );
+        });
     }
 
     /**
@@ -333,7 +375,7 @@ export class TikTokScraper extends EventEmitter {
     /**
      * Store collector data in the CSV and/or JSON files
      */
-    private async saveCollectorData() {
+    private async saveCollectorData(): Promise<string[]> {
         if (this.download) {
             if (this.cli) {
                 this.spinner.stop();
@@ -441,6 +483,7 @@ export class TikTokScraper extends EventEmitter {
                 musicOriginal: posts[i].musicInfos.original,
                 imageUrl: posts[i].itemInfos.coversOrigin[0],
                 videoUrl: posts[i].itemInfos.video.urls[0],
+                videoUrlNoWaterMark: '',
                 diggCount: posts[i].itemInfos.diggCount,
                 shareCount: posts[i].itemInfos.shareCount,
                 playCount: posts[i].itemInfos.playCount,

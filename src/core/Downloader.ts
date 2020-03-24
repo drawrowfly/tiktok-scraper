@@ -22,10 +22,16 @@ export class Downloader {
 
     public test: boolean;
 
-    constructor({ progress, proxy, test }: DownloaderConstructor) {
+    public noWaterMark: boolean;
+
+    public userAgent: string;
+
+    constructor({ progress, proxy, test, noWaterMark, userAgent }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
         this.test = test;
+        this.noWaterMark = noWaterMark;
+        this.userAgent = userAgent;
         this.mbars = new MultipleBar();
         this.agent = proxy && proxy.indexOf('socks') > -1 ? new SocksProxyAgent(proxy) : '';
         this.proxy = proxy && proxy.indexOf('socks') === -1 ? proxy : '';
@@ -63,7 +69,12 @@ export class Downloader {
             if (this.agent) {
                 r = request.defaults({ agent: this.agent as Agent });
             }
-            r.get(item.videoUrl)
+            r.get({
+                url: this.noWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
+                headers: {
+                    'user-agent': this.userAgent,
+                },
+            })
                 .on('response', response => {
                     if (this.progress && !this.test) {
                         barIndex = this.addBar(parseInt(response.headers['content-length'] as string, 10));
