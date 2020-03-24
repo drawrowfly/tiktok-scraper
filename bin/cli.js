@@ -84,6 +84,12 @@ require('yargs')
             default: false,
             describe: 'Scraper will save the progress in the OS TMP folder and in the future usage will only download new videos avoiding duplicates',
         },
+        noWaterMark: {
+            alias: ['w'],
+            boolean: true,
+            default: false,
+            describe: 'Download video without the watermark. This option will affect the execution speed',
+        },
     })
     .check(argv => {
         if (CONST.scrape.indexOf(argv._[0]) === -1) {

@@ -4,6 +4,8 @@ export interface DownloaderConstructor {
     progress: boolean;
     proxy: string;
     test: boolean;
+    noWaterMark: boolean;
+    userAgent: string;
 }
 
 export interface ZipValues {

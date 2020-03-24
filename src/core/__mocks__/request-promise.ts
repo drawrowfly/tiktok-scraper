@@ -21,6 +21,10 @@ const request = options => {
         }
         case uri === 'https://www.tiktok.com/share/item/list':
             return { body: response.list() };
+        case /^https:\/\/v([0-9]){2}.muscdn.com.+$/.test(uri):
+            return Promise.resolve(
+                'vid:v09044ae0000bk2qm0ivfsko76kvric01�gen)dataaweme_6647277225529838341]�mdatok�E���H��,� �#��x264 - core 152 r2854 e9a5903 - H.264/MPEG-4 AVC codec - Copy',
+            );
         default:
             return { body: '' };
     }

@@ -11,7 +11,8 @@ const INIT_OPTIONS = {
     progress: false,
     event: false,
     by_user_id: false,
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:74.0) Gecko/20100101 Firefox/74.0',
+    noWaterMark: false,
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
 };
 
 const promiseScraper = async (input: string, type: ScrapeType, options?: Options): Promise<Result> => {
