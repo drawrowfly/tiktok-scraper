@@ -1,5 +1,6 @@
 import { TikTokScraper } from './core';
 import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge } from './types';
+import CONST from './constant';
 
 const INIT_OPTIONS = {
     number: 20,
@@ -12,7 +13,7 @@ const INIT_OPTIONS = {
     event: false,
     by_user_id: false,
     noWaterMark: false,
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
+    userAgent: CONST.userAgent,
 };
 
 const promiseScraper = async (input: string, type: ScrapeType, options?: Options): Promise<Result> => {

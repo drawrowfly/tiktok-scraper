@@ -92,9 +92,8 @@ export class TikTokScraper extends EventEmitter {
         noWaterMark = false,
     }: TikTokConstructor) {
         super();
-        this.mainHost = 'https://www.tiktok.com/';
-        this.userAgent =
-            userAgent || 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
+        this.mainHost = 'https://m.tiktok.com/';
+        this.userAgent = userAgent || CONST.userAgent;
         this.download = download;
         this.filepath = '' || filepath;
         this.json2csvParser = new Parser();
@@ -170,7 +169,7 @@ export class TikTokScraper extends EventEmitter {
      * Extract new Tac value
      * @param {*} uri
      */
-    private async extractTac(uri = 'https://www.tiktok.com/trending') {
+    private async extractTac(uri = 'https://www.tiktok.com/discover') {
         const query = {
             uri,
             method: 'GET',

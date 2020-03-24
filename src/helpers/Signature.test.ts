@@ -5,6 +5,6 @@ import SignatureData from './__mockData__/data';
 
 describe('Signature', () => {
     it('should return a valid signature', async () => {
-        expect(generateSignature(SignatureData.url, SignatureData.userAgent, SignatureData.tac)).toEqual('TYYDvAAgEBosHbdFdlDDM02HBKAABQA');
+        expect(generateSignature(SignatureData.url, SignatureData.userAgent, SignatureData.tac)).toEqual('TYYDvAAgEBosHbdFdlDDM02GAqAABQA');
     });
 });
