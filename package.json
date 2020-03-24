@@ -50,7 +50,7 @@
         "build": "rimraf build && tsc",
         "format": "prettier --config ./.prettierrc.js --write './src/**/*.ts'",
         "lint": "eslint ./src/**/*.ts",
-        "test": "jest --coverage --verbose"
+        "test": "eslint ./src/**/*.ts && jest --coverage --verbose"
     },
     "jest": {
         "verbose": true,

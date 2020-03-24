@@ -33,7 +33,20 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [ ] Download video without the watermark
 -   [ ] Web interface
 
-**Posts - JSON/CSV output:**
+## Contribution
+
+-   Please use **develop** branch
+-   Add tests if they are missing
+
+```sh
+yarn test
+```
+
+```sh
+yarn build
+```
+
+## JSON/CSV output:
 
 ```
     id: 'VIDEO_ID',

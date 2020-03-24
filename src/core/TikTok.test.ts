@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import fs from 'fs';
-import { ScrapeType } from '../types';
+import { ScrapeType, Result, RequestQuery, Challenge, UserData } from '../types';
 import { TikTokScraper } from './TikTok';
 import CONST from '../constant';
 
@@ -38,13 +38,73 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
     });
 
     it('getUserId should return a valid Object', async () => {
-        const userId = await instance.getUserId();
+        const userId: RequestQuery = await instance.getUserId();
         expect(userId).toEqual({ id: '5831967', secUid: '', type: 1, count: 30, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {
-        const posts = await instance.scrape();
+        const posts: Result = await instance.scrape();
         expect(posts.collector.length).toEqual(5);
+    });
+});
+
+describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
+    let instance;
+    beforeAll(() => {
+        instance = new TikTokScraper({
+            download: false,
+            asyncDownload: 5,
+            filetype: '',
+            filepath: '',
+            input: 'tiktok',
+            type: 'user',
+            userAgent: 'Custom User-Agent',
+            proxy: '',
+            number: 1,
+            event: true,
+        });
+    });
+
+    it('result should emit "data" event with the result', done => {
+        instance.on('data', data => {
+            expect(data).toEqual({
+                authorDigg: 3555,
+                authorFans: 40431380,
+                authorFollowing: 932,
+                authorHeart: '2426012173',
+                authorId: '5831967',
+                authorName: 'charlidamelio',
+                authorPrivate: false,
+                authorSignature: 'don’t worry i don’t get the hype either',
+                authorVerified: true,
+                authorVideo: 1072,
+                commentCount: 46142,
+                createTime: '1584953968',
+                diggCount: 1563781,
+                hashtags: [],
+                id: '6807325450981969158',
+                imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/a43b061c19c445d78587fb775e7c0175_1584953972',
+                musicAuthor: 'sewshiii',
+                musicId: '6799337212367407877',
+                musicName: 'FOLLOW MY IG... SEWSHIII',
+                musicOriginal: true,
+                playCount: 5893701,
+                shareCount: 6728,
+                text: '',
+                videoUrl:
+                    'https://v16.muscdn.com/a01ef53a726eea58a7ce538ee46f8d5f/5e793956/video/tos/useast2a/tos-useast2a-ve-0068c004/6372449d2b1f4236b06a56da83e54b44/?a=1233&br=1944&bt=972&cr=0&cs=0&dr=0&ds=3&er=&l=202003231633420101890741591D500B49&lr=tiktok_m&qs=0&rc=andsa3N1d3U6czMzOzczM0ApNDk4ZmVlOTw1NzloNDpoNGc1YDI0ay0xaHBfLS0wMTZzc18wMjEtY14xYV80Y14xM2I6Yw%3D%3D&vl=&vr=',
+            });
+            done();
+        });
+        instance.scrape();
+    });
+
+    it('result should emit "done" event if task was completed', done => {
+        instance.on('done', data => {
+            expect(data).toEqual('completed');
+            done();
+        });
+        instance.scrape();
     });
 });
 
@@ -80,9 +140,51 @@ describe('TikTok Scraper MODULE(promise): user(invalid input data)', () => {
     });
 });
 
+describe('TikTok Scraper MODULE(event): user(invalid input data)', () => {
+    it('Throw error if username is empty', done => {
+        const instance = new TikTokScraper({
+            download: false,
+            asyncDownload: 5,
+            filetype: '',
+            filepath: '',
+            input: '',
+            type: 'user',
+            userAgent: 'http',
+            proxy: '',
+            number: 1,
+            event: true,
+        });
+        instance.on('error', data => {
+            expect(data).toEqual('Missing input');
+            done();
+        });
+        instance.scrape();
+    });
+
+    it('Throw error if wrong scraping type was provided', done => {
+        const instance = new TikTokScraper({
+            download: false,
+            asyncDownload: 5,
+            filetype: '',
+            filepath: '',
+            input: '',
+            type: 'fake' as ScrapeType,
+            userAgent: 'http',
+            proxy: '',
+            number: 5,
+            event: true,
+        });
+        instance.on('error', data => {
+            expect(data).toEqual(`Missing scraping type. Scrape types: ${CONST.scrape} `);
+            done();
+        });
+        instance.scrape();
+    });
+});
+
 describe('TikTok Scraper MODULE(promise): user(save to a file)', () => {
     let instance;
-    let posts;
+    let posts: Result;
     beforeAll(async () => {
         jest.spyOn(fs, 'writeFile').mockImplementation((file, option, cb) => cb(null));
 
@@ -137,12 +239,12 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
     });
 
     it('getHashTagId should return a valid Object', async () => {
-        const hashtag = await instance.getHashTagId();
+        const hashtag: RequestQuery = await instance.getHashTagId();
         expect(hashtag).toEqual({ id: '4100', secUid: '', type: 3, count: 48, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {
-        const posts = await instance.scrape();
+        const posts: Result = await instance.scrape();
         expect(posts.collector.length).toEqual(5);
     });
 });
@@ -163,8 +265,8 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
         });
     });
     it('signUrl should return a valid signature', async () => {
-        const signature = await instance.signUrl();
-        expect(signature).toEqual('TYYDvAAgEBosHbdFdlDDM02GA6AABQA');
+        const signature: string = await instance.signUrl();
+        expect(signature).toEqual('TYYDvAAgEBosHbdFdlDDM02GBKAABQA');
     });
 
     it('Throw error if input url is empty', () => {
@@ -190,7 +292,7 @@ describe('TikTok Scraper MODULE(promise): getHashtagInfo', () => {
         });
     });
     it('getHashtagInfo should return a valid Object', async () => {
-        const hashtag = await instance.getHashtagInfo();
+        const hashtag: Challenge = await instance.getHashtagInfo();
         expect(hashtag).toEqual({
             challengeId: '4100',
             challengeName: hasthagName,
@@ -232,7 +334,7 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
         });
     });
     it('getUserProfileInfo should return a valid Object', async () => {
-        const user = await instance.getUserProfileInfo();
+        const user: UserData = await instance.getUserProfileInfo();
         expect(user).toEqual({
             secUid: 'MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s',
             userId: '5831967',
@@ -264,7 +366,7 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
 
 describe('TikTok Scraper CLI: user(save progress)', () => {
     let instance;
-    let posts;
+    let posts: Result;
     beforeAll(async () => {
         jest.spyOn(fs, 'writeFile').mockImplementation((file, option, cb) => cb(null));
         jest.spyOn(fs, 'readFile').mockImplementation((file, cb) => cb(null, Buffer.from('0')));

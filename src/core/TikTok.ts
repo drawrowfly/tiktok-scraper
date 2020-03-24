@@ -88,7 +88,7 @@ export class TikTokScraper extends EventEmitter {
         test = false,
     }: TikTokConstructor) {
         super();
-        this.mainHost = 'https://m.tiktok.com/';
+        this.mainHost = 'https://www.tiktok.com/';
         this.userAgent =
             userAgent || 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
         this.download = download;
