@@ -76,6 +76,7 @@ export interface PostCollector {
     commentCount: number;
     hashtags: Hashtags[];
     repeated?: boolean;
+    downloaded: boolean;
 }
 
 export interface Result {
