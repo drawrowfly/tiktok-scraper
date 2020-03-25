@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 import request from 'request';
 import { Agent } from 'http';
@@ -70,7 +71,7 @@ export class Downloader {
                 r = request.defaults({ agent: this.agent as Agent });
             }
             r.get({
-                url: this.noWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
+                url: this.noWaterMark ? item.videoUrlNoWaterMark || item.videoUrl : item.videoUrl,
                 headers: {
                     'user-agent': this.userAgent,
                 },
@@ -90,7 +91,7 @@ export class Downloader {
                     resolve(buffer);
                 })
                 .on('error', () => {
-                    reject(new Error('Cant download media. If you were using proxy, please try without it.'));
+                    reject(new Error(`Cant download video: ${item.id}. If you were using proxy, please try without it.`));
                 });
         });
     }
@@ -114,11 +115,13 @@ export class Downloader {
                 (item: PostCollector, cb) => {
                     this.toBuffer(item)
                         .then(buffer => {
+                            item.downloaded = true;
                             archive.append(buffer, { name: `${item.id}.mp4` });
                             cb(null);
                         })
-                        .catch(error => {
-                            cb(error);
+                        .catch(() => {
+                            item.downloaded = false;
+                            cb(null);
                         });
                 },
                 error => {

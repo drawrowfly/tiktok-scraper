@@ -252,12 +252,14 @@ export class TikTokScraper extends EventEmitter {
                         uri: item.videoUrl,
                     })
                         .then(result => {
-                            const position = Buffer.from(result).indexOf('vid:', 0);
-                            const id = Buffer.from(result)
-                                .slice(position + 4, position + 36)
-                                .toString();
-                            // eslint-disable-next-line no-param-reassign
-                            item.videoUrlNoWaterMark = `https://api2.musical.ly/aweme/v1/playwm/?video_id=${id}`;
+                            const position = Buffer.from(result).indexOf('vid:');
+                            if (position !== -1) {
+                                const id = Buffer.from(result)
+                                    .slice(position + 4, position + 36)
+                                    .toString();
+                                // eslint-disable-next-line no-param-reassign
+                                item.videoUrlNoWaterMark = `https://api2.musical.ly/aweme/v1/playwm/?video_id=${id}`;
+                            }
                             cb(null);
                         })
                         .catch(() => {
@@ -488,6 +490,7 @@ export class TikTokScraper extends EventEmitter {
                 shareCount: posts[i].itemInfos.shareCount,
                 playCount: posts[i].itemInfos.playCount,
                 commentCount: posts[i].itemInfos.commentCount,
+                downloaded: false,
                 hashtags: posts[i].challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
                     id: challengeId,
                     name: challengeName,

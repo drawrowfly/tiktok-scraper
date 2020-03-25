@@ -94,6 +94,7 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                 videoUrl:
                     'https://v16.muscdn.com/a01ef53a726eea58a7ce538ee46f8d5f/5e793956/video/tos/useast2a/tos-useast2a-ve-0068c004/6372449d2b1f4236b06a56da83e54b44/?a=1233&br=1944&bt=972&cr=0&cs=0&dr=0&ds=3&er=&l=202003231633420101890741591D500B49&lr=tiktok_m&qs=0&rc=andsa3N1d3U6czMzOzczM0ApNDk4ZmVlOTw1NzloNDpoNGc1YDI0ay0xaHBfLS0wMTZzc18wMjEtY14xYV80Y14xM2I6Yw%3D%3D&vl=&vr=',
                 videoUrlNoWaterMark: '',
+                downloaded: false,
             });
             done();
         });

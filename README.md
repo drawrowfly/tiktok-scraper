@@ -30,6 +30,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Improve proxy support
 -   [x] Add tests
 -   [x] Download video without the watermark
+-   [x] Indicate in the output file(csv/json) if the video was downloaded or not
 -   [ ] Scrape users/hashtag
 -   [ ] Web interface
 
@@ -78,7 +79,8 @@ yarn build
        name: 'PlayWithLife',
        title: 'HASHTAG_TITLE',
        cover: [Array]
-    }...]
+    }...],
+    downloaded: true
 ```
 
 ![Demo](https://i.imgur.com/6gIbBzo.png)
