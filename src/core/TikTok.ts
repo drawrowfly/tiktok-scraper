@@ -296,13 +296,13 @@ export class TikTokScraper extends EventEmitter {
                         result = await this.scrapeData(
                             this.idStore
                                 ? {
-                                      id: this.idStore,
-                                      secUid: '',
-                                      type: 3,
-                                      count: 48,
-                                      minCursor: 0,
-                                      lang: '',
-                                  }
+                                    id: this.idStore,
+                                    secUid: '',
+                                    type: 3,
+                                    count: 48,
+                                    minCursor: 0,
+                                    lang: '',
+                                }
                                 : await this.getHashTagId(),
                             maxCursor,
                         );
@@ -312,13 +312,13 @@ export class TikTokScraper extends EventEmitter {
                         result = await this.scrapeData(
                             this.byUserId || this.idStore
                                 ? {
-                                      id: this.idStore ? this.idStore : this.input,
-                                      secUid: '',
-                                      type: 1,
-                                      count: 48,
-                                      minCursor: 0,
-                                      lang: '',
-                                  }
+                                    id: this.idStore ? this.idStore : this.input,
+                                    secUid: '',
+                                    type: 1,
+                                    count: 48,
+                                    minCursor: 0,
+                                    lang: '',
+                                }
                                 : await this.getUserId(),
                             maxCursor,
                         );
@@ -512,7 +512,7 @@ export class TikTokScraper extends EventEmitter {
         const shareUid = qs.type === 4 || qs.type === 5 ? '&shareUid=' : '';
         const signature = generateSignature(
             `${this.mainHost}share/item/list?secUid=${qs.secUid}&id=${qs.id}&type=${qs.type}&count=${qs.count}&minCursor=${
-                qs.minCursor
+            qs.minCursor
             }&maxCursor=${maxCursor || 0}${shareUid}&lang=${qs.lang}`,
             this.userAgent,
             this.tacValue,
@@ -552,7 +552,7 @@ export class TikTokScraper extends EventEmitter {
      */
     private async getHashTagId(): Promise<RequestQuery> {
         const query = {
-            uri: `${this.mainHost}node/share/tag/${this.input}`,
+            uri: `${this.mainHost}node/share/tag/${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
@@ -580,7 +580,7 @@ export class TikTokScraper extends EventEmitter {
      */
     private async getUserId(): Promise<RequestQuery> {
         const query = {
-            uri: `${this.mainHost}node/share/user/@${this.input}`,
+            uri: `${this.mainHost}node/share/user/@${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
@@ -613,7 +613,7 @@ export class TikTokScraper extends EventEmitter {
             throw `Username is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@${this.input}`,
+            uri: `${this.mainHost}node/share/user/@${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
@@ -637,7 +637,7 @@ export class TikTokScraper extends EventEmitter {
             throw `Hashtag is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/tag/${this.input}`,
+            uri: `${this.mainHost}node/share/tag/${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
