@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import fs from 'fs';
-import { ScrapeType, Result, RequestQuery, Challenge, UserData } from '../types';
+import { ScrapeType, Result, RequestQuery, Challenge, UserData, PostCollector } from '../types';
 import { TikTokScraper } from './TikTok';
 import CONST from '../constant';
 
@@ -271,9 +271,13 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
         expect(signature).toEqual('TYYDvAAgEBosHbdFdlDDM02GAqAABQA');
     });
 
-    it('Throw error if input url is empty', () => {
+    it('Throw error if input url is empty', async () => {
         instance.input = '';
-        expect(instance.signUrl()).rejects.toEqual('Url is missing');
+        try {
+            await instance.signUrl();
+        } catch (error) {
+            expect(error).toEqual(`Url is missing`);
+        }
     });
 });
 
@@ -308,14 +312,22 @@ describe('TikTok Scraper MODULE(promise): getHashtagInfo', () => {
         });
     });
 
-    it('Throw error if input hashtag is empty', () => {
+    it('Throw error if input hashtag is empty', async () => {
         instance.input = '';
-        expect(instance.getHashtagInfo()).rejects.toEqual(`Hashtag is missing`);
+        try {
+            await instance.getHashtagInfo();
+        } catch (error) {
+            expect(error).toEqual(`Hashtag is missing`);
+        }
     });
 
-    it(`Throw error if hashtag doesn't exist`, () => {
+    it(`Throw error if hashtag doesn't exist`, async () => {
         instance.input = 'na';
-        expect(instance.getHashtagInfo()).rejects.toEqual(`Can't find hashtag: na`);
+        try {
+            await instance.getHashtagInfo();
+        } catch (error) {
+            expect(error).toEqual(`Can't find hashtag: na`);
+        }
     });
 });
 
@@ -355,14 +367,22 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
         });
     });
 
-    it('Throw error if input username is empty', () => {
+    it('Throw error if input username is empty', async () => {
         instance.input = '';
-        expect(instance.getUserProfileInfo()).rejects.toEqual(`Username is missing`);
+        try {
+            await instance.getUserProfileInfo();
+        } catch (error) {
+            expect(error).toEqual(`Username is missing`);
+        }
     });
 
-    it(`Throw error if username doesn't exist`, () => {
+    it(`Throw error if username doesn't exist`, async () => {
         instance.input = 'na';
-        expect(instance.getUserProfileInfo()).rejects.toEqual(`Can't find user: na`);
+        try {
+            await instance.getUserProfileInfo();
+        } catch (error) {
+            expect(error).toEqual(`Can't find user: na`);
+        }
     });
 });
 
@@ -404,5 +424,63 @@ describe('TikTok Scraper CLI: user(save progress)', () => {
 
     it('result should contain a valid file name for the Zip file', async () => {
         expect(posts.zip).toMatch(/^(\w+)_([0-9]{13}).zip$/);
+    });
+});
+
+describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
+    let instance;
+    beforeEach(() => {
+        instance = new TikTokScraper({
+            download: false,
+            asyncDownload: 5,
+            filetype: '',
+            filepath: '',
+            input: 'https://www.tiktok.com/@tiktok/video/6807491984882765062',
+            type: 'video_meta',
+            userAgent: 'http',
+            proxy: '',
+            number: 5,
+        });
+    });
+    it('getVideoMeta should return a valid Object', async () => {
+        const post: PostCollector = await instance.getVideoMeta();
+        expect(post).toEqual({
+            id: '6807491984882765062',
+            text: 'We’re kicking off the #happyathome live stream series today at 5pm PT!',
+            createTime: '1584992742',
+            authorId: '107955',
+            authorName: 'tiktok',
+            musicId: '6807487887634909957',
+            musicName: 'original sound',
+            musicAuthor: 'tiktok',
+            imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/d1b00294a06e488b851ad6553cad41a0_1584992746',
+            videoUrl:
+                'https://v16.muscdn.com/f950058182bcefa15345108bd9ab241f/5e7e615a/video/tos/useast2a/tos-useast2a-ve-0068c003/0dc9964505df43288febb6aac33ac6a0/?a=1233&br=472&bt=236&cr=0&cs=0&dr=0&ds=3&er=&l=20200327142546010115115156167B9215&lr=tiktok_m&qs=0&rc=M3Vna3N1d3FrczMzOzczM0ApO2Q6NjZnOzs0N2k7aGhpaGcxaDM0ay1gMHBfLS0wMTZzc182MWI1YzEtYTY2LWNjXzU6Yw%3D%3D&vl=&vr=',
+            videoUrlNoWaterMark: 'https://api2.musical.ly/aweme/v1/playwm/?video_id=v09044ae0000bk2qm0ivfsko76kvric0',
+            diggCount: 35650,
+            shareCount: 256,
+            playCount: 445444,
+            commentCount: 2543,
+            downloaded: false,
+            hashtags: [{ id: '609365', name: 'happyathome', title: undefined, cover: undefined }],
+        });
+    });
+
+    it('Throw error if input url is empty', async () => {
+        instance.input = '';
+        try {
+            await instance.getVideoMeta();
+        } catch (error) {
+            expect(error).toEqual(`Url is missing`);
+        }
+    });
+
+    it(`Throw error if user has provided incorrect URL`, async () => {
+        instance.input = 'na';
+        try {
+            await instance.getVideoMeta();
+        } catch (error) {
+            expect(error).toEqual(`Bad url format. Correct format: https://www.tiktok.com/@USERNAME/video/ID`);
+        }
     });
 });

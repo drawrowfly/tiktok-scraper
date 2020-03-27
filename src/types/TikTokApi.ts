@@ -120,3 +120,11 @@ export interface RequestQuery {
     minCursor: number;
     lang: string;
 }
+
+export interface VideoProps {
+    props: {
+        pageProps: {
+            videoData: Item;
+        };
+    };
+}

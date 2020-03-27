@@ -1,5 +1,5 @@
 import { TikTokScraper } from './core';
-import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge } from './types';
+import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector } from './types';
 import CONST from './constant';
 
 const INIT_OPTIONS = {
@@ -67,6 +67,7 @@ export const getUserProfileInfo = async (input: string, options?: Options): Prom
     const result = await scraper.getUserProfileInfo();
     return result;
 };
+
 export const signUrl = async (input: string, options?: Options): Promise<string> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
@@ -75,5 +76,16 @@ export const signUrl = async (input: string, options?: Options): Promise<string>
     const scraper = new TikTokScraper(contructor);
 
     const result = await scraper.signUrl();
+    return result;
+};
+
+export const getVideoMeta = async (input: string, options?: Options): Promise<PostCollector> => {
+    if (options && typeof options !== 'object') {
+        throw new TypeError('Object is expected');
+    }
+    const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...{ type: 'video_meta' as ScrapeType, input }, ...options };
+    const scraper = new TikTokScraper(contructor);
+
+    const result = await scraper.getVideoMeta();
     return result;
 };

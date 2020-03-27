@@ -8,7 +8,8 @@ export type ScrapeType =
     | 'discover_music'
     | 'single_user'
     | 'single_hashtag'
-    | 'signature';
+    | 'signature'
+    | 'video_meta';
 
 export interface Options {
     proxy?: string;

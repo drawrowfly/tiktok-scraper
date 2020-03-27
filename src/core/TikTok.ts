@@ -248,29 +248,38 @@ export class TikTokScraper extends EventEmitter {
                 this.collector,
                 5,
                 (item: PostCollector, cb) => {
-                    rp({
-                        uri: item.videoUrl,
-                    })
-                        .then(result => {
-                            const position = Buffer.from(result).indexOf('vid:');
-                            if (position !== -1) {
-                                const id = Buffer.from(result)
-                                    .slice(position + 4, position + 36)
-                                    .toString();
+                    this.extractVideoId(item.videoUrl)
+                        .then(video => {
+                            if (video) {
                                 // eslint-disable-next-line no-param-reassign
-                                item.videoUrlNoWaterMark = `https://api2.musical.ly/aweme/v1/playwm/?video_id=${id}`;
+                                item.videoUrlNoWaterMark = video;
                             }
                             cb(null);
                         })
-                        .catch(() => {
-                            cb('Error');
-                        });
+                        .catch(() => cb(null));
                 },
                 () => {
                     resolve();
                 },
             );
         });
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    private async extractVideoId(uri): Promise<string> {
+        try {
+            const result = await rp({ uri });
+            const position = Buffer.from(result).indexOf('vid:');
+            if (position !== -1) {
+                const id = Buffer.from(result)
+                    .slice(position + 4, position + 36)
+                    .toString();
+                return `https://api2.musical.ly/aweme/v1/playwm/?video_id=${id}`;
+            }
+            throw new Error(`Cant extract video id`);
+        } catch (error) {
+            return '';
+        }
     }
 
     /**
@@ -608,7 +617,7 @@ export class TikTokScraper extends EventEmitter {
      * Get user profile information
      * @param {} username
      */
-    async getUserProfileInfo(): Promise<UserData> {
+    public async getUserProfileInfo(): Promise<UserData> {
         if (!this.input) {
             throw `Username is missing`;
         }
@@ -632,7 +641,7 @@ export class TikTokScraper extends EventEmitter {
      * Get hashtag information
      * @param {} hashtag
      */
-    async getHashtagInfo(): Promise<Challenge> {
+    public async getHashtagInfo(): Promise<Challenge> {
         if (!this.input) {
             throw `Hashtag is missing`;
         }
@@ -657,12 +666,78 @@ export class TikTokScraper extends EventEmitter {
      * Sign URL
      * @param {}
      */
-    async signUrl() {
+    public async signUrl() {
         if (!this.input) {
             throw `Url is missing`;
         }
         await this.extractTac();
 
         return generateSignature(this.input, this.userAgent, this.tacValue);
+    }
+
+    /**
+     * Get video url without the watermark
+     * @param {}
+     */
+    public async getVideoMeta(): Promise<PostCollector> {
+        if (!this.input) {
+            throw `Url is missing`;
+        }
+        if (!/^https:\/\/www\.tiktok\.com\/@(\w+)\/video\/(\d+)$/.test(this.input)) {
+            throw `Bad url format. Correct format: https://www.tiktok.com/@USERNAME/video/ID`;
+        }
+        const query = {
+            uri: this.input,
+            method: 'GET',
+            json: true,
+        };
+        try {
+            const response = await this.request<string>(query);
+            if (!response) {
+                throw new Error(`Can't extract video meta data`);
+            }
+            const regex = /<script id="__NEXT_DATA__" type="application\/json" crossorigin="anonymous">([^]*)<\/script><script crossorigin="anonymous" nomodule=/.exec(
+                response,
+            );
+            if (regex) {
+                const videoProps = JSON.parse(regex[1]);
+                let videoItem = {} as PostCollector;
+                videoItem = {
+                    id: videoProps.props.pageProps.videoData.itemInfos.id,
+                    text: videoProps.props.pageProps.videoData.itemInfos.text,
+                    createTime: videoProps.props.pageProps.videoData.itemInfos.createTime,
+                    authorId: videoProps.props.pageProps.videoData.itemInfos.authorId,
+                    authorName: videoProps.props.pageProps.videoData.authorInfos.uniqueId,
+                    musicId: videoProps.props.pageProps.videoData.musicInfos.musicId,
+                    musicName: videoProps.props.pageProps.videoData.musicInfos.musicName,
+                    musicAuthor: videoProps.props.pageProps.videoData.musicInfos.authorName,
+                    imageUrl: videoProps.props.pageProps.videoData.itemInfos.coversOrigin[0],
+                    videoUrl: videoProps.props.pageProps.videoData.itemInfos.video.urls[0],
+                    videoUrlNoWaterMark: '',
+                    diggCount: videoProps.props.pageProps.videoData.itemInfos.diggCount,
+                    shareCount: videoProps.props.pageProps.videoData.itemInfos.shareCount,
+                    playCount: videoProps.props.pageProps.videoData.itemInfos.playCount,
+                    commentCount: videoProps.props.pageProps.videoData.itemInfos.commentCount,
+                    downloaded: false,
+                    hashtags: videoProps.props.pageProps.videoData.challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
+                        id: challengeId,
+                        name: challengeName,
+                        title: text,
+                        cover: coversLarger,
+                    })),
+                } as PostCollector;
+
+                try {
+                    const video = await this.extractVideoId(videoItem.videoUrl);
+                    videoItem.videoUrlNoWaterMark = video;
+                } catch (error) {
+                    // continue regardless of error
+                }
+                return videoItem;
+            }
+            throw new Error(`Can't extract video meta data`);
+        } catch (error) {
+            throw error.message;
+        }
     }
 }
