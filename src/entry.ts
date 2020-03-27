@@ -6,6 +6,7 @@ const INIT_OPTIONS = {
     number: 20,
     download: false,
     asyncDownload: 5,
+    asyncScraping: 3,
     proxy: '',
     filepath: process.cwd(),
     filetype: 'na',

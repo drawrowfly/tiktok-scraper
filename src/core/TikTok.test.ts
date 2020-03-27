@@ -242,7 +242,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
 
     it('getHashTagId should return a valid Object', async () => {
         const hashtag: RequestQuery = await instance.getHashTagId();
-        expect(hashtag).toEqual({ id: '4100', secUid: '', type: 3, count: 48, minCursor: 0, lang: '' });
+        expect(hashtag).toEqual({ id: '4100', secUid: '', type: 3, count: 30, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {

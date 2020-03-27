@@ -18,7 +18,7 @@ export interface UserData {
 export interface ItemInfos {
     id: string;
     text: string;
-    createTime: string;
+    createTime: number;
     authorId: string;
     musicId: string;
     covers: string[];
@@ -99,7 +99,7 @@ export interface ItemListData {
     body: {
         itemListData: Item[];
         hasMore: boolean;
-        maxCursor: string;
+        maxCursor: number;
         minCursor: string;
     };
 }

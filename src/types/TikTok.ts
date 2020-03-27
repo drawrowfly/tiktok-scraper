@@ -17,6 +17,7 @@ export interface Options {
     by_user_id?: boolean;
     download?: boolean;
     asyncDownload?: number;
+    asyncScraping?: number;
     filepath?: string;
     filetype?: string;
     progress?: boolean;
@@ -30,6 +31,7 @@ export interface TikTokConstructor {
     filetype: string;
     proxy: string;
     asyncDownload: number;
+    asyncScraping: number;
     cli?: boolean;
     event?: boolean;
     progress?: boolean;
@@ -53,7 +55,7 @@ export interface Hashtags {
 export interface PostCollector {
     id: string;
     text: string;
-    createTime: string;
+    createTime: number;
     authorId: string;
     authorName: string;
     authorFollowing: number;

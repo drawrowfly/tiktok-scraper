@@ -428,6 +428,12 @@ let options = {
     // How many post should be downloaded asynchronously. Only if {download:true}: {int default: 5}
     asyncDownload: 5,
 
+    // How many post should be scraped asynchronously: {int default: 3}
+    // Current option will be applied only with current types: music and hashtag
+    // With other types it is always 1 because each request provides "maxCursor" value
+    // that is needed for the next request
+    asyncScraping: 3,
+
     // File path where all files will be saved: {string default: 'CURRENT_DIR'}
     filepath: `CURRENT_DIR`,
 
