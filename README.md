@@ -1,12 +1,12 @@
 # TikTok Scraper & Downloader
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b3ef17f5a8504600931abfa60ac01006)](https://app.codacy.com/manual/drawrowfly/tiktok-scraper?utm_source=github.com&utm_medium=referral&utm_content=drawrowfly/tiktok-scraper&utm_campaign=Badge_Grade_Dashboard)
+![NPM](https://img.shields.io/npm/l/tiktok-scraper.svg?style=for-the-badge) ![npm](https://img.shields.io/npm/v/tiktok-scraper.svg?style=for-the-badge) ![Codacy grade](https://img.shields.io/codacy/grade/b3ef17f5a8504600931abfa60ac01006.svg?style=for-the-badge)
 
 Scrape and download useful information from TikTok.
 
 ## No login or password are required
 
-This is not an official API support and etc. This is just a scraper that is using TikTok Web API to scrape media.
+This is not an official API support and etc. This is just a scraper that is using TikTok Web API to scrape media and related meta information.
 
 ---
 
@@ -18,9 +18,9 @@ This is not an official API support and etc. This is just a scraper that is usin
 
 -   Download **unlimited** post metadata from the User, Hashtag, Trends, or Music-Id pages
 -   Save post metadata to the JSON/CSV files
--   Download media and save to the ZIP file
+-   Download media **with and without the watermark** and save to the ZIP file
 -   Sign URL to make custom request to the TIkTok API
--   Extract metadata from the the User or Hashtag pages
+-   Extract metadata from the User, Hashtag and Sginel Video pages
 -   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and only if **download** flag is on.
 
 ## To Do
@@ -31,6 +31,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Add tests
 -   [x] Download video without the watermark
 -   [x] Indicate in the output file(csv/json) if the video was downloaded or not
+-   [ ] Scrape metadata and download video from the multiple users/hashtags specified in a source(file or etc)
 -   [ ] Scrape users/hashtag
 -   [ ] Web interface
 
@@ -49,7 +50,8 @@ yarn build
 
 ## JSON/CSV output:
 
-```
+```javascript
+{
     id: 'VIDEO_ID',
     text: 'CAPTION',
     createTime: '1583870600',
@@ -81,6 +83,7 @@ yarn build
        cover: [Array]
     }...],
     downloaded: true
+}[]
 ```
 
 ![Demo](https://i.imgur.com/6gIbBzo.png)
@@ -236,6 +239,8 @@ Downloading 6748048372625689861 [==============================] 100%
 
 ## Module
 
+Don't forget to checkout the **examples** folder
+
 ### Promise
 
 ```javascript
@@ -262,7 +267,7 @@ const TikTokScraper = require('tiktok-scraper');
     }
 })();
 
-// Trend
+// Trending feed
 (async () => {
     try {
         const posts = await TikTokScraper.trend('', { number: 100 });
@@ -272,7 +277,7 @@ const TikTokScraper = require('tiktok-scraper');
     }
 })();
 
-// Hashtag
+// Hashtag feed
 (async () => {
     try {
         const posts = await TikTokScraper.hashtag('HASHTAG', { number: 100 });
@@ -325,6 +330,19 @@ const rp = require('request-promise');
             },
         });
         console.log(result);
+    } catch (error) {
+        console.log(error);
+    }
+})();
+
+// Get single video metadata
+// input - WEB_VIDEO_URL
+// For example: https://www.tiktok.com/@tiktok/video/6807491984882765062
+// options - not required
+(async () => {
+    try {
+        const videoMeta = await TikTokScraper.getVideoMeta('https://www.tiktok.com/@tiktok/video/6807491984882765062', options);
+        console.log(videoMeta);
     } catch (error) {
         console.log(error);
     }
@@ -389,6 +407,7 @@ hashtag.scrape();
 .getUserProfileInfo('USERNAME', options) // Get user profile information
 .getHashtagInfo('HASHTAG', options) // Get hashtag information
 .signUrl('URL', options) // Get signature for the request
+.getVideoMeta('WEB_VIDEO_URL', options) // Get video meta info, including video url without the watermark
 ```
 
 ### Options
