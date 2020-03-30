@@ -19,6 +19,7 @@ Steps to reproduce the behavior:
 - Used method
 - Used options
 - If scraping from a profile. Did you checked if profile is Public? Scraper won't work with Private profiles!
+- Preferably provide URL to the profile,hashtag,video and etc page
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
