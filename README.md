@@ -93,7 +93,8 @@ yarn build
 
 ## View and manage previously downloaded posts history in the CLI
 
-You can only view this history from the CLI and only if you have used -s flag in your previous scraper executions
+You can only view this history from the CLI and only if you have used -s flag in your previous scraper executions.
+
 **-s** save download history to avoid downloading duplicate posts in the future
 
 To view history record:
@@ -265,21 +266,6 @@ View previous download history
 
 ```sh
 tiktok-scraper history
-```
-
-**To make it look better, when downloading posts the progress will be shown in terminal**
-
-```sh
-Downloading 6750670497744309509 [==============================] 100%
-Downloading 6749962264020782342 [==============================] 100%
-Downloading 6749433991113264390 [==============================] 100%
-Downloading 6750671571968429318 [==============================] 100%
-Downloading 6750668198011505926 [==============================] 100%
-Downloading 6748611221903117574 [==============================] 100%
-Downloading 6748606789551410438 [==============================] 100%
-Downloading 6748139550251535621 [==============================] 100%
-Downloading 6748616311166799110 [==============================] 100%
-Downloading 6748048372625689861 [==============================] 100%
 ```
 
 ## Module
