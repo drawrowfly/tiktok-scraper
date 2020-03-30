@@ -109,7 +109,12 @@ export const video = async (input: string, options?: Options): Promise<any> => {
 
 // eslint-disable-next-line no-unused-vars
 export const history = async (input: string, options?: Options) => {
-    const store = (await fromCallback(cb => readFile(`${tmpdir()}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;
+    let store: string;
+    try {
+        store = (await fromCallback(cb => readFile(`${tmpdir()}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;
+    } catch (error) {
+        throw `History file doesn't exist`;
+    }
     const historyStore: History = JSON.parse(store);
 
     if (options?.remove) {
