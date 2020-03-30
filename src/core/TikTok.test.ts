@@ -13,9 +13,11 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
         instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 3,
             filetype: '',
             filepath: '',
             input: 'tiktok',
+            noWaterMark: false,
             type: 'user',
             userAgent: 'Custom User-Agent',
             proxy: '',
@@ -54,6 +56,7 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
         instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: 'tiktok',
@@ -115,6 +118,7 @@ describe('TikTok Scraper MODULE(promise): user(invalid input data)', () => {
         const instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: '',
@@ -130,6 +134,7 @@ describe('TikTok Scraper MODULE(promise): user(invalid input data)', () => {
         const instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: '',
@@ -147,6 +152,7 @@ describe('TikTok Scraper MODULE(event): user(invalid input data)', () => {
         const instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: '',
@@ -167,6 +173,7 @@ describe('TikTok Scraper MODULE(event): user(invalid input data)', () => {
         const instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: '',
@@ -193,6 +200,7 @@ describe('TikTok Scraper MODULE(promise): user(save to a file)', () => {
         instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: 'all',
             filepath: '',
             input: 'tiktok',
@@ -225,6 +233,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
         instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: 'summer',
@@ -257,6 +266,7 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
         instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: 'https://m.tiktok.com/share/item/list?secUid=&id=355503&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&lang=',
@@ -288,6 +298,7 @@ describe('TikTok Scraper MODULE(promise): getHashtagInfo', () => {
         instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: hasthagName,
@@ -338,6 +349,7 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
         instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: userName,
@@ -399,6 +411,7 @@ describe('TikTok Scraper CLI: user(save progress)', () => {
             store_history: true,
             test: true,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: 'tiktok',
@@ -414,12 +427,12 @@ describe('TikTok Scraper CLI: user(save progress)', () => {
         jest.restoreAllMocks();
     });
 
-    it('fs.readFile should be called once', async () => {
-        expect(fs.readFile).toHaveBeenCalledTimes(1);
+    it('fs.readFile should be called 2 times', async () => {
+        expect(fs.readFile).toHaveBeenCalledTimes(2);
     });
 
-    it('fs.writeFile should be called once', async () => {
-        expect(fs.writeFile).toHaveBeenCalledTimes(1);
+    it('fs.writeFile should be called 2 times', async () => {
+        expect(fs.writeFile).toHaveBeenCalledTimes(2);
     });
 
     it('result should contain a valid file name for the Zip file', async () => {
@@ -433,6 +446,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
         instance = new TikTokScraper({
             download: false,
             asyncDownload: 5,
+            asyncScraping: 5,
             filetype: '',
             filepath: '',
             input: 'https://www.tiktok.com/@tiktok/video/6807491984882765062',

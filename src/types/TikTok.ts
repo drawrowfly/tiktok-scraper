@@ -24,6 +24,7 @@ export interface Options {
     number?: number;
     userAgent?: string;
     noWaterMark?: boolean;
+    remove?: string;
 }
 export interface TikTokConstructor {
     download: boolean;

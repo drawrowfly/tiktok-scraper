@@ -14,7 +14,7 @@ import CONST from '../constant';
 
 import { generateSignature } from '../helpers';
 
-import { PostCollector, ScrapeType, TikTokConstructor, Result, ItemListData, ApiResponse, Challenge, UserData, RequestQuery, Item } from '../types';
+import { PostCollector, ScrapeType, TikTokConstructor, Result, ItemListData, ApiResponse, Challenge, UserData, RequestQuery, Item, History } from '../types';
 
 import { Downloader } from '../core';
 
@@ -70,6 +70,8 @@ export class TikTokScraper extends EventEmitter {
     private tacValue: string = '';
 
     private storeValue: string = '';
+
+    private maxCursor: number;
 
     private test: boolean = false;
 
@@ -128,6 +130,7 @@ export class TikTokScraper extends EventEmitter {
         this.idStore = '';
         this.test = test;
         this.noWaterMark = noWaterMark;
+        this.maxCursor = 0;
         this.Downloader = new Downloader({
             progress,
             proxy,
@@ -311,7 +314,6 @@ export class TikTokScraper extends EventEmitter {
      */
     private mainLoop(): Promise<any> {
         return new Promise(resolve => {
-            let maxCursor = 0;
             const arrayLength = this.number % 30 ? Math.ceil(this.number / 30) : Math.ceil(this.number / 30) + 1;
             const taskArray = Array.from({ length: arrayLength }, (v, k) => k + 1);
             forEachLimit(
@@ -322,11 +324,8 @@ export class TikTokScraper extends EventEmitter {
                         case 'user':
                             this.fileName = `${this.input}_${Date.now()}`;
                             this.getUserId()
-                                .then(query => this.submitScrapingRequest(query, maxCursor))
-                                .then(cursor => {
-                                    maxCursor = cursor;
-                                    cb(null);
-                                })
+                                .then(query => this.submitScrapingRequest(query, this.maxCursor))
+                                .then(() => cb(null))
                                 .catch(() => cb(null));
                             break;
                         case 'hashtag':
@@ -338,7 +337,7 @@ export class TikTokScraper extends EventEmitter {
                             break;
                         case 'trend':
                             this.getTrendingFeedQuery()
-                                .then(query => this.submitScrapingRequest(query, item === 1 ? 0 : 1))
+                                .then(query => this.submitScrapingRequest(query, this.maxCursor))
                                 .then(() => cb(null))
                                 .catch(() => cb(null));
                             break;
@@ -363,7 +362,7 @@ export class TikTokScraper extends EventEmitter {
      * Submit request to the TikTok web API
      * Collect received metadata
      */
-    private async submitScrapingRequest(query, item): Promise<number> {
+    private async submitScrapingRequest(query, item): Promise<any> {
         try {
             const result = await this.scrapeData(query, item);
 
@@ -376,7 +375,7 @@ export class TikTokScraper extends EventEmitter {
             if (!result.body.hasMore) {
                 throw new Error('No more posts');
             }
-            return result.body.maxCursor;
+            this.maxCursor = result.body.maxCursor;
         } catch (error) {
             throw error.message;
         }
@@ -438,7 +437,32 @@ export class TikTokScraper extends EventEmitter {
      * Only available from the CLI
      */
     private async storeDownlodProgress() {
+        const historyType = this.scrapeType === 'trend' ? 'trend' : `${this.scrapeType}_${this.input}`;
         if (this.storeValue) {
+            let history = {} as History;
+
+            try {
+                const readFromStore = (await fromCallback(cb => readFile(`${this.tmpFolder}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;
+                history = JSON.parse(readFromStore);
+            } catch (error) {
+                history[historyType] = {
+                    type: this.scrapeType,
+                    input: this.input,
+                    downloaded_posts: 0,
+                    last_change: new Date(),
+                    file_location: `${this.tmpFolder}/${this.storeValue}.json`,
+                };
+            }
+
+            if (!history[historyType]) {
+                history[historyType] = {
+                    type: this.scrapeType,
+                    input: this.input,
+                    downloaded_posts: 0,
+                    last_change: new Date(),
+                    file_location: `${this.tmpFolder}/${this.storeValue}.json`,
+                };
+            }
             let store: string[];
             try {
                 const readFromStore = (await fromCallback(cb => readFile(`${this.tmpFolder}/${this.storeValue}.json`, { encoding: 'utf-8' }, cb))) as string;
@@ -458,8 +482,22 @@ export class TikTokScraper extends EventEmitter {
             });
             this.collector = this.collector.filter(item => !item.repeated);
 
+            history[historyType] = {
+                type: this.scrapeType,
+                input: this.input,
+                downloaded_posts: history[historyType].downloaded_posts + this.collector.length,
+                last_change: new Date(),
+                file_location: `${this.tmpFolder}/${this.storeValue}.json`,
+            };
+
             try {
                 await fromCallback(cb => writeFile(`${this.tmpFolder}/${this.storeValue}.json`, JSON.stringify(store), cb));
+            } catch (error) {
+                // continue regardless of error
+            }
+
+            try {
+                await fromCallback(cb => writeFile(`${this.tmpFolder}/tiktok_history.json`, JSON.stringify(history), cb));
             } catch (error) {
                 // continue regardless of error
             }

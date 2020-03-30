@@ -22,6 +22,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   Sign URL to make custom request to the TIkTok API
 -   Extract metadata from the User, Hashtag and Sginel Video pages
 -   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and only if **download** flag is on.
+-   **View and manage previously downloaded posts history in the CLI**
 
 ## To Do
 
@@ -31,8 +32,8 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Add tests
 -   [x] Download video without the watermark
 -   [x] Indicate in the output file(csv/json) if the video was downloaded or not
--   [ ] Scrape metadata and download video from the multiple users/hashtags specified in a source(file or etc)
--   [ ] Scrape users/hashtag
+-   [ ] Scrape metadata and download posts from different users/hashtags in batch
+-   [ ] Scrape users/hashtags
 -   [ ] Web interface
 
 ## Contribution
@@ -48,7 +49,7 @@ yarn test
 yarn build
 ```
 
-## JSON/CSV output:
+## Post metadata example:
 
 ```javascript
 {
@@ -86,8 +87,37 @@ yarn build
 }[]
 ```
 
+## CSV file example
+
 ![Demo](https://i.imgur.com/6gIbBzo.png)
 
+## View and manage previously downloaded posts history in the CLI
+
+You can only view this history from the CLI and only if you have used -s flag in your previous scraper executions
+**-s** save download history to avoid downloading duplicate posts in the future
+
+To view history record:
+
+```sh
+tiktok-scraper history
+```
+
+To delete single history record:
+
+```sh
+tiktok-scraper history -r TYPE:INPUT
+tiktok-scraper history -r user:tiktok
+tiktok-scraper history -r hashtag:summer
+tiktok-scraper history -r trend
+```
+
+To delete all records:
+
+```sh
+tiktok-scraper history -r all
+```
+
+![History](https://i.imgur.com/VnDKh72.png)
 **Possible errors**
 
 -   Unknown. Report them if you will receive any
@@ -122,6 +152,7 @@ Commands:
   tiktok-scraper hashtag [id]  Scrape videos from hashtag. Enter hashtag without #
   tiktok-scraper trend         Scrape posts from current trends
   tiktok-scraper music [id]    Scrape posts from a music id number
+  tiktok-scraper history       View previous download history
 
 Options:
   --help, -h              help                                         [boolean]
@@ -142,12 +173,19 @@ Options:
                           avoiding duplicates         [boolean] [default: false]
   --noWaterMark, -w       Download video without the watermark. This option will
                           affect the execution speed  [boolean] [default: false]
+  --remove, -r            Delete the history record by entering "TYPE:INPUT" or
+                          "all" to clean all the history. For example: user:bob
+                                                                   [default: ""]
 
 Examples:
   tiktok-scraper user USERNAME -d -n 100
   tiktok-scraper hashtag HASHTAG_NAME -d -n 100
   tiktok-scraper trend -d -n 100
   tiktok-scraper music MUSICID -n 100
+  tiktok-scraper music MUSIC_ID -d -n 50
+  tiktok-scraper history
+  tiktok-scraper history -r user:bob
+  tiktok-scraper history -r all
 ```
 
 **Example 1:**
@@ -220,6 +258,13 @@ tiktok-scraper user USERNAME -n 20 -d -w
 Output:
 ZIP path: /{CURRENT_PATH}/trend_1552945659138.zip
 CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
+```
+
+**Example 7:**
+View previous download history
+
+```sh
+tiktok-scraper history
 ```
 
 **To make it look better, when downloading posts the progress will be shown in terminal**

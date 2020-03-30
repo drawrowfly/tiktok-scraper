@@ -4,6 +4,7 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 
+const yargs = require('yargs');
 const TikTokScraper = require('../build');
 const CONST = require('../build/constant');
 
@@ -25,16 +26,26 @@ const startScraper = async argv => {
         if (scraper.csv) {
             console.log(`CSV path: ${scraper.csv}`);
         }
+        if (scraper.message) {
+            console.log(scraper.message);
+        }
+        if (scraper.table) {
+            console.table(scraper.table);
+        }
     } catch (error) {
         console.log(error);
     }
 };
 
-require('yargs')
+yargs
     .usage('Usage: $0 <command> [options]')
     .example(`$0 user USERNAME -d -n 100`)
     .example(`$0 trend -d -n 100`)
     .example(`$0 hashtag HASHTAG_NAME -d -n 100`)
+    .example(`$0 music MUSIC_ID -d -n 50`)
+    .example(`$0 history`)
+    .example(`$0 history -r user:bob`)
+    .example(`$0 history -r all`)
     .command('user [id]', 'Scrape videos from username. Enter only username', {}, argv => {
         startScraper(argv);
     })
@@ -45,6 +56,9 @@ require('yargs')
         startScraper(argv);
     })
     .command('music [id]', 'Scrape videos from music id. Enter only music id', {}, argv => {
+        startScraper(argv);
+    })
+    .command('history', 'View previous post download history', {}, argv => {
         startScraper(argv);
     })
     .options({
@@ -90,6 +104,11 @@ require('yargs')
             default: false,
             describe: 'Download video without the watermark. This option will affect the execution speed',
         },
+        remove: {
+            alias: ['r'],
+            default: '',
+            describe: 'Delete the history record by entering "TYPE:INPUT" or "all" to clean all the history. For example: user:bob',
+        },
     })
     .check(argv => {
         if (CONST.scrape.indexOf(argv._[0]) === -1) {
@@ -98,9 +117,27 @@ require('yargs')
 
         if (argv.store) {
             if (!argv.download) {
-                throw new Error('--store, -s flag only works in combination with the download flag. Add -d to your command');
+                throw new Error('--store, -s flag is only working in combination with the download flag. Add -d to your command');
             }
         }
+
+        if (argv.remove) {
+            if (argv.remove.indexOf(':') === -1) {
+                argv.remove = `${argv.remove}:`;
+            }
+            const split = argv.remove.split(':');
+            const type = split[0];
+            const input = split[1];
+
+            if (type !== 'all' && CONST.history.indexOf(type) === -1) {
+                throw new Error(`--remove, -r list of allowed types: ${CONST.history}`);
+            }
+            if (!input && type !== 'trend' && type !== 'all') {
+                throw new Error('--remove, -r to remove the specific history record you need to enter "TYPE:INPUT". For example: user:bob');
+            }
+        }
+
         return true;
     })
-    .demandCommand().argv;
+    .demandCommand()
+    .help().argv;
