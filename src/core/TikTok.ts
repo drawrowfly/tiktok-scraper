@@ -65,7 +65,7 @@ export class TikTokScraper extends EventEmitter {
 
     private idStore: string;
 
-    private Downloader: Downloader;
+    public Downloader: Downloader;
 
     private tacValue: string = '';
 
@@ -791,6 +791,9 @@ export class TikTokScraper extends EventEmitter {
             if (regex) {
                 const videoProps = JSON.parse(regex[1]);
                 let videoItem = {} as PostCollector;
+                if (videoProps.props.pageProps.statusCode) {
+                    throw new Error(`Can't find video: ${this.input}`);
+                }
                 videoItem = {
                     id: videoProps.props.pageProps.videoData.itemInfos.id,
                     text: videoProps.props.pageProps.videoData.itemInfos.text,

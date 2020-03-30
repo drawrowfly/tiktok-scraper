@@ -19,8 +19,9 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   Download **unlimited** post metadata from the User, Hashtag, Trends, or Music-Id pages
 -   Save post metadata to the JSON/CSV files
 -   Download media **with and without the watermark** and save to the ZIP file
+-   Download single video without the watermark from the CLI
 -   Sign URL to make custom request to the TIkTok API
--   Extract metadata from the User, Hashtag and Sginel Video pages
+-   Extract metadata from the User, Hashtag and Single Video pages
 -   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and only if **download** flag is on.
 -   **View and manage previously downloaded posts history in the CLI**
 
@@ -153,6 +154,7 @@ Commands:
   tiktok-scraper hashtag [id]  Scrape videos from hashtag. Enter hashtag without #
   tiktok-scraper trend         Scrape posts from current trends
   tiktok-scraper music [id]    Scrape posts from a music id number
+  tiktok-scraper video [id]    Download single video without the watermark
   tiktok-scraper history       View previous download history
 
 Options:
@@ -164,7 +166,7 @@ Options:
   --download, -d          Download and archive all scraped videos to a ZIP file
                                                       [boolean] [default: false]
   --filepath              Directory to save all output files.
-      [default: "/Users/karl.wint/Documents/projects/javascript/tiktok-scraper"]
+      [default: "/Users/USER/Downloads"]
   --filetype, --type, -t  Type of output file where post information will be
                           saved. 'all' - save information about all posts to a
                           'json' and 'csv'
@@ -184,6 +186,7 @@ Examples:
   tiktok-scraper trend -d -n 100
   tiktok-scraper music MUSICID -n 100
   tiktok-scraper music MUSIC_ID -d -n 50
+  tiktok-scraper video https://www.tiktok.com/@tiktok/video/6807491984882765062
   tiktok-scraper history
   tiktok-scraper history -r user:bob
   tiktok-scraper history -r all
@@ -262,6 +265,16 @@ CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 ```
 
 **Example 7:**
+Download single video without the watermark from the CLI
+
+```sh
+tiktok-scraper video https://www.tiktok.com/@tiktok/video/6807491984882765062
+
+Output:
+Video was saved in: /Users/USER/Downloads/6807491984882765062.mp4
+```
+
+**Example 8:**
 View previous download history
 
 ```sh
@@ -380,7 +393,9 @@ const rp = require('request-promise');
 })();
 ```
 
-**Promise will return current result**
+### Result
+
+##### user, hashtag, trend, music
 
 ```javascript
 {
@@ -389,6 +404,67 @@ const rp = require('request-promise');
     zip: '/{CURRENT_PATH}/user_1552963581094.zip',
     json: '/{CURRENT_PATH}/user_1552963581094.json',
     csv: '/{CURRENT_PATH}/user_1552963581094.csv'
+}
+```
+
+##### getUserProfileInfo
+
+```javascript
+{
+    secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
+    userId: '107955',
+    isSecret: false,
+    uniqueId: 'tiktok',
+    nickName: 'TikTok',
+    signature: 'Make Your Day',
+    covers: ['COVER_URL'],
+    coversMedium: ['COVER_URL'],
+    following: 490,
+    fans: 38040567,
+    heart: '211522962',
+    video: 93,
+    verified: true,
+    digg: 29,
+}
+```
+
+##### getHashtagInfo
+
+```javascript
+{
+    challengeId: '4231',
+    challengeName: 'love',
+    text: '',
+    covers: [],
+    coversMedium: [],
+    posts: 66904972,
+    views: '194557706433',
+    isCommerce: false,
+    splitTitle: ''
+}
+```
+
+##### getVideoMeta
+
+```javascript
+{
+    id: '6807491984882765062',
+    text: 'We’re kicking off the #happyathome live stream series today at 5pm PT!',
+    createTime: '1584992742',
+    authorId: '107955',
+    authorName: 'tiktok',
+    musicId: '6807487887634909957',
+    musicName: 'original sound',
+    musicAuthor: 'tiktok',
+    imageUrl: 'IMAGE_URL',
+    videoUrl: 'VIDEO_URL',
+    videoUrlNoWaterMark: 'VIDEO_URL_WITHOUT_THE_WATERMARK',
+    diggCount: 49292,
+    shareCount: 339,
+    playCount: 614678,
+    commentCount: 4023,
+    downloaded: false,
+    hashtags: [],
 }
 ```
 

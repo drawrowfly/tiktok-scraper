@@ -1,8 +1,10 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 import request from 'request';
+import rp from 'request-promise';
 import { Agent } from 'http';
-import { createWriteStream } from 'fs';
+import { createWriteStream, writeFile } from 'fs';
+import { fromCallback } from 'bluebird';
 import archiver from 'archiver';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
@@ -134,5 +136,22 @@ export class Downloader {
                 },
             );
         });
+    }
+
+    public async downloadSingleVideo(post: PostCollector) {
+        const query = {
+            uri: post.videoUrlNoWaterMark,
+            headers: {
+                'user-agent': this.userAgent,
+            },
+            encoding: null,
+        };
+        try {
+            const result = await rp(query);
+
+            await fromCallback(cb => writeFile(`${post.id}.mp4`, result, cb));
+        } catch (error) {
+            throw error.message;
+        }
     }
 }

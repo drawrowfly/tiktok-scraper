@@ -96,6 +96,17 @@ export const getVideoMeta = async (input: string, options?: Options): Promise<Po
     return result;
 };
 
+export const video = async (input: string, options?: Options): Promise<any> => {
+    const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...{ type: 'video' as ScrapeType, input }, ...options };
+    const scraper = new TikTokScraper(contructor);
+
+    const result: PostCollector = await scraper.getVideoMeta();
+
+    await scraper.Downloader.downloadSingleVideo(result);
+
+    return { message: `Video was saved in: ${process.cwd()}/${result.id}.mp4` };
+};
+
 // eslint-disable-next-line no-unused-vars
 export const history = async (input: string, options?: Options) => {
     const store = (await fromCallback(cb => readFile(`${tmpdir()}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;

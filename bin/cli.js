@@ -43,22 +43,26 @@ yargs
     .example(`$0 trend -d -n 100`)
     .example(`$0 hashtag HASHTAG_NAME -d -n 100`)
     .example(`$0 music MUSIC_ID -d -n 50`)
+    .example(`$0 video https://www.tiktok.com/@tiktok/video/6807491984882765062`)
     .example(`$0 history`)
     .example(`$0 history -r user:bob`)
     .example(`$0 history -r all`)
-    .command('user [id]', 'Scrape videos from username. Enter only username', {}, argv => {
+    .command('user [id]', 'Scrape videos from the User Feed. Enter only the username', {}, argv => {
         startScraper(argv);
     })
-    .command('hashtag [id]', 'Scrape videos from hashtag. Enter hashtag without #', {}, argv => {
+    .command('hashtag [id]', 'Scrape videos from the Hashtag Feed. Enter hashtag without the #', {}, argv => {
         startScraper(argv);
     })
-    .command('trend', 'Scrape posts from current trends', {}, argv => {
+    .command('trend', 'Scrape posts from the Trend Feed', {}, argv => {
         startScraper(argv);
     })
-    .command('music [id]', 'Scrape videos from music id. Enter only music id', {}, argv => {
+    .command('music [id]', 'Scrape videos from the Music Feed. Enter only the music id', {}, argv => {
         startScraper(argv);
     })
-    .command('history', 'View previous post download history', {}, argv => {
+    .command('video [id]', 'Download single video without the watermark', {}, argv => {
+        startScraper(argv);
+    })
+    .command('history', 'View previous download history', {}, argv => {
         startScraper(argv);
     })
     .options({
@@ -134,6 +138,12 @@ yargs
             }
             if (!input && type !== 'trend' && type !== 'all') {
                 throw new Error('--remove, -r to remove the specific history record you need to enter "TYPE:INPUT". For example: user:bob');
+            }
+        }
+
+        if (argv._[0] === 'video') {
+            if (!/^https:\/\/www\.tiktok\.com\/@(\w+)\/video\/(\d+)$/.test(argv.id)) {
+                throw new Error('Enter a valid TikTok video URL. For example: https://www.tiktok.com/@tiktok/video/6807491984882765062');
             }
         }
 
