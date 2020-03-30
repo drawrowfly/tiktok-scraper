@@ -1,11 +1,17 @@
+/* eslint-disable no-throw-literal */
+/* eslint-disable no-restricted-syntax */
+import { tmpdir } from 'os';
+import { readFile, writeFile, unlink } from 'fs';
+import { fromCallback } from 'bluebird';
 import { TikTokScraper } from './core';
-import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge } from './types';
+import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem } from './types';
 import CONST from './constant';
 
 const INIT_OPTIONS = {
     number: 20,
     download: false,
     asyncDownload: 5,
+    asyncScraping: 3,
     proxy: '',
     filepath: process.cwd(),
     filetype: 'na',
@@ -67,6 +73,7 @@ export const getUserProfileInfo = async (input: string, options?: Options): Prom
     const result = await scraper.getUserProfileInfo();
     return result;
 };
+
 export const signUrl = async (input: string, options?: Options): Promise<string> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
@@ -76,4 +83,69 @@ export const signUrl = async (input: string, options?: Options): Promise<string>
 
     const result = await scraper.signUrl();
     return result;
+};
+
+export const getVideoMeta = async (input: string, options?: Options): Promise<PostCollector> => {
+    if (options && typeof options !== 'object') {
+        throw new TypeError('Object is expected');
+    }
+    const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...{ type: 'video_meta' as ScrapeType, input }, ...options };
+    const scraper = new TikTokScraper(contructor);
+
+    const result = await scraper.getVideoMeta();
+    return result;
+};
+
+export const video = async (input: string, options?: Options): Promise<any> => {
+    const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...{ type: 'video' as ScrapeType, input }, ...options };
+    const scraper = new TikTokScraper(contructor);
+
+    const result: PostCollector = await scraper.getVideoMeta();
+
+    await scraper.Downloader.downloadSingleVideo(result);
+
+    return { message: `Video was saved in: ${process.cwd()}/${result.id}.mp4` };
+};
+
+// eslint-disable-next-line no-unused-vars
+export const history = async (input: string, options?: Options) => {
+    const store = (await fromCallback(cb => readFile(`${tmpdir()}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;
+    const historyStore: History = JSON.parse(store);
+
+    if (options?.remove) {
+        const split = options.remove.split(':');
+        const type = split[0];
+
+        if (type === 'all') {
+            const remove: any = [];
+            for (const key of Object.keys(historyStore)) {
+                remove.push(fromCallback(cb => unlink(historyStore[key].file_location, cb)));
+            }
+            remove.push(fromCallback(cb => unlink(`${tmpdir()}/tiktok_history.json`, cb)));
+
+            await Promise.all(remove);
+
+            return { message: `History was completely removed` };
+        }
+
+        const key = type !== 'trend' ? options.remove.replace(':', '_') : 'trend';
+
+        if (historyStore[key]) {
+            const historyFile = historyStore[key].file_location;
+
+            await fromCallback(cb => unlink(historyFile, cb));
+
+            delete historyStore[key];
+
+            await fromCallback(cb => writeFile(`${tmpdir()}/tiktok_history.json`, JSON.stringify(historyStore), cb));
+
+            return { message: `Record ${key} was removed` };
+        }
+        throw `Can't find record: ${key.split('_').join(' ')}`;
+    }
+    const table: HistoryItem[] = [];
+    for (const key of Object.keys(historyStore)) {
+        table.push(historyStore[key]);
+    }
+    return { table };
 };

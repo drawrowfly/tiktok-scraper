@@ -1,12 +1,12 @@
 # TikTok Scraper & Downloader
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b3ef17f5a8504600931abfa60ac01006)](https://app.codacy.com/manual/drawrowfly/tiktok-scraper?utm_source=github.com&utm_medium=referral&utm_content=drawrowfly/tiktok-scraper&utm_campaign=Badge_Grade_Dashboard)
+![NPM](https://img.shields.io/npm/l/tiktok-scraper.svg?style=for-the-badge) ![npm](https://img.shields.io/npm/v/tiktok-scraper.svg?style=for-the-badge) ![Codacy grade](https://img.shields.io/codacy/grade/b3ef17f5a8504600931abfa60ac01006.svg?style=for-the-badge)
 
 Scrape and download useful information from TikTok.
 
 ## No login or password are required
 
-This is not an official API support and etc. This is just a scraper that is using TikTok Web API to scrape media.
+This is not an official API support and etc. This is just a scraper that is using TikTok Web API to scrape media and related meta information.
 
 ---
 
@@ -18,10 +18,12 @@ This is not an official API support and etc. This is just a scraper that is usin
 
 -   Download **unlimited** post metadata from the User, Hashtag, Trends, or Music-Id pages
 -   Save post metadata to the JSON/CSV files
--   Download media and save to the ZIP file
+-   Download media **with and without the watermark** and save to the ZIP file
+-   Download single video without the watermark from the CLI
 -   Sign URL to make custom request to the TIkTok API
--   Extract metadata from the the User or Hashtag pages
+-   Extract metadata from the User, Hashtag and Single Video pages
 -   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and only if **download** flag is on.
+-   **View and manage previously downloaded posts history in the CLI**
 
 ## To Do
 
@@ -31,7 +33,8 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Add tests
 -   [x] Download video without the watermark
 -   [x] Indicate in the output file(csv/json) if the video was downloaded or not
--   [ ] Scrape users/hashtag
+-   [ ] Scrape metadata and download posts from different users/hashtags in batch
+-   [ ] Scrape users/hashtags
 -   [ ] Web interface
 
 ## Contribution
@@ -47,9 +50,10 @@ yarn test
 yarn build
 ```
 
-## JSON/CSV output:
+## Post metadata example:
 
-```
+```javascript
+{
     id: 'VIDEO_ID',
     text: 'CAPTION',
     createTime: '1583870600',
@@ -81,10 +85,41 @@ yarn build
        cover: [Array]
     }...],
     downloaded: true
+}[]
 ```
+
+## CSV file example
 
 ![Demo](https://i.imgur.com/6gIbBzo.png)
 
+## View and manage previously downloaded posts history in the CLI
+
+You can only view this history from the CLI and only if you have used -s flag in your previous scraper executions.
+
+**-s** save download history to avoid downloading duplicate posts in the future
+
+To view history record:
+
+```sh
+tiktok-scraper history
+```
+
+To delete single history record:
+
+```sh
+tiktok-scraper history -r TYPE:INPUT
+tiktok-scraper history -r user:tiktok
+tiktok-scraper history -r hashtag:summer
+tiktok-scraper history -r trend
+```
+
+To delete all records:
+
+```sh
+tiktok-scraper history -r all
+```
+
+![History](https://i.imgur.com/VnDKh72.png)
 **Possible errors**
 
 -   Unknown. Report them if you will receive any
@@ -119,6 +154,8 @@ Commands:
   tiktok-scraper hashtag [id]  Scrape videos from hashtag. Enter hashtag without #
   tiktok-scraper trend         Scrape posts from current trends
   tiktok-scraper music [id]    Scrape posts from a music id number
+  tiktok-scraper video [id]    Download single video without the watermark
+  tiktok-scraper history       View previous download history
 
 Options:
   --help, -h              help                                         [boolean]
@@ -129,7 +166,7 @@ Options:
   --download, -d          Download and archive all scraped videos to a ZIP file
                                                       [boolean] [default: false]
   --filepath              Directory to save all output files.
-      [default: "/Users/karl.wint/Documents/projects/javascript/tiktok-scraper"]
+      [default: "/Users/USER/Downloads"]
   --filetype, --type, -t  Type of output file where post information will be
                           saved. 'all' - save information about all posts to a
                           'json' and 'csv'
@@ -139,12 +176,20 @@ Options:
                           avoiding duplicates         [boolean] [default: false]
   --noWaterMark, -w       Download video without the watermark. This option will
                           affect the execution speed  [boolean] [default: false]
+  --remove, -r            Delete the history record by entering "TYPE:INPUT" or
+                          "all" to clean all the history. For example: user:bob
+                                                                   [default: ""]
 
 Examples:
   tiktok-scraper user USERNAME -d -n 100
   tiktok-scraper hashtag HASHTAG_NAME -d -n 100
   tiktok-scraper trend -d -n 100
   tiktok-scraper music MUSICID -n 100
+  tiktok-scraper music MUSIC_ID -d -n 50
+  tiktok-scraper video https://www.tiktok.com/@tiktok/video/6807491984882765062
+  tiktok-scraper history
+  tiktok-scraper history -r user:bob
+  tiktok-scraper history -r all
 ```
 
 **Example 1:**
@@ -219,22 +264,26 @@ ZIP path: /{CURRENT_PATH}/trend_1552945659138.zip
 CSV path: /{CURRENT_PATH}/tend_1552945659138.csv
 ```
 
-**To make it look better, when downloading posts the progress will be shown in terminal**
+**Example 7:**
+Download single video without the watermark from the CLI
 
 ```sh
-Downloading 6750670497744309509 [==============================] 100%
-Downloading 6749962264020782342 [==============================] 100%
-Downloading 6749433991113264390 [==============================] 100%
-Downloading 6750671571968429318 [==============================] 100%
-Downloading 6750668198011505926 [==============================] 100%
-Downloading 6748611221903117574 [==============================] 100%
-Downloading 6748606789551410438 [==============================] 100%
-Downloading 6748139550251535621 [==============================] 100%
-Downloading 6748616311166799110 [==============================] 100%
-Downloading 6748048372625689861 [==============================] 100%
+tiktok-scraper video https://www.tiktok.com/@tiktok/video/6807491984882765062
+
+Output:
+Video was saved in: /Users/USER/Downloads/6807491984882765062.mp4
+```
+
+**Example 8:**
+View previous download history
+
+```sh
+tiktok-scraper history
 ```
 
 ## Module
+
+Don't forget to checkout the **examples** folder
 
 ### Promise
 
@@ -262,7 +311,7 @@ const TikTokScraper = require('tiktok-scraper');
     }
 })();
 
-// Trend
+// Trending feed
 (async () => {
     try {
         const posts = await TikTokScraper.trend('', { number: 100 });
@@ -272,7 +321,7 @@ const TikTokScraper = require('tiktok-scraper');
     }
 })();
 
-// Hashtag
+// Hashtag feed
 (async () => {
     try {
         const posts = await TikTokScraper.hashtag('HASHTAG', { number: 100 });
@@ -329,9 +378,24 @@ const rp = require('request-promise');
         console.log(error);
     }
 })();
+
+// Get single video metadata
+// input - WEB_VIDEO_URL
+// For example: https://www.tiktok.com/@tiktok/video/6807491984882765062
+// options - not required
+(async () => {
+    try {
+        const videoMeta = await TikTokScraper.getVideoMeta('https://www.tiktok.com/@tiktok/video/6807491984882765062', options);
+        console.log(videoMeta);
+    } catch (error) {
+        console.log(error);
+    }
+})();
 ```
 
-**Promise will return current result**
+### Result
+
+##### user, hashtag, trend, music
 
 ```javascript
 {
@@ -340,6 +404,67 @@ const rp = require('request-promise');
     zip: '/{CURRENT_PATH}/user_1552963581094.zip',
     json: '/{CURRENT_PATH}/user_1552963581094.json',
     csv: '/{CURRENT_PATH}/user_1552963581094.csv'
+}
+```
+
+##### getUserProfileInfo
+
+```javascript
+{
+    secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
+    userId: '107955',
+    isSecret: false,
+    uniqueId: 'tiktok',
+    nickName: 'TikTok',
+    signature: 'Make Your Day',
+    covers: ['COVER_URL'],
+    coversMedium: ['COVER_URL'],
+    following: 490,
+    fans: 38040567,
+    heart: '211522962',
+    video: 93,
+    verified: true,
+    digg: 29,
+}
+```
+
+##### getHashtagInfo
+
+```javascript
+{
+    challengeId: '4231',
+    challengeName: 'love',
+    text: '',
+    covers: [],
+    coversMedium: [],
+    posts: 66904972,
+    views: '194557706433',
+    isCommerce: false,
+    splitTitle: ''
+}
+```
+
+##### getVideoMeta
+
+```javascript
+{
+    id: '6807491984882765062',
+    text: 'We’re kicking off the #happyathome live stream series today at 5pm PT!',
+    createTime: '1584992742',
+    authorId: '107955',
+    authorName: 'tiktok',
+    musicId: '6807487887634909957',
+    musicName: 'original sound',
+    musicAuthor: 'tiktok',
+    imageUrl: 'IMAGE_URL',
+    videoUrl: 'VIDEO_URL',
+    videoUrlNoWaterMark: 'VIDEO_URL_WITHOUT_THE_WATERMARK',
+    diggCount: 49292,
+    shareCount: 339,
+    playCount: 614678,
+    commentCount: 4023,
+    downloaded: false,
+    hashtags: [],
 }
 ```
 
@@ -389,6 +514,7 @@ hashtag.scrape();
 .getUserProfileInfo('USERNAME', options) // Get user profile information
 .getHashtagInfo('HASHTAG', options) // Get hashtag information
 .signUrl('URL', options) // Get signature for the request
+.getVideoMeta('WEB_VIDEO_URL', options) // Get video meta info, including video url without the watermark
 ```
 
 ### Options
@@ -408,6 +534,12 @@ let options = {
 
     // How many post should be downloaded asynchronously. Only if {download:true}: {int default: 5}
     asyncDownload: 5,
+
+    // How many post should be scraped asynchronously: {int default: 3}
+    // Current option will be applied only with current types: music and hashtag
+    // With other types it is always 1 because each request provides "maxCursor" value
+    // that is needed for the next request
+    asyncScraping: 3,
 
     // File path where all files will be saved: {string default: 'CURRENT_DIR'}
     filepath: `CURRENT_DIR`,

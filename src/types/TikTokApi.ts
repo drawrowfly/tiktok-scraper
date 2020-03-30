@@ -18,7 +18,7 @@ export interface UserData {
 export interface ItemInfos {
     id: string;
     text: string;
-    createTime: string;
+    createTime: number;
     authorId: string;
     musicId: string;
     covers: string[];
@@ -99,7 +99,7 @@ export interface ItemListData {
     body: {
         itemListData: Item[];
         hasMore: boolean;
-        maxCursor: string;
+        maxCursor: number;
         minCursor: string;
     };
 }
@@ -119,4 +119,12 @@ export interface RequestQuery {
     count: number;
     minCursor: number;
     lang: string;
+}
+
+export interface VideoProps {
+    props: {
+        pageProps: {
+            videoData: Item;
+        };
+    };
 }

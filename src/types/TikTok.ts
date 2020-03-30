@@ -8,7 +8,8 @@ export type ScrapeType =
     | 'discover_music'
     | 'single_user'
     | 'single_hashtag'
-    | 'signature';
+    | 'signature'
+    | 'video_meta';
 
 export interface Options {
     proxy?: string;
@@ -16,12 +17,14 @@ export interface Options {
     by_user_id?: boolean;
     download?: boolean;
     asyncDownload?: number;
+    asyncScraping?: number;
     filepath?: string;
     filetype?: string;
     progress?: boolean;
     number?: number;
     userAgent?: string;
     noWaterMark?: boolean;
+    remove?: string;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -29,6 +32,7 @@ export interface TikTokConstructor {
     filetype: string;
     proxy: string;
     asyncDownload: number;
+    asyncScraping: number;
     cli?: boolean;
     event?: boolean;
     progress?: boolean;
@@ -52,7 +56,7 @@ export interface Hashtags {
 export interface PostCollector {
     id: string;
     text: string;
-    createTime: string;
+    createTime: number;
     authorId: string;
     authorName: string;
     authorFollowing: number;
