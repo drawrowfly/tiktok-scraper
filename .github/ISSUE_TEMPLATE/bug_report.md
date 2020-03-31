@@ -14,7 +14,8 @@ If fields below will be empty then issue will be Ignored and Closed
 **To Reproduce**
 Steps to reproduce the behavior:
 - Used OS
-- Used version
+- NodeJs Version
+- Scraper Version
 - CLI or Module
 - Used method
 - Used options
