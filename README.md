@@ -39,8 +39,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 
 ## Contribution
 
--   Please use **develop** branch
--   Add tests if they are missing
+-   Don't forget about tests
 
 ```sh
 yarn test

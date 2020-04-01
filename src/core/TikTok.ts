@@ -297,18 +297,6 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
-    // private getMaxCursor(type: string, item: number, count: number): number {
-    //     switch (type) {
-    //         case 'hashtag':
-    //             if (item === 1) {
-    //                 return 0;
-    //             }else if(item)
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // }
-
     /**
      * Main loop that collects all required metadata from the tiktok web api
      */
@@ -326,26 +314,26 @@ export class TikTokScraper extends EventEmitter {
                             this.getUserId()
                                 .then(query => this.submitScrapingRequest(query, this.maxCursor))
                                 .then(() => cb(null))
-                                .catch(() => cb(null));
+                                .catch(error => cb(error));
                             break;
                         case 'hashtag':
                             this.fileName = `${this.input}_${Date.now()}`;
                             this.getHashTagId()
                                 .then(query => this.submitScrapingRequest(query, item === 1 ? 0 : (item - 1) * query.count))
                                 .then(() => cb(null))
-                                .catch(() => cb(null));
+                                .catch(error => cb(error));
                             break;
                         case 'trend':
                             this.getTrendingFeedQuery()
                                 .then(query => this.submitScrapingRequest(query, this.maxCursor))
                                 .then(() => cb(null))
-                                .catch(() => cb(null));
+                                .catch(error => cb(error));
                             break;
                         case 'music':
                             this.getMusicFeedQuery()
                                 .then(query => this.submitScrapingRequest(query, item === 1 ? 0 : (item - 1) * query.count))
                                 .then(() => cb(null))
-                                .catch(() => cb(null));
+                                .catch(error => cb(error));
                             break;
                         default:
                             break;
@@ -772,7 +760,7 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        if (!/^https:\/\/www\.tiktok\.com\/@(\w+)\/video\/(\d+)$/.test(this.input)) {
+        if (!/^https:\/\/www\.tiktok\.com\/@(\w.+)\/video\/(\d+)$/.test(this.input)) {
             throw `Bad url format. Correct format: https://www.tiktok.com/@USERNAME/video/ID`;
         }
         const query = {

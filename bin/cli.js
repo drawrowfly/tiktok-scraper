@@ -142,7 +142,7 @@ yargs
         }
 
         if (argv._[0] === 'video') {
-            if (!/^https:\/\/www\.tiktok\.com\/@(\w+)\/video\/(\d+)$/.test(argv.id)) {
+            if (!/^https:\/\/www\.tiktok\.com\/@(\w.+)\/video\/(\d+)$/.test(argv.id)) {
                 throw new Error('Enter a valid TikTok video URL. For example: https://www.tiktok.com/@tiktok/video/6807491984882765062');
             }
         }
