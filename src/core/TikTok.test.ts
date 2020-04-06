@@ -76,6 +76,7 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                 authorMeta: {
                     id: '5831967',
                     name: 'charlidamelio',
+                    nickName: 'charli d’amelio',
                     following: 932,
                     fans: 40431380,
                     heart: '2426012173',

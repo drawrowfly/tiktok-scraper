@@ -62,6 +62,7 @@ export interface PostCollector {
     authorMeta: {
         id: string;
         name: string;
+        nickName: string;
         following: number;
         fans: number;
         heart: number;

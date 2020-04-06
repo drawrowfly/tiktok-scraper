@@ -522,6 +522,7 @@ export class TikTokScraper extends EventEmitter {
                     authorMeta: {
                         id: posts[i].authorInfos.userId,
                         name: posts[i].authorInfos.uniqueId,
+                        nickName: posts[i].authorInfos.nickName,
                         following: posts[i].authorStats.followingCount,
                         fans: posts[i].authorStats.followerCount,
                         heart: posts[i].authorStats.heartCount,
