@@ -14,6 +14,9 @@ const startScraper = async argv => {
         argv.cli = true;
         argv.input = argv.id;
         argv.store_history = argv.store;
+        if (argv.filename) {
+            argv.fileName = argv.filename;
+        }
 
         const scraper = await TikTokScraper[argv.type](argv.input, argv);
 
@@ -95,6 +98,11 @@ yargs
             default: 'csv',
             choices: ['csv', 'json', 'all'],
             describe: "Type of output file where post information will be saved. 'all' - save information about all posts to a 'json' and 'csv' ",
+        },
+        filename: {
+            alias: ['f'],
+            default: '',
+            describe: 'Set custom filename for the output files',
         },
         store: {
             alias: ['s'],

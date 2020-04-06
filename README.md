@@ -56,32 +56,39 @@ yarn build
     id: 'VIDEO_ID',
     text: 'CAPTION',
     createTime: '1583870600',
-    authorId: 'AUTHOR_ID',
-    authorName: 'AUTHOR_USERNAME',
-    authorFollowing: 208,
-    authorFans: 2273771,
-    authorHeart: 79791624,
-    authorVideo: 1149,
-    authorDigg: 8922,
-    authorVerified: true,
-    authorPrivate: false,
-    authorSignature: 'AUTHOR_DESCRIPTION(BIO)',
-    musicId: 'MUSIC_ID',
-    musicName: 'AUTHOR_NICK',
-    musicAuthor: 'AUTHOR_NAME',
-    musicOriginal: '',
+    authorMeta:{
+        id: 'USER ID',
+        name: 'USERNAME',
+        following: 195,
+        fans: 43500,
+        heart: '1093998',
+        video: 3,
+        digg: 95,
+        verified: false,
+        private: false,
+        signature: 'USER BIO',
+        avatar:'AVATAR_URL'
+    },
+    musicMeta:{
+        musicId: '6808098113188120838',
+        musicName: 'blah blah',
+        musicAuthor: 'blah',
+        musicOriginal: true
+    },
     imageUrl:'IMAGE_URL',
     videoUrl:'VIDEO_URL',
     videoUrlNoWaterMark:'VIDEO_URL_WITHOUT_THE_WATERMARK',
+    videoMeta: { width: 480, height: 864, ratio: 14, duration: 14 },
     diggCount: 2104,
     shareCount: 1,
     playCount: 9007,
     commentCount: 50,
     hashtags:
-    [{ id: '69573911',
-       name: 'PlayWithLife',
-       title: 'HASHTAG_TITLE',
-       cover: [Array]
+    [{
+        id: '69573911',
+        name: 'PlayWithLife',
+        title: 'HASHTAG_TITLE',
+        cover: [Array]
     }...],
     downloaded: true
 }[]
@@ -93,7 +100,9 @@ yarn build
 
 ## View and manage previously downloaded posts history in the CLI
 
-You can only view this history from the CLI and only if you have used -s flag in your previous scraper executions.
+![History](https://i.imgur.com/VnDKh72.png)
+
+You can only view the history from the CLI and only if you have used **-s** flag in your previous scraper executions.
 
 **-s** save download history to avoid downloading duplicate posts in the future
 
@@ -118,7 +127,6 @@ To delete all records:
 tiktok-scraper history -r all
 ```
 
-![History](https://i.imgur.com/VnDKh72.png)
 **Possible errors**
 
 -   Unknown. Report them if you will receive any
@@ -170,6 +178,7 @@ Options:
                           saved. 'all' - save information about all posts to a
                           'json' and 'csv'
                                 [choices: "csv", "json", "all"] [default: "csv"]
+  --filename, -f          Set custom filename for the output files [default: ""]
   --store, -s             Scraper will save the progress in the OS TMP folder
                           and in the future usage will only download new videos
                           avoiding duplicates         [boolean] [default: false]
@@ -181,6 +190,7 @@ Options:
 
 Examples:
   tiktok-scraper user USERNAME -d -n 100
+  tiktok-scraper user USERNAME -d -n 100 -f customFileName
   tiktok-scraper hashtag HASHTAG_NAME -d -n 100
   tiktok-scraper trend -d -n 100
   tiktok-scraper music MUSICID -n 100
@@ -398,7 +408,45 @@ const rp = require('request-promise');
 
 ```javascript
 {
-    collector:[ARRAY_OF_DATA]
+    collector:[{
+        id: 'VIDEO_ID',
+        text: 'CAPTION',
+        createTime: '1583870600',
+        authorMeta:{
+            id: 'USER ID',
+            name: 'USERNAME',
+            following: 195,
+            fans: 43500,
+            heart: '1093998',
+            video: 3,
+            digg: 95,
+            verified: false,
+            private: false,
+            signature: 'USER BIO',
+            avatar:'AVATAR_URL'
+        },
+        musicMeta:{
+            musicId: '6808098113188120838',
+            musicName: 'blah blah',
+            musicAuthor: 'blah',
+            musicOriginal: true
+        },
+        imageUrl:'IMAGE_URL',
+        videoUrl:'VIDEO_URL',
+        videoUrlNoWaterMark:'VIDEO_URL_WITHOUT_THE_WATERMARK',
+        videoMeta: { width: 480, height: 864, ratio: 14, duration: 14 },
+        diggCount: 2104,
+        shareCount: 1,
+        playCount: 9007,
+        commentCount: 50,
+        hashtags:
+        [{ id: '69573911',
+           name: 'PlayWithLife',
+           title: 'HASHTAG_TITLE',
+           cover: [Array]
+        }],
+        downloaded: true
+    }...],
     //If {filetype} and {download} options are enbabled then:
     zip: '/{CURRENT_PATH}/user_1552963581094.zip',
     json: '/{CURRENT_PATH}/user_1552963581094.json',
@@ -450,11 +498,12 @@ const rp = require('request-promise');
     id: '6807491984882765062',
     text: 'We’re kicking off the #happyathome live stream series today at 5pm PT!',
     createTime: '1584992742',
-    authorId: '107955',
-    authorName: 'tiktok',
-    musicId: '6807487887634909957',
-    musicName: 'original sound',
-    musicAuthor: 'tiktok',
+    authorMeta: { id: '6812221792183403526', name: 'blah' },
+    musicMeta:{
+        musicId: '6822233276137213677',
+        musicName: 'blah',
+        musicAuthor: 'blah'
+    },
     imageUrl: 'IMAGE_URL',
     videoUrl: 'VIDEO_URL',
     videoUrlNoWaterMark: 'VIDEO_URL_WITHOUT_THE_WATERMARK',
@@ -536,12 +585,15 @@ let options = {
 
     // How many post should be scraped asynchronously: {int default: 3}
     // Current option will be applied only with current types: music and hashtag
-    // With other types it is always 1 because each request provides "maxCursor" value
+    // With other types it is always 1 because every response is providing the "maxCursor" value
     // that is needed for the next request
     asyncScraping: 3,
 
     // File path where all files will be saved: {string default: 'CURRENT_DIR'}
     filepath: `CURRENT_DIR`,
+
+    // Custom file name for the output files: {string default: ''}
+    fileName: `CURRENT_DIR`,
 
     // Output with information can be saved to a CSV or JSON files: {string default: 'na'}
     // 'csv' to save in csv

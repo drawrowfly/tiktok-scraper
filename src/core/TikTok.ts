@@ -45,8 +45,6 @@ export class TikTokScraper extends EventEmitter {
 
     private collector: PostCollector[];
 
-    private date: number;
-
     private event: boolean;
 
     private scrapeType: ScrapeType;
@@ -61,7 +59,7 @@ export class TikTokScraper extends EventEmitter {
 
     private tmpFolder: string;
 
-    private fileName: string;
+    private fileName: () => string;
 
     private idStore: string;
 
@@ -76,6 +74,8 @@ export class TikTokScraper extends EventEmitter {
     private test: boolean = false;
 
     private noWaterMark: boolean;
+
+    private noDuplicates: string[];
 
     constructor({
         download,
@@ -95,13 +95,14 @@ export class TikTokScraper extends EventEmitter {
         userAgent,
         test = false,
         noWaterMark = false,
+        fileName,
     }: TikTokConstructor) {
         super();
         this.mainHost = 'https://m.tiktok.com/';
         this.userAgent = userAgent || CONST.userAgent;
         this.download = download;
         this.filepath = '' || filepath;
-        this.json2csvParser = new Parser();
+        this.json2csvParser = new Parser({ flatten: true });
         this.filetype = filetype;
         this.input = input;
         this.agent = proxy && proxy.indexOf('socks') > -1 ? new SocksProxyAgent(proxy) : '';
@@ -118,7 +119,6 @@ export class TikTokScraper extends EventEmitter {
             }
         };
         this.collector = [];
-        this.date = Date.now();
         this.event = event;
         this.scrapeType = type;
         this.cli = cli;
@@ -126,11 +126,23 @@ export class TikTokScraper extends EventEmitter {
         this.byUserId = by_user_id;
         this.storeHistory = cli && download && store_history;
         this.tmpFolder = tmpdir();
-        this.fileName = `${this.scrapeType}_${this.date}`;
+        this.fileName = (): string => {
+            if (fileName) {
+                return fileName;
+            }
+            switch (type) {
+                case 'user':
+                case 'hashtag':
+                    return `${input}_${Date.now()}`;
+                default:
+                    return `${this.scrapeType}_${Date.now()}`;
+            }
+        };
         this.idStore = '';
         this.test = test;
         this.noWaterMark = noWaterMark;
         this.maxCursor = 0;
+        this.noDuplicates = [];
         this.Downloader = new Downloader({
             progress,
             proxy,
@@ -302,7 +314,10 @@ export class TikTokScraper extends EventEmitter {
      */
     private mainLoop(): Promise<any> {
         return new Promise(resolve => {
-            const arrayLength = this.number % 30 ? Math.ceil(this.number / 30) : Math.ceil(this.number / 30) + 1;
+            let arrayLength = this.number % 27 ? Math.ceil(this.number / 27) : Math.ceil(this.number / 27) + 1;
+            if (!this.number) {
+                arrayLength = 1000;
+            }
             const taskArray = Array.from({ length: arrayLength }, (v, k) => k + 1);
             forEachLimit(
                 taskArray,
@@ -310,14 +325,12 @@ export class TikTokScraper extends EventEmitter {
                 (item, cb) => {
                     switch (this.scrapeType) {
                         case 'user':
-                            this.fileName = `${this.input}_${Date.now()}`;
                             this.getUserId()
                                 .then(query => this.submitScrapingRequest(query, this.maxCursor))
                                 .then(() => cb(null))
                                 .catch(error => cb(error));
                             break;
                         case 'hashtag':
-                            this.fileName = `${this.input}_${Date.now()}`;
                             this.getHashTagId()
                                 .then(query => this.submitScrapingRequest(query, item === 1 ? 0 : (item - 1) * query.count))
                                 .then(() => cb(null))
@@ -363,7 +376,7 @@ export class TikTokScraper extends EventEmitter {
             if (!result.body.hasMore) {
                 throw new Error('No more posts');
             }
-            this.maxCursor = result.body.maxCursor;
+            this.maxCursor = parseInt(result.body.maxCursor, 10);
         } catch (error) {
             throw error.message;
         }
@@ -381,7 +394,7 @@ export class TikTokScraper extends EventEmitter {
                 await this.Downloader.zipIt({
                     collector: this.collector,
                     filepath: this.filepath,
-                    fileName: this.fileName,
+                    fileName: this.fileName(),
                     asyncDownload: this.asyncDownload,
                 });
             }
@@ -391,9 +404,9 @@ export class TikTokScraper extends EventEmitter {
         let zip = '';
 
         if (this.collector.length) {
-            json = this.filepath ? `${this.filepath}/${this.fileName}.json` : `${this.fileName}.json`;
-            csv = this.filepath ? `${this.filepath}/${this.fileName}.csv` : `${this.fileName}.csv`;
-            zip = this.filepath ? `${this.filepath}/${this.fileName}.zip` : `${this.fileName}.zip`;
+            json = this.filepath ? `${this.filepath}/${this.fileName()}.json` : `${this.fileName()}.json`;
+            csv = this.filepath ? `${this.filepath}/${this.fileName()}.csv` : `${this.fileName()}.csv`;
+            zip = this.filepath ? `${this.filepath}/${this.fileName()}.zip` : `${this.fileName()}.zip`;
 
             if (this.collector.length) {
                 switch (this.filetype) {
@@ -499,45 +512,55 @@ export class TikTokScraper extends EventEmitter {
                     break;
                 }
             }
-            const item: PostCollector = {
-                id: posts[i].itemInfos.id,
-                text: posts[i].itemInfos.text,
-                createTime: posts[i].itemInfos.createTime,
-                authorId: posts[i].itemInfos.authorId,
-                authorName: posts[i].authorInfos.uniqueId,
-                authorFollowing: posts[i].authorStats.followingCount,
-                authorFans: posts[i].authorStats.followerCount,
-                authorHeart: posts[i].authorStats.heartCount,
-                authorVideo: posts[i].authorStats.videoCount,
-                authorDigg: posts[i].authorStats.diggCount,
-                authorVerified: posts[i].authorInfos.verified,
-                authorPrivate: posts[i].authorInfos.isSecret,
-                authorSignature: posts[i].authorInfos.signature,
-                musicId: posts[i].itemInfos.musicId,
-                musicName: posts[i].musicInfos.musicName,
-                musicAuthor: posts[i].musicInfos.authorName,
-                musicOriginal: posts[i].musicInfos.original,
-                imageUrl: posts[i].itemInfos.coversOrigin[0],
-                videoUrl: posts[i].itemInfos.video.urls[0],
-                videoUrlNoWaterMark: '',
-                diggCount: posts[i].itemInfos.diggCount,
-                shareCount: posts[i].itemInfos.shareCount,
-                playCount: posts[i].itemInfos.playCount,
-                commentCount: posts[i].itemInfos.commentCount,
-                downloaded: false,
-                hashtags: posts[i].challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
-                    id: challengeId,
-                    name: challengeName,
-                    title: text,
-                    cover: coversLarger,
-                })),
-            };
 
-            if (this.event) {
-                this.emit('data', item);
-                this.collector.push({} as PostCollector);
-            } else {
-                this.collector.push(item);
+            if (this.noDuplicates.indexOf(posts[i].itemInfos.id) === -1) {
+                this.noDuplicates.push(posts[i].itemInfos.id);
+                const item: PostCollector = {
+                    id: posts[i].itemInfos.id,
+                    text: posts[i].itemInfos.text,
+                    createTime: posts[i].itemInfos.createTime,
+                    authorMeta: {
+                        id: posts[i].authorInfos.userId,
+                        name: posts[i].authorInfos.uniqueId,
+                        following: posts[i].authorStats.followingCount,
+                        fans: posts[i].authorStats.followerCount,
+                        heart: posts[i].authorStats.heartCount,
+                        video: posts[i].authorStats.videoCount,
+                        digg: posts[i].authorStats.diggCount,
+                        verified: posts[i].authorInfos.verified,
+                        private: posts[i].authorInfos.isSecret,
+                        signature: posts[i].authorInfos.signature,
+                        avatar: posts[i].authorInfos.coversMedium[0],
+                    },
+                    musicMeta: {
+                        musicId: posts[i].itemInfos.musicId,
+                        musicName: posts[i].musicInfos.musicName,
+                        musicAuthor: posts[i].musicInfos.authorName,
+                        musicOriginal: posts[i].musicInfos.original,
+                    },
+                    imageUrl: posts[i].itemInfos.coversOrigin[0],
+                    videoUrl: posts[i].itemInfos.video.urls[0],
+                    videoUrlNoWaterMark: '',
+                    videoMeta: posts[i].itemInfos.video.videoMeta,
+                    diggCount: posts[i].itemInfos.diggCount,
+                    shareCount: posts[i].itemInfos.shareCount,
+                    playCount: posts[i].itemInfos.playCount,
+                    commentCount: posts[i].itemInfos.commentCount,
+                    downloaded: false,
+                    hashtags: posts[i].challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
+                        id: challengeId,
+                        name: challengeName,
+                        title: text,
+                        cover: coversLarger,
+                    })),
+                };
+
+                if (this.event) {
+                    this.emit('data', item);
+                    this.collector.push({} as PostCollector);
+                } else {
+                    this.collector.push(item);
+                }
             }
         }
     }
@@ -575,9 +598,9 @@ export class TikTokScraper extends EventEmitter {
             if (response.statusCode === 0) {
                 return response;
             }
-            return response;
+            throw new Error('Not more posts');
         } catch (error) {
-            throw new Error(error);
+            throw error.message;
         }
     }
 
@@ -786,11 +809,15 @@ export class TikTokScraper extends EventEmitter {
                     id: videoProps.props.pageProps.videoData.itemInfos.id,
                     text: videoProps.props.pageProps.videoData.itemInfos.text,
                     createTime: videoProps.props.pageProps.videoData.itemInfos.createTime,
-                    authorId: videoProps.props.pageProps.videoData.itemInfos.authorId,
-                    authorName: videoProps.props.pageProps.videoData.authorInfos.uniqueId,
-                    musicId: videoProps.props.pageProps.videoData.musicInfos.musicId,
-                    musicName: videoProps.props.pageProps.videoData.musicInfos.musicName,
-                    musicAuthor: videoProps.props.pageProps.videoData.musicInfos.authorName,
+                    authorMeta: {
+                        id: videoProps.props.pageProps.videoData.itemInfos.authorId,
+                        name: videoProps.props.pageProps.videoData.authorInfos.uniqueId,
+                    },
+                    musicMeta: {
+                        musicId: videoProps.props.pageProps.videoData.musicInfos.musicId,
+                        musicName: videoProps.props.pageProps.videoData.musicInfos.musicName,
+                        musicAuthor: videoProps.props.pageProps.videoData.musicInfos.authorName,
+                    },
                     imageUrl: videoProps.props.pageProps.videoData.itemInfos.coversOrigin[0],
                     videoUrl: videoProps.props.pageProps.videoData.itemInfos.video.urls[0],
                     videoUrlNoWaterMark: '',

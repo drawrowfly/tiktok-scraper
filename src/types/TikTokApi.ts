@@ -99,7 +99,7 @@ export interface ItemListData {
     body: {
         itemListData: Item[];
         hasMore: boolean;
-        maxCursor: number;
+        maxCursor: string;
         minCursor: string;
     };
 }

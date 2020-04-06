@@ -25,6 +25,7 @@ export interface Options {
     userAgent?: string;
     noWaterMark?: boolean;
     remove?: string;
+    fileName?: string;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -44,6 +45,7 @@ export interface TikTokConstructor {
     userAgent: string;
     test?: boolean;
     noWaterMark?: boolean;
+    fileName?: string;
 }
 
 export interface Hashtags {
@@ -57,23 +59,34 @@ export interface PostCollector {
     id: string;
     text: string;
     createTime: number;
-    authorId: string;
-    authorName: string;
-    authorFollowing: number;
-    authorFans: number;
-    authorHeart: number;
-    authorVideo: number;
-    authorDigg: number;
-    authorVerified: boolean;
-    authorPrivate: boolean;
-    authorSignature: string;
-    musicId: string;
-    musicName: string;
-    musicAuthor: string;
-    musicOriginal: boolean;
+    authorMeta: {
+        id: string;
+        name: string;
+        following: number;
+        fans: number;
+        heart: number;
+        video: number;
+        digg: number;
+        verified: boolean;
+        private: boolean;
+        signature: string;
+        avatar: string;
+    };
+    musicMeta: {
+        musicId: string;
+        musicName: string;
+        musicAuthor: string;
+        musicOriginal: boolean;
+    };
     imageUrl: string;
     videoUrl: string;
     videoUrlNoWaterMark: string;
+    videoMeta: {
+        width: number;
+        height: number;
+        ratio: number;
+        duration: number;
+    };
     diggCount: number;
     shareCount: number;
     playCount: number;
