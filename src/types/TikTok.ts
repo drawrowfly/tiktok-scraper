@@ -79,6 +79,11 @@ export interface PostCollector {
         musicAuthor: string;
         musicOriginal: boolean;
     };
+    covers: {
+        default: string;
+        origin: string;
+        dynamic: string;
+    };
     imageUrl: string;
     videoUrl: string;
     videoUrlNoWaterMark: string;

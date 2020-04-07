@@ -539,6 +539,11 @@ export class TikTokScraper extends EventEmitter {
                         musicAuthor: posts[i].musicInfos.authorName,
                         musicOriginal: posts[i].musicInfos.original,
                     },
+                    covers: {
+                        default: posts[i].itemInfos.covers[0],
+                        origin: posts[i].itemInfos.coversOrigin[0],
+                        dynamic: posts[i].itemInfos.coversDynamic[0],
+                    },
                     imageUrl: posts[i].itemInfos.coversOrigin[0],
                     videoUrl: posts[i].itemInfos.video.urls[0],
                     videoUrlNoWaterMark: '',
