@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+/* eslint-disable */
 import fs from 'fs';
 import { ScrapeType, Result, RequestQuery, Challenge, UserData, PostCollector } from '../types';
 import { TikTokScraper } from './TikTok';
