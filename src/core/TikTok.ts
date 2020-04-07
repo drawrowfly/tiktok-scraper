@@ -822,6 +822,7 @@ export class TikTokScraper extends EventEmitter {
                     imageUrl: videoProps.props.pageProps.videoData.itemInfos.coversOrigin[0],
                     videoUrl: videoProps.props.pageProps.videoData.itemInfos.video.urls[0],
                     videoUrlNoWaterMark: '',
+                    videoMeta: videoProps.props.pageProps.videoData.itemInfos.video.videoMeta,
                     diggCount: videoProps.props.pageProps.videoData.itemInfos.diggCount,
                     shareCount: videoProps.props.pageProps.videoData.itemInfos.shareCount,
                     playCount: videoProps.props.pageProps.videoData.itemInfos.playCount,
