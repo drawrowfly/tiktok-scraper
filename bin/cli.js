@@ -5,6 +5,7 @@
 /* eslint-disable no-param-reassign */
 
 const yargs = require('yargs');
+const { tmpdir } = require('os');
 const TikTokScraper = require('../build');
 const CONST = require('../build/constant');
 
@@ -16,6 +17,10 @@ const startScraper = async argv => {
         argv.store_history = argv.store;
         if (argv.filename) {
             argv.fileName = argv.filename;
+        }
+
+        if (argv.historypath) {
+            argv.historyPath = argv.historypath;
         }
 
         const scraper = await TikTokScraper[argv.type](argv.input, argv);
@@ -104,17 +109,21 @@ yargs
             default: '',
             describe: 'Set custom filename for the output files',
         },
+        noWaterMark: {
+            alias: ['w'],
+            boolean: true,
+            default: false,
+            describe: 'Download video without the watermark. This option will affect the execution speed',
+        },
         store: {
             alias: ['s'],
             boolean: true,
             default: false,
             describe: 'Scraper will save the progress in the OS TMP folder and in the future usage will only download new videos avoiding duplicates',
         },
-        noWaterMark: {
-            alias: ['w'],
-            boolean: true,
-            default: false,
-            describe: 'Download video without the watermark. This option will affect the execution speed',
+        historypath: {
+            default: tmpdir(),
+            describe: 'Set custom path where history file/files will be stored',
         },
         remove: {
             alias: ['r'],

@@ -26,6 +26,7 @@ export interface Options {
     noWaterMark?: boolean;
     remove?: string;
     fileName?: string;
+    historyPath?: string;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -42,6 +43,7 @@ export interface TikTokConstructor {
     type: ScrapeType;
     by_user_id?: boolean;
     store_history?: boolean;
+    historyPath?: string;
     userAgent: string;
     test?: boolean;
     noWaterMark?: boolean;
@@ -78,6 +80,12 @@ export interface PostCollector {
         musicName: string;
         musicAuthor: string;
         musicOriginal: boolean;
+        playUrl: string;
+    };
+    covers: {
+        default: string;
+        origin: string;
+        dynamic: string;
     };
     imageUrl: string;
     videoUrl: string;

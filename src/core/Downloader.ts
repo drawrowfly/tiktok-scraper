@@ -29,12 +29,15 @@ export class Downloader {
 
     public userAgent: string;
 
-    constructor({ progress, proxy, test, noWaterMark, userAgent }: DownloaderConstructor) {
+    public filepath: string;
+
+    constructor({ progress, proxy, test, noWaterMark, userAgent, filepath }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
         this.test = test;
         this.noWaterMark = noWaterMark;
         this.userAgent = userAgent;
+        this.filepath = filepath;
         this.mbars = new MultipleBar();
         this.agent = proxy && proxy.indexOf('socks') > -1 ? new SocksProxyAgent(proxy) : '';
         this.proxy = proxy && proxy.indexOf('socks') === -1 ? proxy : '';
@@ -149,7 +152,7 @@ export class Downloader {
         try {
             const result = await rp(query);
 
-            await fromCallback(cb => writeFile(`${post.id}.mp4`, result, cb));
+            await fromCallback(cb => writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
         } catch (error) {
             throw error.message;
         }

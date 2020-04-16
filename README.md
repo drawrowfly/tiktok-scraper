@@ -34,6 +34,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Download video without the watermark
 -   [x] Indicate in the output file(csv/json) if the video was downloaded or not
 -   [ ] Scrape metadata and download posts from different users/hashtags in batch
+-   [ ] Download audio files
 -   [ ] Scrape users/hashtags
 -   [ ] Web interface
 
@@ -73,7 +74,13 @@ yarn build
         musicId: '6808098113188120838',
         musicName: 'blah blah',
         musicAuthor: 'blah',
-        musicOriginal: true
+        musicOriginal: true,
+        playUrl: 'SOUND/MUSIC_URL',
+    },
+    covers:{
+        default: 'COVER_URL',
+        origin: 'COVER_URL',
+        dynamic: 'COVER_URL'
     },
     imageUrl:'IMAGE_URL',
     videoUrl:'VIDEO_URL',
@@ -98,7 +105,7 @@ yarn build
 
 ![Demo](https://i.imgur.com/6gIbBzo.png)
 
-## View and manage previously downloaded posts history in the CLI
+## View and manage previously downloaded posts history from the CLI
 
 ![History](https://i.imgur.com/VnDKh72.png)
 
@@ -119,6 +126,13 @@ tiktok-scraper history -r TYPE:INPUT
 tiktok-scraper history -r user:tiktok
 tiktok-scraper history -r hashtag:summer
 tiktok-scraper history -r trend
+```
+
+Set custom path where history files will be stored.
+**NOTE: After setting the custom path you will have to specify it all the time so that the scraper knows the file location**
+
+```
+tiktok-scraper hashtag summer -s -d -n 10 --historypath /Blah/Blah/Blah
 ```
 
 To delete all records:
@@ -179,14 +193,18 @@ Options:
                           'json' and 'csv'
                                 [choices: "csv", "json", "all"] [default: "csv"]
   --filename, -f          Set custom filename for the output files [default: ""]
+  --noWaterMark, -w       Download video without the watermark. This option will
+                          affect the execution speed  [boolean] [default: false]
   --store, -s             Scraper will save the progress in the OS TMP folder
                           and in the future usage will only download new videos
                           avoiding duplicates         [boolean] [default: false]
-  --noWaterMark, -w       Download video without the watermark. This option will
-                          affect the execution speed  [boolean] [default: false]
+  --historypath           Set custom path where history file/files will be
+                          stored
+                   [default: "/var/folders/blah/blah/blah"]
   --remove, -r            Delete the history record by entering "TYPE:INPUT" or
                           "all" to clean all the history. For example: user:bob
                                                                    [default: ""]
+  --help                  Show help                                    [boolean]
 
 Examples:
   tiktok-scraper user USERNAME -d -n 100
@@ -200,6 +218,8 @@ Examples:
   tiktok-scraper history -r user:bob
   tiktok-scraper history -r all
 ```
+
+**AGAIN FOR THOSE WHO DO NOT READ THOROUGHLY: After setting the custom History File path you will have to specify it all the time so that the scraper knows the file location**
 
 **Example 1:**
 Scrape 300 video posts from user {USERNAME}. Save post info in to a CSV file (by default)
@@ -429,7 +449,13 @@ const rp = require('request-promise');
             musicId: '6808098113188120838',
             musicName: 'blah blah',
             musicAuthor: 'blah',
-            musicOriginal: true
+            musicOriginal: true,
+            playUrl: 'SOUND/MUSIC_URL',
+        },
+        covers:{
+            default: 'COVER_URL',
+            origin: 'COVER_URL',
+            dynamic: 'COVER_URL'
         },
         imageUrl:'IMAGE_URL',
         videoUrl:'VIDEO_URL',
@@ -440,11 +466,12 @@ const rp = require('request-promise');
         playCount: 9007,
         commentCount: 50,
         hashtags:
-        [{ id: '69573911',
-           name: 'PlayWithLife',
-           title: 'HASHTAG_TITLE',
-           cover: [Array]
-        }],
+        [{
+            id: '69573911',
+            name: 'PlayWithLife',
+            title: 'HASHTAG_TITLE',
+            cover: [Array]
+        }...],
         downloaded: true
     }...],
     //If {filetype} and {download} options are enbabled then:
@@ -507,6 +534,11 @@ const rp = require('request-promise');
     imageUrl: 'IMAGE_URL',
     videoUrl: 'VIDEO_URL',
     videoUrlNoWaterMark: 'VIDEO_URL_WITHOUT_THE_WATERMARK',
+    videoMeta: { width: 480, height: 864, ratio: 14, duration: 14 },
+    covers:{
+        default: 'COVER_URL',
+        origin: 'COVER_URL'
+    },
     diggCount: 49292,
     shareCount: 339,
     playCount: 614678,

@@ -99,19 +99,19 @@ export const getVideoMeta = async (input: string, options?: Options): Promise<Po
 export const video = async (input: string, options?: Options): Promise<any> => {
     const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...{ type: 'video' as ScrapeType, input }, ...options };
     const scraper = new TikTokScraper(contructor);
-
     const result: PostCollector = await scraper.getVideoMeta();
 
     await scraper.Downloader.downloadSingleVideo(result);
-
-    return { message: `Video was saved in: ${process.cwd()}/${result.id}.mp4` };
+    return { message: `Video was saved in: ${contructor.filepath}/${result.id}.mp4` };
 };
 
 // eslint-disable-next-line no-unused-vars
 export const history = async (input: string, options?: Options) => {
     let store: string;
+
+    const historyPath = options?.historyPath || tmpdir();
     try {
-        store = (await fromCallback(cb => readFile(`${tmpdir()}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;
+        store = (await fromCallback(cb => readFile(`${historyPath}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;
     } catch (error) {
         throw `History file doesn't exist`;
     }
@@ -126,7 +126,7 @@ export const history = async (input: string, options?: Options) => {
             for (const key of Object.keys(historyStore)) {
                 remove.push(fromCallback(cb => unlink(historyStore[key].file_location, cb)));
             }
-            remove.push(fromCallback(cb => unlink(`${tmpdir()}/tiktok_history.json`, cb)));
+            remove.push(fromCallback(cb => unlink(`${historyPath}/tiktok_history.json`, cb)));
 
             await Promise.all(remove);
 
@@ -142,7 +142,7 @@ export const history = async (input: string, options?: Options) => {
 
             delete historyStore[key];
 
-            await fromCallback(cb => writeFile(`${tmpdir()}/tiktok_history.json`, JSON.stringify(historyStore), cb));
+            await fromCallback(cb => writeFile(`${historyPath}/tiktok_history.json`, JSON.stringify(historyStore), cb));
 
             return { message: `Record ${key} was removed` };
         }

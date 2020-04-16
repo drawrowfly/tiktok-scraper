@@ -6,6 +6,7 @@ export interface DownloaderConstructor {
     test: boolean;
     noWaterMark: boolean;
     userAgent: string;
+    filepath: string;
 }
 
 export interface ZipValues {

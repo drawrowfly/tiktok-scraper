@@ -91,7 +91,18 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                 hashtags: [],
                 id: '6807325450981969158',
                 imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/a43b061c19c445d78587fb775e7c0175_1584953972',
-                musicMeta: { musicId: '6799337212367407877', musicName: 'FOLLOW MY IG... SEWSHIII', musicAuthor: 'sewshiii', musicOriginal: true },
+                musicMeta: {
+                    musicId: '6799337212367407877',
+                    musicName: 'FOLLOW MY IG... SEWSHIII',
+                    musicAuthor: 'sewshiii',
+                    musicOriginal: true,
+                    playUrl: 'https://p16.muscdn.com/obj/musically-maliva-obj/1659997213465654.mp3',
+                },
+                covers: {
+                    default: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/23d8be88ee6b4cd09d44facd18ef86d4_1584953972',
+                    origin: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/a43b061c19c445d78587fb775e7c0175_1584953972',
+                    dynamic: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/f0c6b5ea5c2244b2b8f28cef8e70a0cd_1584953973',
+                },
                 playCount: 5893701,
                 shareCount: 6728,
                 text: '',
@@ -470,10 +481,15 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             videoUrl:
                 'https://v16.muscdn.com/f950058182bcefa15345108bd9ab241f/5e7e615a/video/tos/useast2a/tos-useast2a-ve-0068c003/0dc9964505df43288febb6aac33ac6a0/?a=1233&br=472&bt=236&cr=0&cs=0&dr=0&ds=3&er=&l=20200327142546010115115156167B9215&lr=tiktok_m&qs=0&rc=M3Vna3N1d3FrczMzOzczM0ApO2Q6NjZnOzs0N2k7aGhpaGcxaDM0ay1gMHBfLS0wMTZzc182MWI1YzEtYTY2LWNjXzU6Yw%3D%3D&vl=&vr=',
             videoUrlNoWaterMark: 'https://api2.musical.ly/aweme/v1/playwm/?video_id=v09044ae0000bk2qm0ivfsko76kvric0',
+            videoMeta: { width: 576, height: 1024, ratio: 16, duration: 16 },
             diggCount: 35650,
             shareCount: 256,
             playCount: 445444,
             commentCount: 2543,
+            covers: {
+                default: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/2bc9c980bea7409698bd0acf0206bb8f_1584992746',
+                origin: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/d1b00294a06e488b851ad6553cad41a0_1584992746',
+            },
             downloaded: false,
             hashtags: [{ id: '609365', name: 'happyathome', title: undefined, cover: undefined }],
         });
@@ -493,7 +509,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
         try {
             await instance.getVideoMeta();
         } catch (error) {
-            expect(error).toEqual(`Bad url format. Correct format: https://www.tiktok.com/@USERNAME/video/ID`);
+            expect(error).toEqual(`Not supported url format`);
         }
     });
 });

@@ -3,10 +3,10 @@ import response from './response';
 const request = options => {
     const { uri } = options;
     switch (true) {
-        case /^https:\/\/www\.tiktok\.com\/@(\w.+)\/video\/(\d+)$/.test(uri):
-            return { body: response.videoMeta };
         case uri === 'https://www.tiktok.com/discover':
             return { body: response.tac };
+        case /^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(\w.+)\/video\/(\d+))$/.test(uri):
+            return { body: response.videoMeta };
         case /^https:\/\/m.tiktok.com\/node\/share\/user\/@(\w+)$/.test(uri): {
             const user = /^https:\/\/m.tiktok.com\/node\/share\/user\/@(\w+)$/.exec(uri);
             if (user) {
