@@ -41,7 +41,7 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
 
     it('getUserId should return a valid Object', async () => {
         const userId: RequestQuery = await instance.getUserId();
-        expect(userId).toEqual({ id: '5831967', secUid: '', type: 1, count: 30, minCursor: 0, lang: '' });
+        expect(userId).toEqual({ id: '5831967', secUid: '', shareUid: '', type: 1, verifyFp: '', count: 30, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {
@@ -71,7 +71,8 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
     it('result should emit "data" event with the result', done => {
         instance.on('data', data => {
             expect(data).toEqual({
-                commentCount: 46142,
+                id: '6807325450981969158',
+                text: '',
                 createTime: '1584953968',
                 authorMeta: {
                     id: '5831967',
@@ -87,10 +88,6 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                     signature: 'don’t worry i don’t get the hype either',
                     avatar: 'https://p16.muscdn.com/img/musically-maliva-obj/1655662764778502~c5_720x720.jpeg',
                 },
-                diggCount: 1563781,
-                hashtags: [],
-                id: '6807325450981969158',
-                imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/a43b061c19c445d78587fb775e7c0175_1584953972',
                 musicMeta: {
                     musicId: '6799337212367407877',
                     musicName: 'FOLLOW MY IG... SEWSHIII',
@@ -103,14 +100,18 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                     origin: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/a43b061c19c445d78587fb775e7c0175_1584953972',
                     dynamic: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/f0c6b5ea5c2244b2b8f28cef8e70a0cd_1584953973',
                 },
-                playCount: 5893701,
-                shareCount: 6728,
-                text: '',
+                imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/a43b061c19c445d78587fb775e7c0175_1584953972',
+                webVideoUrl: 'https://www.tiktok.com/@charlidamelio/video/6807325450981969158',
                 videoUrl:
                     'https://v16.muscdn.com/a01ef53a726eea58a7ce538ee46f8d5f/5e793956/video/tos/useast2a/tos-useast2a-ve-0068c004/6372449d2b1f4236b06a56da83e54b44/?a=1233&br=1944&bt=972&cr=0&cs=0&dr=0&ds=3&er=&l=202003231633420101890741591D500B49&lr=tiktok_m&qs=0&rc=andsa3N1d3U6czMzOzczM0ApNDk4ZmVlOTw1NzloNDpoNGc1YDI0ay0xaHBfLS0wMTZzc18wMjEtY14xYV80Y14xM2I6Yw%3D%3D&vl=&vr=',
                 videoUrlNoWaterMark: '',
                 videoMeta: { width: 576, height: 1024, ratio: 15, duration: 15 },
+                diggCount: 1563781,
+                shareCount: 6728,
+                playCount: 5893701,
+                commentCount: 46142,
                 downloaded: false,
+                hashtags: [],
             });
             done();
         });
@@ -264,7 +265,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
 
     it('getHashTagId should return a valid Object', async () => {
         const hashtag: RequestQuery = await instance.getHashTagId();
-        expect(hashtag).toEqual({ id: '4100', secUid: '', type: 3, count: 30, minCursor: 0, lang: '' });
+        expect(hashtag).toEqual({ id: '4100', secUid: '', shareUid: '', type: 3, verifyFp: '', count: 30, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {

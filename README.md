@@ -83,6 +83,7 @@ yarn build
         dynamic: 'COVER_URL'
     },
     imageUrl:'IMAGE_URL',
+    webVideoUrl:'https://www.tiktok.com/@USER/video/VIDEO_ID',
     videoUrl:'VIDEO_URL',
     videoUrlNoWaterMark:'VIDEO_URL_WITHOUT_THE_WATERMARK',
     videoMeta: { width: 480, height: 864, ratio: 14, duration: 14 },

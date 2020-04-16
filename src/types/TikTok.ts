@@ -88,6 +88,7 @@ export interface PostCollector {
         dynamic: string;
     };
     imageUrl: string;
+    webVideoUrl?: string;
     videoUrl: string;
     videoUrlNoWaterMark: string;
     videoMeta: {

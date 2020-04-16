@@ -548,6 +548,7 @@ export class TikTokScraper extends EventEmitter {
                         dynamic: posts[i].itemInfos.coversDynamic[0],
                     },
                     imageUrl: posts[i].itemInfos.coversOrigin[0],
+                    webVideoUrl: `https://www.tiktok.com/@${posts[i].authorInfos.uniqueId}/video/${posts[i].itemInfos.id}`,
                     videoUrl: posts[i].itemInfos.video.urls[0],
                     videoUrlNoWaterMark: '',
                     videoMeta: posts[i].itemInfos.video.videoMeta,
@@ -579,7 +580,7 @@ export class TikTokScraper extends EventEmitter {
         const signature = generateSignature(
             `${this.mainHost}share/item/list?secUid=${qs.secUid}&id=${qs.id}&type=${qs.type}&count=${qs.count}&minCursor=${
                 qs.minCursor
-            }&maxCursor=${maxCursor || 0}${shareUid}&lang=${qs.lang}`,
+            }&maxCursor=${maxCursor || 0}${shareUid}&lang=${qs.lang}&shareUid=${qs.shareUid}&verifyFp=${qs.verifyFp}`,
             this.userAgent,
             this.tacValue,
         );
@@ -626,6 +627,7 @@ export class TikTokScraper extends EventEmitter {
             type: 5,
             count: 30,
             minCursor: 0,
+            verifyFp: '',
         };
     }
 
@@ -641,6 +643,7 @@ export class TikTokScraper extends EventEmitter {
             type: 4,
             count: 30,
             minCursor: 0,
+            verifyFp: '',
         };
     }
 
@@ -656,6 +659,8 @@ export class TikTokScraper extends EventEmitter {
                 count: 30,
                 minCursor: 0,
                 lang: '',
+                verifyFp: '',
+                shareUid: '',
             };
         }
         const query = {
@@ -676,6 +681,8 @@ export class TikTokScraper extends EventEmitter {
                 count: 30,
                 minCursor: 0,
                 lang: '',
+                verifyFp: '',
+                shareUid: '',
             };
         } catch (error) {
             throw error.message;
@@ -694,6 +701,8 @@ export class TikTokScraper extends EventEmitter {
                 count: 30,
                 minCursor: 0,
                 lang: '',
+                verifyFp: '',
+                shareUid: '',
             };
         }
 
@@ -716,6 +725,8 @@ export class TikTokScraper extends EventEmitter {
                 count: 30,
                 minCursor: 0,
                 lang: '',
+                verifyFp: '',
+                shareUid: '',
             };
         } catch (error) {
             throw error.message;

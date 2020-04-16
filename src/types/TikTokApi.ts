@@ -119,6 +119,7 @@ export interface RequestQuery {
     count: number;
     minCursor: number;
     lang: string;
+    verifyFp: string;
 }
 
 export interface VideoProps {
