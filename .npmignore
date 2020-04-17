@@ -2,7 +2,11 @@ node_modules/
 coverage/
 src/
 reverse_eng/
+examples/
+.github/
 
+.dockerignore
+Dockerfile
 .DS_Store
 .prettierrc.js
 *.csv

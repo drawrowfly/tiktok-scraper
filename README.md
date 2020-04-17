@@ -33,6 +33,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Add tests
 -   [x] Download video without the watermark
 -   [x] Indicate in the output file(csv/json) if the video was downloaded or not
+-   [x] Build and run from Docker
 -   [ ] Scrape metadata and download posts from different users/hashtags in batch
 -   [ ] Download audio files
 -   [ ] Scrape users/hashtags
@@ -309,6 +310,32 @@ View previous download history
 
 ```sh
 tiktok-scraper history
+```
+
+## Docker
+
+By using docker you won't be able to use --filepath and --historypath , but you set volume(**host path where all files will be saved**) by using -v
+
+##### Build
+
+```sh
+docker build . -t tiktok-scraper
+```
+
+##### Run
+
+**Example 1:**
+All files including history file will be saved in the directory(\$pwd) where you running the docker from
+
+```sh
+docker run -v $(pwd):/usr/app/files tiktok-scraper user tiktok -d -n 5 -s
+```
+
+**Example 2:**
+All files including history file will be saved in /User/blah/downloads
+
+```sh
+docker run -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d -n 5 -s
 ```
 
 ## Module

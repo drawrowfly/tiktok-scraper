@@ -34,7 +34,6 @@
         "@types/request-promise": "^4.1.45",
         "@typescript-eslint/eslint-plugin": "^2.24.0",
         "@typescript-eslint/parser": "^2.24.0",
-        "canvas": "^2.6.1",
         "eslint": "^6.8.0",
         "eslint-config-airbnb-base": "^14.0.0",
         "eslint-config-prettier": "^6.10.0",
@@ -48,6 +47,7 @@
     },
     "scripts": {
         "build": "rimraf build && tsc",
+        "docker:build": "tsc",
         "format": "prettier --config ./.prettierrc.js --write './src/**/*.ts'",
         "lint": "eslint ./src/**/*.ts",
         "test": "eslint ./src/**/*.ts && jest --coverage --verbose"

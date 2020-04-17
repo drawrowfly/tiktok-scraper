@@ -109,7 +109,7 @@ export const video = async (input: string, options?: Options): Promise<any> => {
 export const history = async (input: string, options?: Options) => {
     let store: string;
 
-    const historyPath = options?.historyPath || tmpdir();
+    const historyPath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : options?.historyPath || tmpdir();
     try {
         store = (await fromCallback(cb => readFile(`${historyPath}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;
     } catch (error) {

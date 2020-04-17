@@ -1,6 +1,7 @@
 // @ts-nocheck
 /* eslint-disable */
 import ProgressBar from 'progress';
+import * as readline from 'readline';
 
 export class MultipleBar {
     constructor() {
@@ -40,7 +41,8 @@ export class MultipleBar {
 
     terminate() {
         this.move(this.bars.length);
-        this.stream.clearLine();
+
+        readline.clearLine();
         if (!this.stream.isTTY) return;
         this.stream.cursorTo(0);
     }

@@ -95,7 +95,7 @@ yargs
             describe: 'Download and archive all scraped videos to a ZIP file',
         },
         filepath: {
-            default: process.cwd(),
+            default: process.env.SCRAPING_FROM_DOCKER ? '' : process.cwd(),
             describe: 'Directory to save all output files.',
         },
         filetype: {
@@ -122,7 +122,7 @@ yargs
             describe: 'Scraper will save the progress in the OS TMP folder and in the future usage will only download new videos avoiding duplicates',
         },
         historypath: {
-            default: tmpdir(),
+            default: process.env.SCRAPING_FROM_DOCKER ? '' : tmpdir(),
             describe: 'Set custom path where history file/files will be stored',
         },
         remove: {
@@ -142,6 +142,9 @@ yargs
             }
         }
 
+        if (process.env.SCRAPING_FROM_DOCKER && (argv.historypath || argv.filepath)) {
+            throw new Error(`Can't set custom path when running from Docker`);
+        }
         if (argv.remove) {
             if (argv.remove.indexOf(':') === -1) {
                 argv.remove = `${argv.remove}:`;
@@ -159,7 +162,7 @@ yargs
         }
 
         if (argv._[0] === 'video') {
-            if (!/^https:\/\/www\.tiktok\.com\/@(\w.+)\/video\/(\d+)$/.test(argv.id)) {
+            if (!/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(\w.+)\/video\/(\d+))$/.test(argv.id)) {
                 throw new Error('Enter a valid TikTok video URL. For example: https://www.tiktok.com/@tiktok/video/6807491984882765062');
             }
         }

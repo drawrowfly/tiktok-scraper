@@ -102,7 +102,7 @@ export class TikTokScraper extends EventEmitter {
         this.mainHost = 'https://m.tiktok.com/';
         this.userAgent = userAgent || CONST.userAgent;
         this.download = download;
-        this.filepath = filepath || '';
+        this.filepath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '';
         this.json2csvParser = new Parser({ flatten: true });
         this.filetype = filetype;
         this.input = input;
@@ -126,7 +126,7 @@ export class TikTokScraper extends EventEmitter {
         this.spinner = ora('TikTok Scraper Started');
         this.byUserId = by_user_id;
         this.storeHistory = cli && download && store_history;
-        this.historyPath = historyPath || tmpdir();
+        this.historyPath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : historyPath || tmpdir();
         this.fileName = (): string => {
             if (fileName) {
                 return fileName;
