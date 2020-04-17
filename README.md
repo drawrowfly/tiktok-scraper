@@ -314,7 +314,7 @@ tiktok-scraper history
 
 ## Docker
 
-By using docker you won't be able to use --filepath and --historypath , but you set volume(**host path where all files will be saved**) by using -v
+By using docker you won't be able to use --filepath and --historypath , but you can set volume(**host path where all files will be saved**) by using -v
 
 ##### Build
 

@@ -292,7 +292,7 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
     });
     it('signUrl should return a valid signature', async () => {
         const signature: string = await instance.signUrl();
-        expect(signature).toEqual('TYYDvAAgEBqrxivav6.DM02GAqAABQA');
+        expect(signature).toEqual('TYYDvAAgEBqyefxDv6.DM02GAqAABQA');
     });
 
     it('Throw error if input url is empty', async () => {
