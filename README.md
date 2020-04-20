@@ -48,7 +48,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   Extract metadata from the User, Hashtag and Single Video pages
 -   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and only if **download** flag is on.
 -   **View and manage previously downloaded posts history in the CLI**
--   Scrape and download user,hashtag,music feeds and single videos specified in a file
+-   Scrape and download user, hashtag, music feeds and single videos specified in the file in batch mode
 
 ## To Do
 
@@ -334,9 +334,9 @@ https://www.tiktok.com/@.one_man_army/video/6798822211307310338
 
 **FILE** - name of the file
 
-**ASYNC_TASKS** - how many task(each line ins file is a task) should be started at the time. I have tested with 40 and it worked really well, if you have slow connection then do not set more then 5
+**ASYNC_TASKS** - how many tasks(each line in the file is a task) should be started at the time. I have tested with 40 and it worked really well, if you have slow connection then do not set more then 5
 
-Command below will download single videos without the watermark and will make attempt to download all the videos from the users, hashtags and musics feeds specified in the example file above and will save user, hashtag, music metadata to the JSON and CSV files. 
+Command below will download single videos without the watermark and will make attempt to download all the videos from the users, hashtags and music feeds specified in the example file above and will save user, hashtag, music metadata to the JSON and CSV files. 
 ```sh
 tiktok-scraper from-file FILE ASYNC_TASKS -d -f all
 ```
@@ -347,7 +347,7 @@ It is always better to use proxies for any task especially when downloading in b
 
 **FILE** - name of the file
 
-**ASYNC_TASKS** - how many task(each line is a task) should be started at the time. 
+**ASYNC_TASKS** - how many tasks(each line in the file is a task) should be started at the time. 
 
 **PROXY** - proxy file
 
