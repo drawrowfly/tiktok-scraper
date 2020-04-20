@@ -14,6 +14,14 @@ This is not an official API support and etc. This is just a scraper that is usin
 
 ---
 
+## Content
+
+-   [Features](#features)
+-   [To Do](#to-do)
+-   [Contribution](#contribution)
+-   [Installation](#installation)
+-   [Usage](#usage) - [In Terminal](#in-terminal) - [Terminal Examples](#terminal-examples) - [Manage Download History](#manage-download-history) - [Scrape and Download in Batch](#batch-scrape-and-download-example) - [Batch Scraping Output](#batch-scraping-output) - [Output File Example](#output-file-example) - [Docker](#docker) - [Build](#build) - [Run](#run) - [Module](#docker) - [Methods](#methods) - [Options](#options) - [Use with Promises](#promise) - [Use with Events](#event) - [Output Example](#json-output-example) - [Video Feed Methods](#video-feed) - [getUserProfileInfo](#getUserProfileInfo) - [getHashtagInfo](#getHashtagInfo) - [getVideoMeta](#getVideoMeta)
+
 ## Features
 
 -   Download **unlimited** post metadata from the User, Hashtag, Trends, or Music-Id pages
@@ -24,6 +32,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   Extract metadata from the User, Hashtag and Single Video pages
 -   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and only if **download** flag is on.
 -   **View and manage previously downloaded posts history in the CLI**
+-   Scrape and download user,hashtag,music feeds and single videos specified in a file
 
 ## To Do
 
@@ -34,7 +43,9 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Download video without the watermark
 -   [x] Indicate in the output file(csv/json) if the video was downloaded or not
 -   [x] Build and run from Docker
--   [ ] Scrape metadata and download posts from different users/hashtags in batch
+-   [x] CLI: Scrape and download in batch
+-   [x] CLi: Load proxies from a file
+-   [ ] CLI: Download without ZIP
 -   [ ] Download audio files
 -   [ ] Scrape users/hashtags
 -   [ ] Web interface
@@ -50,102 +61,6 @@ yarn test
 ```sh
 yarn build
 ```
-
-## Post metadata example:
-
-```javascript
-{
-    id: 'VIDEO_ID',
-    text: 'CAPTION',
-    createTime: '1583870600',
-    authorMeta:{
-        id: 'USER ID',
-        name: 'USERNAME',
-        following: 195,
-        fans: 43500,
-        heart: '1093998',
-        video: 3,
-        digg: 95,
-        verified: false,
-        private: false,
-        signature: 'USER BIO',
-        avatar:'AVATAR_URL'
-    },
-    musicMeta:{
-        musicId: '6808098113188120838',
-        musicName: 'blah blah',
-        musicAuthor: 'blah',
-        musicOriginal: true,
-        playUrl: 'SOUND/MUSIC_URL',
-    },
-    covers:{
-        default: 'COVER_URL',
-        origin: 'COVER_URL',
-        dynamic: 'COVER_URL'
-    },
-    imageUrl:'IMAGE_URL',
-    webVideoUrl:'https://www.tiktok.com/@USER/video/VIDEO_ID',
-    videoUrl:'VIDEO_URL',
-    videoUrlNoWaterMark:'VIDEO_URL_WITHOUT_THE_WATERMARK',
-    videoMeta: { width: 480, height: 864, ratio: 14, duration: 14 },
-    diggCount: 2104,
-    shareCount: 1,
-    playCount: 9007,
-    commentCount: 50,
-    hashtags:
-    [{
-        id: '69573911',
-        name: 'PlayWithLife',
-        title: 'HASHTAG_TITLE',
-        cover: [Array]
-    }...],
-    downloaded: true
-}[]
-```
-
-## CSV file example
-
-![Demo](https://i.imgur.com/6gIbBzo.png)
-
-## View and manage previously downloaded posts history from the CLI
-
-![History](https://i.imgur.com/VnDKh72.png)
-
-You can only view the history from the CLI and only if you have used **-s** flag in your previous scraper executions.
-
-**-s** save download history to avoid downloading duplicate posts in the future
-
-To view history record:
-
-```sh
-tiktok-scraper history
-```
-
-To delete single history record:
-
-```sh
-tiktok-scraper history -r TYPE:INPUT
-tiktok-scraper history -r user:tiktok
-tiktok-scraper history -r hashtag:summer
-tiktok-scraper history -r trend
-```
-
-Set custom path where history files will be stored.
-**NOTE: After setting the custom path you will have to specify it all the time so that the scraper knows the file location**
-
-```
-tiktok-scraper hashtag summer -s -d -n 10 --historypath /Blah/Blah/Blah
-```
-
-To delete all records:
-
-```sh
-tiktok-scraper history -r all
-```
-
-**Possible errors**
-
--   Unknown. Report them if you will receive any
 
 ## Installation
 
@@ -179,30 +94,36 @@ Commands:
   tiktok-scraper music [id]    Scrape posts from a music id number
   tiktok-scraper video [id]    Download single video without the watermark
   tiktok-scraper history       View previous download history
+  tiktok-scraper from-file [file] [async]  Scrape users, hashtags, music, videos mentioned
+                                in a file. 1 value per 1 line
 
 Options:
-  --help, -h              help                                         [boolean]
   --version               Show version number                          [boolean]
+  --timeout               Set timeout between requests. Timeout is in
+                          Milliseconds: 1000 mls = 1 s              [default: 0]
   --number, -n            Number of posts to scrape. If you will set 0 then all
-                          posts will be scraped                    [default: 20]
-  --proxy, -p             Set proxy                                [default: ""]
-  --download, -d          Download and archive all scraped videos to a ZIP file
-                                                      [boolean] [default: false]
-  --filepath              Directory to save all output files.
-      [default: "/Users/USER/Downloads"]
-  --filetype, --type, -t  Type of output file where post information will be
-                          saved. 'all' - save information about all posts to a
-                          'json' and 'csv'
+                          posts will be scraped                     [default: 0]
+  --proxy, -p             Set single proxy                         [default: ""]
+  --proxy-file            Use proxies from a file. Scraper will use random
+                          proxies from the file per each request. 1 line 1
+                          proxy.                                   [default: ""]
+  --download, -d          Download and archive all scraped videos to the ZIP
+                          file                        [boolean] [default: false]
+  --filepath              File path to save all output files.
+      [default: "/Users/karl.wint/Documents/projects/javascript/tiktok-scraper"]
+  --filetype, --type, -t  Type of the output file where post information will
+                          be saved. 'all' - save information about all posts to
+                          the` 'json' and 'csv'
                                 [choices: "csv", "json", "all"] [default: "csv"]
   --filename, -f          Set custom filename for the output files [default: ""]
   --noWaterMark, -w       Download video without the watermark. This option will
                           affect the execution speed  [boolean] [default: false]
-  --store, -s             Scraper will save the progress in the OS TMP folder
-                          and in the future usage will only download new videos
-                          avoiding duplicates         [boolean] [default: false]
+  --store, -s             Scraper will save the progress in the OS TMP or Custom
+                          folder and in the future usage will only download new
+                          videos avoiding duplicates  [boolean] [default: false]
   --historypath           Set custom path where history file/files will be
                           stored
-                   [default: "/var/folders/blah/blah/blah"]
+                   [default: "/var/folders/d5/fyh1_f2926q7c65g7skc0qh80000gn/T"]
   --remove, -r            Delete the history record by entering "TYPE:INPUT" or
                           "all" to clean all the history. For example: user:bob
                                                                    [default: ""]
@@ -219,9 +140,10 @@ Examples:
   tiktok-scraper history
   tiktok-scraper history -r user:bob
   tiktok-scraper history -r all
+  tiktok-scraper from-file BATCH_FILE ASYNC_TASKS -d -n 25
 ```
 
-**AGAIN FOR THOSE WHO DO NOT READ THOROUGHLY: After setting the custom History File path you will have to specify it all the time so that the scraper knows the file location**
+#### Terminal Examples
 
 **Example 1:**
 Scrape 300 video posts from user {USERNAME}. Save post info in to a CSV file (by default)
@@ -312,6 +234,135 @@ View previous download history
 tiktok-scraper history
 ```
 
+### Manage Download History
+
+![History](https://i.imgur.com/VnDKh72.png)
+
+You can only view the history from the CLI and only if you have used **-s** flag in your previous scraper executions.
+
+**-s** save download history to avoid downloading duplicate posts in the future
+
+To view history record:
+
+```sh
+tiktok-scraper history
+```
+
+To delete single history record:
+
+```sh
+tiktok-scraper history -r TYPE:INPUT
+tiktok-scraper history -r user:tiktok
+tiktok-scraper history -r hashtag:summer
+tiktok-scraper history -r trend
+```
+
+Set custom path where history files will be stored.
+
+**NOTE: After setting the custom path you will have to specify it all the time so that the scraper knows the file location**
+
+```
+tiktok-scraper hashtag summer -s -d -n 10 --historypath /Blah/Blah/Blah
+```
+
+To delete all records:
+
+```sh
+tiktok-scraper history -r all
+```
+
+### Batch Scrape And Download Example
+
+**This function works really good with fast internet and good proxies**
+
+In order to download in batch you need to create a file(any name) with one value per line. Lines that are starting with ## are considered as comments and will be ignored.
+
+To scrape data from the user feed, enter **username**.
+
+To scrape from the user feed by user id, enter **id:USER_ID**.
+
+To scrape from the hashtag feed, enter hashtag starting with **#**.
+
+To scrape from the music feed, enter **music:MUSIC_ID**.
+
+To download video, enter plain video url.
+
+**File Example:**
+
+```
+## User feed by username <---- this is just a comment and hence it is not important
+tiktok
+charlidamelio
+sam
+bob
+
+## User feed by user id
+id:12312312312
+
+## Hashtag feed
+#love
+#summer
+#story
+
+## Music feed
+music:3242234234
+music:46646
+music:23423424234
+
+## Single Videos. Each video will be downloaded without the watermark
+https://www.tiktok.com/@shalisavdlaan/video/6788483055796391173
+https://www.tiktok.com/@officialsaarx/video/6785180623263911174
+https://www.tiktok.com/@dominos_nl/video/6786669305623842053
+https://www.tiktok.com/@jessiejikki/video/6620697278451551493
+https://www.tiktok.com/@.one_man_army/video/6798822211307310338
+```
+
+**Example 1 without proxy**
+
+**FILE** - name of the file
+
+**ASYNC_TASKS** - how many task(each line ins file is a task) should be started at the time. I have tested with 40 and it worked really well, if you have slow connection then do not set more then 5
+
+Command below will download single videos without the watermark and will make attempt to download all the videos from the users, hashtags and musics feeds specified in the example file above and will save user, hashtag, music metadata to the JSON and CSV files.
+
+```sh
+tiktok-scraper from-file FILE ASYNC_TASKS -d -f all
+```
+
+**Example 2 with the proxy**
+
+It is always better to use proxies for any task especially when downloading in batches. You can set 1 proxy or you can point scraper to the file with the proxy list and scraper will use random proxy from that list per request.
+
+**FILE** - name of the file
+
+**ASYNC_TASKS** - how many task(each line is a task) should be started at the time.
+
+**PROXY** - proxy file
+
+**Proxy File Example**
+
+```
+user:password@127.0.0.1:8080
+user:password@127.0.0.1:8081
+127.0.0.1:8082
+socks5://127.0.0.1:8083
+socks4://127.0.0.1:8084
+```
+
+Command below will download single videos without the watermark and will make attempt to download 50 videos from each user, hashtag and music feed specified in the example file above.
+
+```sh
+tiktok-scraper from-file FILE ASYNC_TASKS --proxy-file PROXY -d -n 50
+```
+
+### Batch Scraping Output
+
+![Demo](https://i.imgur.com/9Gt4xgL.png)
+
+### Output File Example
+
+![Demo](https://i.imgur.com/6gIbBzo.png)
+
 ## Docker
 
 By using docker you won't be able to use --filepath and --historypath , but you can set volume(**host path where all files will be saved**) by using -v
@@ -340,7 +391,75 @@ docker run -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d 
 
 ## Module
 
-Don't forget to checkout the **examples** folder
+### Methods
+
+```javascript
+.user(id, options) //Scrape posts from a specific user (Promise)
+.hashtag(id, options) //Scrape posts from hashtag section (Promise)
+.trend('', options) // Scrape posts from a trends section (Promise)
+.music(id, options) // Scrape posts by music id (Promise)
+
+.userEvent(id, options) //Scrape posts from a specific user (Event)
+.hashtagEvent(id, options) //Scrape posts from hashtag section (Event)
+.trendEvent('', options) // Scrape posts from a trends section (Event)
+.musicEvent(id, options) // Scrape posts by music id (Event)
+
+.getUserProfileInfo('USERNAME', options) // Get user profile information
+.getHashtagInfo('HASHTAG', options) // Get hashtag information
+.signUrl('URL', options) // Get signature for the request
+.getVideoMeta('WEB_VIDEO_URL', options) // Get video meta info, including video url without the watermark
+```
+
+### Options
+
+```javascript
+const options = {
+    // Number of posts to scrape: {int default: 20}
+    number: 50,
+
+    // Set proxy {string[] | string default: ''}
+    // http proxy: 127.0.0.1:8080
+    // socks proxy: socks5://127.0.0.1:8080
+    // You can pass proxies as an array and scraper will randomly select a proxy from the array to execute the requests
+    proxy: '',
+
+    // Set to {true} to search by user id: {boolean default: false}
+    by_user_id: false,
+
+    // How many post should be downloaded asynchronously. Only if {download:true}: {int default: 5}
+    asyncDownload: 5,
+
+    // How many post should be scraped asynchronously: {int default: 3}
+    // Current option will be applied only with current types: music and hashtag
+    // With other types it is always 1 because every request response to the TikTok API is providing the "maxCursor" value
+    // that is required to send the next request
+    asyncScraping: 3,
+
+    // File path where all files will be saved: {string default: 'CURRENT_DIR'}
+    filepath: `CURRENT_DIR`,
+
+    // Custom file name for the output files: {string default: ''}
+    fileName: `CURRENT_DIR`,
+
+    // Output with information can be saved to a CSV or JSON files: {string default: 'na'}
+    // 'csv' to save in csv
+    // 'json' to save in json
+    // 'all' to save in json and csv
+    // 'na' to skip this step
+    filetype: `na`,
+
+    // Custom User-Agent
+    // {string default: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36' }
+    userAgent: '',
+
+    // Download video without the watermark: {boolean default: false}
+    // Set to true to download without the watermark
+    // This option will affect the execution speed
+    noWaterMark: false,
+};
+```
+
+Don't forget to check the **examples** folder
 
 ### Promise
 
@@ -450,9 +569,41 @@ const rp = require('request-promise');
 })();
 ```
 
-### Result
+### Event
 
-##### user, hashtag, trend, music
+```javascript
+const TikTokScraper = require('tiktok-scraper');
+
+const users = TikTokScraper.userEvent("tiktok" { number: 30 });
+users.on('data', json => {
+    //data in JSON format
+});
+users.on('done', () => {
+    //completed
+});
+users.on('error', error => {
+    //error message
+});
+users.scrape();
+
+const hashtag = TikTokScraper.hashtagEvent("summer", { number: 250, proxy: 'socks5://1.1.1.1:90' });
+hashtag.on('data', json => {
+    //data in JSON format
+});
+hashtag.on('done', () => {
+    //completed
+});
+hashtag.on('error', error => {
+    //error message
+});
+hashtag.scrape();
+```
+
+### Json Output Example
+
+##### Video Feed
+
+Example output for the methods: **user, hashtag, trend, music, userEvent, hashtagEvent, musicEvent, trendEvent**
 
 ```javascript
 {
@@ -574,103 +725,6 @@ const rp = require('request-promise');
     downloaded: false,
     hashtags: [],
 }
-```
-
-### Event
-
-```javascript
-const TikTokScraper = require('tiktok-scraper');
-
-const users = TikTokScraper.userEvent({ USERNAME }, { number: 30 });
-users.on('data', json => {
-    //data in JSON format
-});
-users.on('done', () => {
-    //completed
-});
-users.on('error', error => {
-    //error message
-});
-users.scrape();
-
-const hashtag = TikTokScraper.hashtagEvent({ HASHTAG }, { number: 250, proxy: 'socks5://1.1.1.1:90' });
-hashtag.on('data', json => {
-    //data in JSON format
-});
-hashtag.on('done', () => {
-    //completed
-});
-hashtag.on('error', error => {
-    //error message
-});
-hashtag.scrape();
-```
-
-### Methods
-
-```javascript
-.user(id, options) //Scrape posts from a specific user (Promise)
-.hashtag(id, options) //Scrape posts from hashtag section (Promise)
-.trend('', options) // Scrape posts from a trends section (Promise)
-.music(id, options) // Scrape posts by music id (Promise)
-
-.userEvent(id, options) //Scrape posts from a specific user (Event)
-.hashtagEvent(id, options) //Scrape posts from hashtag section (Event)
-.trendEvent('', options) // Scrape posts from a trends section (Event)
-.musicEvent(id, options) // Scrape posts by music id (Event)
-
-.getUserProfileInfo('USERNAME', options) // Get user profile information
-.getHashtagInfo('HASHTAG', options) // Get hashtag information
-.signUrl('URL', options) // Get signature for the request
-.getVideoMeta('WEB_VIDEO_URL', options) // Get video meta info, including video url without the watermark
-```
-
-### Options
-
-```javascript
-let options = {
-    // Number of posts to scrape: {int default: 20}
-    number: 50,
-
-    // Set proxy {string default: ''}
-    // http proxy: 127.0.0.1:8080
-    // socks proxy: socks5://127.0.0.1:8080
-    proxy: '',
-
-    // Set to {true} to search by user id: {boolean default: false}
-    by_user_id: false,
-
-    // How many post should be downloaded asynchronously. Only if {download:true}: {int default: 5}
-    asyncDownload: 5,
-
-    // How many post should be scraped asynchronously: {int default: 3}
-    // Current option will be applied only with current types: music and hashtag
-    // With other types it is always 1 because every response is providing the "maxCursor" value
-    // that is needed for the next request
-    asyncScraping: 3,
-
-    // File path where all files will be saved: {string default: 'CURRENT_DIR'}
-    filepath: `CURRENT_DIR`,
-
-    // Custom file name for the output files: {string default: ''}
-    fileName: `CURRENT_DIR`,
-
-    // Output with information can be saved to a CSV or JSON files: {string default: 'na'}
-    // 'csv' to save in csv
-    // 'json' to save in json
-    // 'all' to save in json and csv
-    // 'na' to skip this step
-    filetype: `na`,
-
-    // Custom User-Agent
-    // {string default: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36' }
-    userAgent: '',
-
-    // Download video without the watermark: {boolean default: false}
-    // Set to true to download without the watermark
-    // This option will affect the execution speed
-    noWaterMark: false,
-};
 ```
 
 <a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>

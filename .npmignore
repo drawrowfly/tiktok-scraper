@@ -4,6 +4,7 @@ src/
 reverse_eng/
 examples/
 .github/
+garbage/
 
 .dockerignore
 Dockerfile
@@ -14,3 +15,5 @@ Dockerfile
 .eslintrc.js
 ex.js
 ex.ts
+proxy
+bulk

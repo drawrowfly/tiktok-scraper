@@ -14,7 +14,20 @@ import CONST from '../constant';
 
 import { generateSignature } from '../helpers';
 
-import { PostCollector, ScrapeType, TikTokConstructor, Result, ItemListData, ApiResponse, Challenge, UserData, RequestQuery, Item, History } from '../types';
+import {
+    PostCollector,
+    ScrapeType,
+    TikTokConstructor,
+    Result,
+    ItemListData,
+    ApiResponse,
+    Challenge,
+    UserData,
+    RequestQuery,
+    Item,
+    History,
+    Proxy,
+} from '../types';
 
 import { Downloader } from '../core';
 
@@ -33,9 +46,9 @@ export class TikTokScraper extends EventEmitter {
 
     private input: string;
 
-    private agent: SocksProxyAgent | string;
+    // private agent: SocksProxyAgent | string;
 
-    private proxy: string;
+    private proxy: string[] | string;
 
     private number: number;
 
@@ -77,6 +90,10 @@ export class TikTokScraper extends EventEmitter {
 
     private noDuplicates: string[];
 
+    private timeout: number;
+
+    private bulk: boolean;
+
     constructor({
         download,
         filepath,
@@ -97,6 +114,8 @@ export class TikTokScraper extends EventEmitter {
         test = false,
         noWaterMark = false,
         fileName,
+        timeout = 0,
+        bulk = false,
     }: TikTokConstructor) {
         super();
         this.mainHost = 'https://m.tiktok.com/';
@@ -106,8 +125,8 @@ export class TikTokScraper extends EventEmitter {
         this.json2csvParser = new Parser({ flatten: true });
         this.filetype = filetype;
         this.input = input;
-        this.agent = proxy && proxy.indexOf('socks') > -1 ? new SocksProxyAgent(proxy) : '';
-        this.proxy = proxy && proxy.indexOf('socks') === -1 ? proxy : '';
+        // this.agent = proxy && proxy.indexOf('socks') > -1 ? new SocksProxyAgent(proxy) : '';
+        this.proxy = proxy;
         this.number = number;
         this.asyncDownload = asyncDownload || 5;
         this.asyncScraping = (): number => {
@@ -144,6 +163,8 @@ export class TikTokScraper extends EventEmitter {
         this.noWaterMark = noWaterMark;
         this.maxCursor = 0;
         this.noDuplicates = [];
+        this.timeout = timeout;
+        this.bulk = bulk;
         this.Downloader = new Downloader({
             progress,
             proxy,
@@ -151,40 +172,73 @@ export class TikTokScraper extends EventEmitter {
             noWaterMark,
             userAgent,
             filepath,
+            bulk,
         });
+    }
+
+    /**
+     * Get proxy
+     */
+    private get getProxy(): Proxy {
+        if (Array.isArray(this.proxy)) {
+            const selectProxy = this.proxy.length ? this.proxy[Math.floor(Math.random() * this.proxy.length)] : '';
+            return {
+                socks: false,
+                proxy: selectProxy,
+            };
+        }
+        if (this.proxy.indexOf('socks4://') > -1 || this.proxy.indexOf('socks5://') > -1) {
+            return {
+                socks: true,
+                proxy: new SocksProxyAgent(this.proxy as string),
+            };
+        }
+        return {
+            socks: false,
+            proxy: this.proxy as string,
+        };
     }
 
     /**
      * Main request method
      * @param {} OptionsWithUri
      */
-    private async request<T>({ uri, method, qs, body, form, headers, json, gzip }: OptionsWithUri): Promise<T> {
-        const query = {
-            uri,
-            method,
-            ...(qs ? { qs } : {}),
-            ...(body ? { body } : {}),
-            ...(form ? { form } : {}),
-            headers: {
-                'User-Agent': this.userAgent,
-                referer: 'https://www.tiktok.com/',
-                ...headers,
-            },
-            ...(json ? { json: true } : {}),
-            ...(gzip ? { gzip: true } : {}),
-            resolveWithFullResponse: true,
-            ...(this.proxy ? { proxy: `http://${this.proxy}/` } : {}),
-            ...(this.agent ? { agent: this.agent } : {}),
-            timeout: 10000,
-        } as OptionsWithUri;
+    private request<T>({ uri, method, qs, body, form, headers, json, gzip }: OptionsWithUri): Promise<T> {
+        // eslint-disable-next-line no-async-promise-executor
+        return new Promise(async (resolve, reject) => {
+            const proxy = this.getProxy;
+            const query = {
+                uri,
+                method,
+                ...(qs ? { qs } : {}),
+                ...(body ? { body } : {}),
+                ...(form ? { form } : {}),
+                headers: {
+                    'User-Agent': this.userAgent,
+                    referer: 'https://www.tiktok.com/',
+                    ...headers,
+                },
+                ...(json ? { json: true } : {}),
+                ...(gzip ? { gzip: true } : {}),
+                resolveWithFullResponse: true,
+                ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
+                ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
+                timeout: 10000,
+            } as OptionsWithUri;
 
-        const response = await rp(query);
-
-        return response.body;
+            try {
+                const response = await rp(query);
+                setTimeout(() => {
+                    resolve(response.body);
+                }, this.timeout);
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     private returnInitError(error) {
-        if (this.cli) {
+        if (this.cli && !this.bulk) {
             this.spinner.stop();
         }
         if (this.event) {
@@ -228,7 +282,7 @@ export class TikTokScraper extends EventEmitter {
      */
     // eslint-disable-next-line consistent-return
     public async scrape(): Promise<Result | any> {
-        if (this.cli) {
+        if (this.cli && !this.bulk) {
             this.spinner.start();
         }
 
@@ -803,7 +857,7 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        if (!/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(\w.+)\/video\/(\d+))$/.test(this.input)) {
+        if (!/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))$/.test(this.input)) {
             throw `Not supported url format`;
         }
         const query = {

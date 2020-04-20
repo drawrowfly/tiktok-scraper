@@ -3,9 +3,12 @@ examples/
 reverse_eng/
 node_modules/
 .github/
+garbage/
 
 .DS_Store
 *.csv
 *.zip
 ex.js
 ex.ts
+proxy
+bulk

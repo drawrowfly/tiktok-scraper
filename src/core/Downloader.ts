@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
-import request from 'request';
+import request, { OptionsWithUri } from 'request';
 import rp from 'request-promise';
 import { Agent } from 'http';
 import { createWriteStream, writeFile } from 'fs';
@@ -10,7 +10,7 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 
 import { MultipleBar } from '../helpers';
-import { DownloaderConstructor, PostCollector, ZipValues } from '../types';
+import { DownloaderConstructor, PostCollector, ZipValues, Proxy } from '../types';
 
 export class Downloader {
     public progress: boolean;
@@ -19,9 +19,7 @@ export class Downloader {
 
     public progressBar: any[];
 
-    public proxy: string;
-
-    public agent: Agent | string;
+    private proxy: string[] | string;
 
     public test: boolean;
 
@@ -31,7 +29,9 @@ export class Downloader {
 
     public filepath: string;
 
-    constructor({ progress, proxy, test, noWaterMark, userAgent, filepath }: DownloaderConstructor) {
+    public bulk: boolean;
+
+    constructor({ progress, proxy, test, noWaterMark, userAgent, filepath, bulk }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
         this.test = test;
@@ -39,8 +39,31 @@ export class Downloader {
         this.userAgent = userAgent;
         this.filepath = filepath;
         this.mbars = new MultipleBar();
-        this.agent = proxy && proxy.indexOf('socks') > -1 ? new SocksProxyAgent(proxy) : '';
-        this.proxy = proxy && proxy.indexOf('socks') === -1 ? proxy : '';
+        this.proxy = proxy;
+        this.bulk = bulk;
+    }
+
+    /**
+     * Get proxy
+     */
+    private get getProxy(): Proxy {
+        if (Array.isArray(this.proxy)) {
+            const selectProxy = this.proxy.length ? this.proxy[Math.floor(Math.random() * this.proxy.length)] : '';
+            return {
+                socks: false,
+                proxy: selectProxy,
+            };
+        }
+        if (this.proxy.indexOf('socks4://') > -1 || this.proxy.indexOf('socks5://') > -1) {
+            return {
+                socks: true,
+                proxy: new SocksProxyAgent(this.proxy as string),
+            };
+        }
+        return {
+            socks: false,
+            proxy: this.proxy as string,
+        };
     }
 
     /**
@@ -66,14 +89,15 @@ export class Downloader {
      */
     public toBuffer(item: PostCollector): Promise<Buffer> {
         return new Promise((resolve, reject) => {
+            const proxy = this.getProxy;
             let r = request;
             let barIndex;
             let buffer = Buffer.from('');
-            if (this.proxy) {
-                r = request.defaults({ proxy: `http://${this.proxy}/` });
+            if (proxy.proxy && !proxy.socks) {
+                r = request.defaults({ proxy: `http://${proxy.proxy}/` });
             }
-            if (this.agent) {
-                r = request.defaults({ agent: this.agent as Agent });
+            if (proxy.proxy && proxy.socks) {
+                r = request.defaults({ agent: proxy.proxy as Agent });
             }
             r.get({
                 url: this.noWaterMark ? item.videoUrlNoWaterMark || item.videoUrl : item.videoUrl,
@@ -82,13 +106,13 @@ export class Downloader {
                 },
             })
                 .on('response', response => {
-                    if (this.progress && !this.test) {
+                    if (this.progress && !this.test && !this.bulk) {
                         barIndex = this.addBar(parseInt(response.headers['content-length'] as string, 10));
                     }
                 })
                 .on('data', chunk => {
                     buffer = Buffer.concat([buffer, chunk as Buffer]);
-                    if (this.progress && !this.test) {
+                    if (this.progress && !this.test && !this.bulk) {
                         barIndex.tick(chunk.length, { id: item.id });
                     }
                 })
@@ -142,15 +166,18 @@ export class Downloader {
     }
 
     public async downloadSingleVideo(post: PostCollector) {
-        const query = {
+        const proxy = this.getProxy;
+        const options = {
             uri: post.videoUrlNoWaterMark,
             headers: {
                 'user-agent': this.userAgent,
             },
             encoding: null,
-        };
+            ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
+            ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
+        } as OptionsWithUri;
         try {
-            const result = await rp(query);
+            const result = await rp(options);
 
             await fromCallback(cb => writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
         } catch (error) {

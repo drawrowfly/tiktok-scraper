@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 #!/usr/bin/env node
 
 /* eslint-disable no-unused-expressions */
@@ -22,7 +23,16 @@ const startScraper = async argv => {
         if (argv.historypath) {
             argv.historyPath = argv.historypath;
         }
+        if (argv.file) {
+            argv.input = argv.file;
+        }
+        if (argv.type.indexOf('-') > -1) {
+            argv.type = argv.type.replace('-', '');
+        }
 
+        if (argv.async) {
+            argv.asyncBulk = argv.async;
+        }
         const scraper = await TikTokScraper[argv.type](argv.input, argv);
 
         if (scraper.zip) {
@@ -55,6 +65,7 @@ yargs
     .example(`$0 history`)
     .example(`$0 history -r user:bob`)
     .example(`$0 history -r all`)
+    .example(`$0 from-file BATCH_FILE ASYNC_TASKS -d`)
     .command('user [id]', 'Scrape videos from the User Feed. Enter only the username', {}, argv => {
         startScraper(argv);
     })
@@ -73,36 +84,47 @@ yargs
     .command('history', 'View previous download history', {}, argv => {
         startScraper(argv);
     })
+    .command('from-file [file] [async]', 'Scrape users, hashtags, music, videos mentioned in a file. 1 value per 1 lin', {}, argv => {
+        startScraper(argv);
+    })
     .options({
         help: {
             alias: 'h',
             describe: 'help',
         },
+        timeout: {
+            default: 0,
+            describe: 'Set timeout between requests. Timeout is in Milliseconds: 1000 mls = 1 s',
+        },
         number: {
             alias: 'n',
-            default: 20,
+            default: 0,
             describe: 'Number of posts to scrape. If you will set 0 then all posts will be scraped',
         },
         proxy: {
             alias: 'p',
             default: '',
-            describe: 'Set proxy',
+            describe: 'Set single proxy',
+        },
+        'proxy-file': {
+            default: '',
+            describe: 'Use proxies from a file. Scraper will use random proxies from the file per each request. 1 line 1 proxy.',
         },
         download: {
             alias: 'd',
             boolean: true,
             default: false,
-            describe: 'Download and archive all scraped videos to a ZIP file',
+            describe: 'Download and archive all scraped videos to the ZIP file',
         },
         filepath: {
             default: process.env.SCRAPING_FROM_DOCKER ? '' : process.cwd(),
-            describe: 'Directory to save all output files.',
+            describe: 'File path to save all output files.',
         },
         filetype: {
             alias: ['type', 't'],
             default: 'csv',
             choices: ['csv', 'json', 'all'],
-            describe: "Type of output file where post information will be saved. 'all' - save information about all posts to a 'json' and 'csv' ",
+            describe: "Type of the output file where post information will be saved. 'all' - save information about all posts to the` 'json' and 'csv' ",
         },
         filename: {
             alias: ['f'],
@@ -119,7 +141,7 @@ yargs
             alias: ['s'],
             boolean: true,
             default: false,
-            describe: 'Scraper will save the progress in the OS TMP folder and in the future usage will only download new videos avoiding duplicates',
+            describe: 'Scraper will save the progress in the OS TMP or Custom folder and in the future usage will only download new videos avoiding duplicates',
         },
         historypath: {
             default: process.env.SCRAPING_FROM_DOCKER ? '' : tmpdir(),
@@ -139,6 +161,13 @@ yargs
         if (argv.store) {
             if (!argv.download) {
                 throw new Error('--store, -s flag is only working in combination with the download flag. Add -d to your command');
+            }
+        }
+
+        if (argv._[0] === 'from-file') {
+            const async = parseInt(argv.async, 10);
+            if (!async) {
+                throw new Error('You need to set number of task that should be executed at the same time');
             }
         }
 
@@ -162,7 +191,7 @@ yargs
         }
 
         if (argv._[0] === 'video') {
-            if (!/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(\w.+)\/video\/(\d+))$/.test(argv.id)) {
+            if (!/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))$/.test(argv.id)) {
                 throw new Error('Enter a valid TikTok video URL. For example: https://www.tiktok.com/@tiktok/video/6807491984882765062');
             }
         }

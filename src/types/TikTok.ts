@@ -1,3 +1,5 @@
+import { SocksProxyAgent } from 'socks-proxy-agent';
+
 export type ScrapeType =
     | 'user'
     | 'hashtag'
@@ -11,11 +13,20 @@ export type ScrapeType =
     | 'signature'
     | 'video_meta';
 
+export interface Proxy {
+    socks: boolean;
+    proxy: string | SocksProxyAgent;
+}
+
 export interface Options {
-    proxy?: string;
+    proxy?: string[] | string;
+    proxyFile?: string;
     event?: boolean;
     by_user_id?: boolean;
     download?: boolean;
+    bulk?: boolean;
+    cli?: boolean;
+    asyncBulk?: number;
     asyncDownload?: number;
     asyncScraping?: number;
     filepath?: string;
@@ -27,17 +38,19 @@ export interface Options {
     remove?: string;
     fileName?: string;
     historyPath?: string;
+    timeout?: number;
 }
 export interface TikTokConstructor {
     download: boolean;
     filepath: string;
     filetype: string;
-    proxy: string;
+    proxy: string[] | string;
     asyncDownload: number;
     asyncScraping: number;
     cli?: boolean;
     event?: boolean;
     progress?: boolean;
+    bulk?: boolean;
     input: string;
     number: number;
     type: ScrapeType;
@@ -48,6 +61,7 @@ export interface TikTokConstructor {
     test?: boolean;
     noWaterMark?: boolean;
     fileName?: string;
+    timeout?: number;
 }
 
 export interface Hashtags {

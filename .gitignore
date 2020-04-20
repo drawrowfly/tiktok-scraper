@@ -2,9 +2,12 @@ node_modules/
 reverse_eng/
 build/
 coverage/
+garbage/
 
 .DS_Store
 *.csv
 *.zip
 ex.js
 ex.ts
+proxy
+bulk
