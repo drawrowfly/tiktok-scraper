@@ -13,34 +13,31 @@ This is not an official API support and etc. This is just a scraper that is usin
 <a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 ---
-
 ## Content
-
--   [Features](#features)
--   [To Do](#to-do)
--   [Contribution](#contribution)
--   [Installation](#installation)
--   [Usage](#usage) 
-    - [In Terminal](#in-terminal) 
-          - [Terminal Examples](#terminal-examples) 
-          - [Manage Download History](#manage-download-history) 
-          - [Scrape and Download in Batch](#batch-scrape-and-download-example) 
-          - [Batch Scraping Output](#batch-scraping-output) 
-          - [Output File Example](#output-file-example) 
-     - [Docker](#docker) 
-            - [Build](#build) 
-            - [Run](#run) 
-      - [Module](#docker) 
-            - [Methods](#methods) 
-            - [Options](#options) 
-            - [Use with Promises](#promise) 
-            - [Use with Events](#event) 
-            - [Output Example](#json-output-example) 
-                  - [Video Feed Methods](#video-feed) 
-                  - [getUserProfileInfo](#getUserProfileInfo) 
-                  - [getHashtagInfo](#getHashtagInfo) 
-                  - [getVideoMeta](#getVideoMeta)
-
+- [Features](#features)
+- [To Do](#to-do)
+- [Contribution](#contribution)
+- [Installation](#installation)
+- [Usage](#usage)
+	- [In Terminal](#in-terminal)
+	    - [Terminal Examples](#terminal-examples)
+	    - [Manage Download History](#manage-download-history)
+	    - [Scrape and Download in Batch](#batch-scrape-and-download-example)
+	        - [Batch Scraping Output](#batch-scraping-output)
+	    - [Output File Example](#output-file-example)
+	- [Docker](#docker)
+	    - [Build](#build)
+	    - [Run](#run)
+	- [Module](#docker)
+	    - [Methods](#methods)
+	    - [Options](#options)
+	    - [Use with Promises](#promise)
+	    - [Use with Events](#event)
+	    - [Output Example](#json-output-example)
+	        - [Video Feed Methods](#video-feed)
+	        - [getUserProfileInfo](#getUserProfileInfo)
+	        - [getHashtagInfo](#getHashtagInfo)
+	        - [getVideoMeta](#getVideoMeta)
 ## Features
 
 -   Download **unlimited** post metadata from the User, Hashtag, Trends, or Music-Id pages
@@ -80,7 +77,6 @@ yarn test
 ```sh
 yarn build
 ```
-
 ## Installation
 
 tiktok-scraper requires [Node.js](https://nodejs.org/) v10+ to run.
@@ -163,7 +159,6 @@ Examples:
 ```
 
 #### Terminal Examples
-
 **Example 1:**
 Scrape 300 video posts from user {USERNAME}. Save post info in to a CSV file (by default)
 
@@ -307,7 +302,6 @@ To scrape from the music feed, enter **music:MUSIC_ID**.
 To download video, enter plain video url.
 
 **File Example:**
-
 ```
 ## User feed by username <---- this is just a comment and hence it is not important
 tiktok
@@ -342,8 +336,7 @@ https://www.tiktok.com/@.one_man_army/video/6798822211307310338
 
 **ASYNC_TASKS** - how many task(each line ins file is a task) should be started at the time. I have tested with 40 and it worked really well, if you have slow connection then do not set more then 5
 
-Command below will download single videos without the watermark and will make attempt to download all the videos from the users, hashtags and musics feeds specified in the example file above and will save user, hashtag, music metadata to the JSON and CSV files.
-
+Command below will download single videos without the watermark and will make attempt to download all the videos from the users, hashtags and musics feeds specified in the example file above and will save user, hashtag, music metadata to the JSON and CSV files. 
 ```sh
 tiktok-scraper from-file FILE ASYNC_TASKS -d -f all
 ```
@@ -354,12 +347,11 @@ It is always better to use proxies for any task especially when downloading in b
 
 **FILE** - name of the file
 
-**ASYNC_TASKS** - how many task(each line is a task) should be started at the time.
+**ASYNC_TASKS** - how many task(each line is a task) should be started at the time. 
 
 **PROXY** - proxy file
 
 **Proxy File Example**
-
 ```
 user:password@127.0.0.1:8080
 user:password@127.0.0.1:8081
@@ -368,8 +360,7 @@ socks5://127.0.0.1:8083
 socks4://127.0.0.1:8084
 ```
 
-Command below will download single videos without the watermark and will make attempt to download 50 videos from each user, hashtag and music feed specified in the example file above.
-
+Command below will download single videos without the watermark and will make attempt to download 50 videos from each user, hashtag and music feed specified in the example file above. 
 ```sh
 tiktok-scraper from-file FILE ASYNC_TASKS --proxy-file PROXY -d -n 50
 ```
@@ -621,9 +612,7 @@ hashtag.scrape();
 ### Json Output Example
 
 ##### Video Feed
-
 Example output for the methods: **user, hashtag, trend, music, userEvent, hashtagEvent, musicEvent, trendEvent**
-
 ```javascript
 {
     collector:[{
@@ -745,6 +734,7 @@ Example output for the methods: **user, hashtag, trend, music, userEvent, hashta
     hashtags: [],
 }
 ```
+
 
 <a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
