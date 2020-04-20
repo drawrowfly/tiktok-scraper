@@ -1,6 +1,5 @@
-/* eslint-disable no-console */
 #!/usr/bin/env node
-
+/* eslint-disable no-console */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
