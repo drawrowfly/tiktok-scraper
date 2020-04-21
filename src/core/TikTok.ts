@@ -171,7 +171,7 @@ export class TikTokScraper extends EventEmitter {
             test,
             noWaterMark,
             userAgent,
-            filepath,
+            filepath: process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '',
             bulk,
         });
     }
@@ -499,7 +499,9 @@ export class TikTokScraper extends EventEmitter {
             let history = {} as History;
 
             try {
-                const readFromStore = (await fromCallback(cb => readFile(`${this.historyPath}/tiktok_history.json`, { encoding: 'utf-8' }, cb))) as string;
+                const readFromStore = (await fromCallback(cb =>
+                    readFile(`${this.historyPath}/tiktok_history.json`, { encoding: 'utf-8' }, cb),
+                )) as string;
                 history = JSON.parse(readFromStore);
             } catch (error) {
                 history[historyType] = {
@@ -522,7 +524,9 @@ export class TikTokScraper extends EventEmitter {
             }
             let store: string[];
             try {
-                const readFromStore = (await fromCallback(cb => readFile(`${this.historyPath}/${this.storeValue}.json`, { encoding: 'utf-8' }, cb))) as string;
+                const readFromStore = (await fromCallback(cb =>
+                    readFile(`${this.historyPath}/${this.storeValue}.json`, { encoding: 'utf-8' }, cb),
+                )) as string;
                 store = JSON.parse(readFromStore);
             } catch (error) {
                 store = [];
