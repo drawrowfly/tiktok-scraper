@@ -64,9 +64,9 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [ ] CLI: Download without ZIP
 -   [ ] Download audio files
 -   [ ] Add account authorization
--   [ ] Add bot functionality to like posts
--   [ ] Scrape post comments
--   [ ] Scrape users/hashtags
+-   [ ] AUTH ONLY: Add bot functionality to like posts
+-   [ ] AUTH ONLY: Scrape post comments
+-   [ ] AUTH ONLY: Scrape users/hashtags
 -   [ ] Web interface
 
 ## Contribution
