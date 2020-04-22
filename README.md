@@ -63,6 +63,9 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] CLi: Load proxies from a file
 -   [ ] CLI: Download without ZIP
 -   [ ] Download audio files
+-   [ ] Add account authorization
+-   [ ] Add bot functionality to like posts
+-   [ ] Scrape post comments
 -   [ ] Scrape users/hashtags
 -   [ ] Web interface
 
