@@ -62,7 +62,7 @@ yargs
     .example(`$0 trend -d -n 100`)
     .example(`$0 hashtag HASHTAG_NAME -d -n 100`)
     .example(`$0 music MUSIC_ID -d -n 50`)
-    .example(`$0 video https://www.tiktok.com/@tiktok/video/6807491984882765062`)
+    .example(`$0 video https://www.tiktok.com/@tiktok/video/6807491984882765062 -d`)
     .example(`$0 history`)
     .example(`$0 history -r user:bob`)
     .example(`$0 history -r all`)

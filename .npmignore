@@ -9,6 +9,9 @@ garbage/
 .dockerignore
 Dockerfile
 .DS_Store
+.eslintrc.js
+tsconfig.json
+.gitignore
 .prettierrc.js
 *.csv
 *.zip
