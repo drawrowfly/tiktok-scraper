@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 import request, { OptionsWithUri } from 'request';
@@ -10,7 +11,7 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 
 import { MultipleBar } from '../helpers';
-import { DownloaderConstructor, PostCollector, ZipValues, Proxy } from '../types';
+import { DownloaderConstructor, PostCollector, DownloadParams, Proxy } from '../types';
 
 export class Downloader {
     public progress: boolean;
@@ -21,8 +22,6 @@ export class Downloader {
 
     private proxy: string[] | string;
 
-    public test: boolean;
-
     public noWaterMark: boolean;
 
     public userAgent: string;
@@ -31,10 +30,9 @@ export class Downloader {
 
     public bulk: boolean;
 
-    constructor({ progress, proxy, test, noWaterMark, userAgent, filepath, bulk }: DownloaderConstructor) {
+    constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
-        this.test = test;
         this.noWaterMark = noWaterMark;
         this.userAgent = userAgent;
         this.filepath = filepath;
@@ -67,7 +65,7 @@ export class Downloader {
     }
 
     /**
-     * Add new bard to indicate download progress
+     * Add new bar to indicate download progress
      * @param {number} len
      */
     public addBar(len: number): any[] {
@@ -84,7 +82,7 @@ export class Downloader {
     }
 
     /**
-     * Convert video file to a buffer
+     * Convert video file to the buffer
      * @param {*} item
      */
     public toBuffer(item: PostCollector): Promise<Buffer> {
@@ -106,13 +104,13 @@ export class Downloader {
                 },
             })
                 .on('response', response => {
-                    if (this.progress && !this.test && !this.bulk) {
+                    if (this.progress && !this.bulk) {
                         barIndex = this.addBar(parseInt(response.headers['content-length'] as string, 10));
                     }
                 })
                 .on('data', chunk => {
                     buffer = Buffer.concat([buffer, chunk as Buffer]);
-                    if (this.progress && !this.test && !this.bulk) {
+                    if (this.progress && !this.bulk) {
                         barIndex.tick(chunk.length, { id: item.id });
                     }
                 })
@@ -126,26 +124,33 @@ export class Downloader {
     }
 
     /**
-     * Download and ZIP video files
+     * Download posts
+     * if {zip} is true then zip the result else save posts to the {folder}
      */
-    public zipIt({ collector, filepath, fileName, asyncDownload }: ZipValues) {
+    public downloadPosts({ zip, folder, collector, fileName, asyncDownload }: DownloadParams) {
         return new Promise((resolve, reject) => {
-            const zip = filepath ? `${filepath}/${fileName}.zip` : `${fileName}.zip`;
-            const output = createWriteStream(zip);
+            const saveDestination = zip ? `${fileName}.zip` : folder;
             const archive = archiver('zip', {
                 gzip: true,
                 zlib: { level: 9 },
             });
-            archive.pipe(output);
+            if (zip) {
+                const output = createWriteStream(saveDestination);
+                archive.pipe(output);
+            }
 
             forEachLimit(
                 collector,
                 asyncDownload,
                 (item: PostCollector, cb) => {
                     this.toBuffer(item)
-                        .then(buffer => {
+                        .then(async buffer => {
                             item.downloaded = true;
-                            archive.append(buffer, { name: `${item.id}.mp4` });
+                            if (zip) {
+                                archive.append(buffer, { name: `${item.id}.mp4` });
+                            } else {
+                                await fromCallback(cback => writeFile(`${saveDestination}/${item.id}.mp4`, buffer, cback));
+                            }
                             cb(null);
                         })
                         .catch(() => {
@@ -158,13 +163,21 @@ export class Downloader {
                         return reject(error);
                     }
 
-                    archive.finalize();
-                    archive.on('end', () => resolve());
+                    if (zip) {
+                        archive.finalize();
+                        archive.on('end', () => resolve());
+                    } else {
+                        resolve();
+                    }
                 },
             );
         });
     }
 
+    /**
+     * Download single video without the watermark
+     * @param post
+     */
     public async downloadSingleVideo(post: PostCollector) {
         const proxy = this.getProxy;
         const options = {

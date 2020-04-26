@@ -2,7 +2,7 @@
 /* eslint-disable no-await-in-loop */
 import rp, { OptionsWithUri } from 'request-promise';
 import { tmpdir } from 'os';
-import { writeFile, readFile } from 'fs';
+import { writeFile, readFile, mkdir } from 'fs';
 import { Parser } from 'json2csv';
 import ora, { Ora } from 'ora';
 import { fromCallback } from 'bluebird';
@@ -72,8 +72,6 @@ export class TikTokScraper extends EventEmitter {
 
     private historyPath: string;
 
-    private fileName: () => string;
-
     private idStore: string;
 
     public Downloader: Downloader;
@@ -84,8 +82,6 @@ export class TikTokScraper extends EventEmitter {
 
     private maxCursor: number;
 
-    private test: boolean = false;
-
     private noWaterMark: boolean;
 
     private noDuplicates: string[];
@@ -93,6 +89,14 @@ export class TikTokScraper extends EventEmitter {
     private timeout: number;
 
     private bulk: boolean;
+
+    private zip: boolean;
+
+    private fileName: string;
+
+    private test: boolean;
+
+    private hdVideo: boolean;
 
     constructor({
         download,
@@ -111,23 +115,28 @@ export class TikTokScraper extends EventEmitter {
         store_history = false,
         historyPath = '',
         userAgent,
-        test = false,
         noWaterMark = false,
-        fileName,
+        fileName = '',
         timeout = 0,
         bulk = false,
+        zip = false,
+        test = false,
+        hdVideo = false,
     }: TikTokConstructor) {
         super();
         this.mainHost = 'https://m.tiktok.com/';
         this.userAgent = userAgent || CONST.userAgent;
         this.download = download;
         this.filepath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '';
+        this.fileName = fileName;
         this.json2csvParser = new Parser({ flatten: true });
         this.filetype = filetype;
         this.input = input;
-        // this.agent = proxy && proxy.indexOf('socks') > -1 ? new SocksProxyAgent(proxy) : '';
+        this.test = test;
         this.proxy = proxy;
         this.number = number;
+        this.zip = zip;
+        this.hdVideo = hdVideo;
         this.asyncDownload = asyncDownload || 5;
         this.asyncScraping = (): number => {
             switch (this.scrapeType) {
@@ -146,20 +155,7 @@ export class TikTokScraper extends EventEmitter {
         this.byUserId = by_user_id;
         this.storeHistory = cli && download && store_history;
         this.historyPath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : historyPath || tmpdir();
-        this.fileName = (): string => {
-            if (fileName) {
-                return fileName;
-            }
-            switch (type) {
-                case 'user':
-                case 'hashtag':
-                    return `${input}_${Date.now()}`;
-                default:
-                    return `${this.scrapeType}_${Date.now()}`;
-            }
-        };
         this.idStore = '';
-        this.test = test;
         this.noWaterMark = noWaterMark;
         this.maxCursor = 0;
         this.noDuplicates = [];
@@ -168,12 +164,47 @@ export class TikTokScraper extends EventEmitter {
         this.Downloader = new Downloader({
             progress,
             proxy,
-            test,
             noWaterMark,
             userAgent,
             filepath: process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '',
             bulk,
         });
+    }
+
+    /**
+     * Get file destination(csv, zip, json)
+     */
+    private get fileDestination(): string {
+        if (this.fileName) {
+            return this.filepath ? `${this.filepath}/${this.fileName}` : this.fileName;
+        }
+        switch (this.scrapeType) {
+            case 'user':
+            case 'hashtag':
+                return this.filepath ? `${this.filepath}/${this.input}_${Date.now()}` : `${this.input}_${Date.now()}`;
+            default:
+                return this.filepath ? `${this.filepath}/${this.scrapeType}_${Date.now()}` : `${this.scrapeType}_${Date.now()}`;
+        }
+    }
+
+    /**
+     * Get folder destination, where all downloaded posts will be saved
+     */
+    private get folderDestination(): string {
+        switch (this.scrapeType) {
+            case 'user':
+                return this.filepath ? `${this.filepath}/${this.input}` : this.input;
+            case 'hashtag':
+                return this.filepath ? `${this.filepath}/#${this.input}` : `#${this.input}`;
+            case 'music':
+                return this.filepath ? `${this.filepath}/music:${this.input}` : `music:${this.input}`;
+            case 'trend':
+                return this.filepath ? `${this.filepath}/trend` : `trend`;
+            case 'video':
+                return this.filepath ? `${this.filepath}/video` : `video`;
+            default:
+                throw new TypeError(`${this.scrapeType} is not supported`);
+        }
     }
 
     /**
@@ -286,6 +317,14 @@ export class TikTokScraper extends EventEmitter {
             this.spinner.start();
         }
 
+        if (this.download && !this.zip) {
+            try {
+                await fromCallback(cb => mkdir(this.folderDestination, { recursive: true }, cb));
+            } catch (error) {
+                return this.returnInitError(error.message);
+            }
+        }
+
         if (!this.scrapeType || CONST.scrape.indexOf(this.scrapeType) === -1) {
             return this.returnInitError(`Missing scraping type. Scrape types: ${CONST.scrape} `);
         }
@@ -348,6 +387,10 @@ export class TikTokScraper extends EventEmitter {
         });
     }
 
+    /**
+     * Extract uniq video id
+     * @param uri
+     */
     // eslint-disable-next-line class-methods-use-this
     private async extractVideoId(uri): Promise<string> {
         try {
@@ -357,7 +400,7 @@ export class TikTokScraper extends EventEmitter {
                 const id = Buffer.from(result)
                     .slice(position + 4, position + 36)
                     .toString();
-                return `https://api2.musical.ly/aweme/v1/playwm/?video_id=${id}`;
+                return `https://api2.musical.ly/aweme/v1/playwm/?video_id=${id}${this.hdVideo ? `&improve_bitrate=1&ratio=1080p` : ''}`;
             }
             throw new Error(`Cant extract video id`);
         } catch (error) {
@@ -447,10 +490,11 @@ export class TikTokScraper extends EventEmitter {
                 this.spinner.stop();
             }
             if (this.collector.length && !this.test) {
-                await this.Downloader.zipIt({
+                await this.Downloader.downloadPosts({
+                    zip: this.zip,
+                    folder: this.folderDestination,
                     collector: this.collector,
-                    filepath: this.filepath,
-                    fileName: this.fileName(),
+                    fileName: this.fileDestination,
                     asyncDownload: this.asyncDownload,
                 });
             }
@@ -460,33 +504,41 @@ export class TikTokScraper extends EventEmitter {
         let zip = '';
 
         if (this.collector.length) {
-            json = this.filepath ? `${this.filepath}/${this.fileName()}.json` : `${this.fileName()}.json`;
-            csv = this.filepath ? `${this.filepath}/${this.fileName()}.csv` : `${this.fileName()}.csv`;
-            zip = this.filepath ? `${this.filepath}/${this.fileName()}.zip` : `${this.fileName()}.zip`;
+            json = `${this.fileDestination}.json`;
+            csv = `${this.fileDestination}.csv`;
+            zip = this.zip ? `${this.fileDestination}.zip` : this.folderDestination;
 
-            if (this.collector.length) {
-                switch (this.filetype) {
-                    case 'json':
-                        await fromCallback(cb => writeFile(json, JSON.stringify(this.collector), cb));
-                        break;
-                    case 'csv':
-                        await fromCallback(cb => writeFile(csv, this.json2csvParser.parse(this.collector), cb));
-                        break;
-                    case 'all':
-                        await Promise.all([
-                            await fromCallback(cb => writeFile(json, JSON.stringify(this.collector), cb)),
-                            await fromCallback(cb => writeFile(csv, this.json2csvParser.parse(this.collector), cb)),
-                        ]);
-                        break;
-                    default:
-                        break;
-                }
-            }
+            await this.saveMetadata({ json, csv });
         }
         if (this.cli) {
             this.spinner.stop();
         }
         return [json, csv, zip];
+    }
+
+    /**
+     * Save post metadata
+     * @param param0
+     */
+    public async saveMetadata({ json, csv }) {
+        if (this.collector.length) {
+            switch (this.filetype) {
+                case 'json':
+                    await fromCallback(cb => writeFile(json, JSON.stringify(this.collector), cb));
+                    break;
+                case 'csv':
+                    await fromCallback(cb => writeFile(csv, this.json2csvParser.parse(this.collector), cb));
+                    break;
+                case 'all':
+                    await Promise.all([
+                        await fromCallback(cb => writeFile(json, JSON.stringify(this.collector), cb)),
+                        await fromCallback(cb => writeFile(csv, this.json2csvParser.parse(this.collector), cb)),
+                    ]);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     /**
@@ -615,6 +667,7 @@ export class TikTokScraper extends EventEmitter {
                     playCount: posts[i].itemInfos.playCount,
                     commentCount: posts[i].itemInfos.commentCount,
                     downloaded: false,
+                    mentions: posts[i].itemInfos.text.match(/(@\w+)/g),
                     hashtags: posts[i].challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
                         id: challengeId,
                         name: challengeName,
@@ -909,6 +962,7 @@ export class TikTokScraper extends EventEmitter {
                     playCount: videoProps.props.pageProps.videoData.itemInfos.playCount,
                     commentCount: videoProps.props.pageProps.videoData.itemInfos.commentCount,
                     downloaded: false,
+                    mentions: videoProps.props.pageProps.videoData.itemInfos.text.match(/(@\w+)/g),
                     hashtags: videoProps.props.pageProps.videoData.challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
                         id: challengeId,
                         name: challengeName,
@@ -923,6 +977,8 @@ export class TikTokScraper extends EventEmitter {
                 } catch (error) {
                     // continue regardless of error
                 }
+                this.collector.push(videoItem);
+
                 return videoItem;
             }
             throw new Error(`Can't extract video meta data`);

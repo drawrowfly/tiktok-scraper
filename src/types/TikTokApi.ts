@@ -75,6 +75,8 @@ export interface Challenge {
     covers: string[];
     coversMedium: string[];
     coversLarger: string[];
+    posts: number;
+    views: string;
     splitTitle: string;
 }
 

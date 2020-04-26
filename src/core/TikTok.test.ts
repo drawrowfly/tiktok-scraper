@@ -422,6 +422,7 @@ describe('TikTok Scraper CLI: user(save progress)', () => {
         instance = new TikTokScraper({
             download: true,
             cli: true,
+            zip: true,
             store_history: true,
             test: true,
             asyncDownload: 5,

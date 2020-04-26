@@ -29,13 +29,15 @@ const startScraper = async argv => {
             argv.type = argv.type.replace('-', '');
         }
 
+        argv.hdVideo = argv.hd;
+
         if (argv.async) {
             argv.asyncBulk = argv.async;
         }
         const scraper = await TikTokScraper[argv.type](argv.input, argv);
 
         if (scraper.zip) {
-            console.log(`ZIP path: ${scraper.zip}`);
+            console.log(argv.zip ? `ZIP path: ${scraper.zip}` : `Folder Path: ${scraper.zip}`);
         }
         if (scraper.json) {
             console.log(`JSON path: ${scraper.json}`);
@@ -77,7 +79,7 @@ yargs
     .command('music [id]', 'Scrape videos from the Music Feed. Enter only the music id', {}, argv => {
         startScraper(argv);
     })
-    .command('video [id]', 'Download single video without the watermark', {}, argv => {
+    .command('video [id]', 'Extract metadata from a single video without the watermark. To download use -d flag', {}, argv => {
         startScraper(argv);
     })
     .command('history', 'View previous download history', {}, argv => {
@@ -113,7 +115,19 @@ yargs
             alias: 'd',
             boolean: true,
             default: false,
-            describe: 'Download and archive all scraped videos to the ZIP file',
+            describe: 'Download video posts to the folder with the name input [id]',
+        },
+        hd: {
+            boolean: true,
+            default: false,
+            describe:
+                'Download video in HD. Video size will be x5-x10 times larger and this will affect scraper execution speed. This option only works in combination with -w flag',
+        },
+        zip: {
+            alias: 'z',
+            boolean: true,
+            default: false,
+            describe: 'ZIP all downloaded video posts',
         },
         filepath: {
             default: process.env.SCRAPING_FROM_DOCKER ? '' : process.cwd(),
@@ -121,9 +135,10 @@ yargs
         },
         filetype: {
             alias: ['type', 't'],
-            default: 'csv',
-            choices: ['csv', 'json', 'all'],
-            describe: "Type of the output file where post information will be saved. 'all' - save information about all posts to the` 'json' and 'csv' ",
+            default: '',
+            choices: ['csv', 'json', 'all', ''],
+            describe:
+                "Type of the output file where post information will be saved. 'all' - save information about all posts to the` 'json' and 'csv' ",
         },
         filename: {
             alias: ['f'],
@@ -140,7 +155,8 @@ yargs
             alias: ['s'],
             boolean: true,
             default: false,
-            describe: 'Scraper will save the progress in the OS TMP or Custom folder and in the future usage will only download new videos avoiding duplicates',
+            describe:
+                'Scraper will save the progress in the OS TMP or Custom folder and in the future usage will only download new videos avoiding duplicates',
         },
         historypath: {
             default: process.env.SCRAPING_FROM_DOCKER ? '' : tmpdir(),
@@ -157,6 +173,12 @@ yargs
             throw new Error('Wrong command');
         }
 
+        if (!argv.download) {
+            if (argv.cli && !argv.zip && !argv.type) {
+                throw new Error(`Pointless commands. Try again but with the correct set of commands`);
+            }
+        }
+
         if (argv.store) {
             if (!argv.download) {
                 throw new Error('--store, -s flag is only working in combination with the download flag. Add -d to your command');
@@ -169,6 +191,14 @@ yargs
                 throw new Error('You need to set number of task that should be executed at the same time');
             }
         }
+
+        if (argv.hd && !argv.noWaterMark && argv._[0] !== 'video') {
+            throw new Error(`--hd option won't work without -w option`);
+        }
+
+        // if (argv._[0] === 'video' && argv.download) {
+        //     throw new Error('Use this command with the --download, -d flags');
+        // }
 
         if (process.env.SCRAPING_FROM_DOCKER && (argv.historypath || argv.filepath)) {
             throw new Error(`Can't set custom path when running from Docker`);
@@ -190,6 +220,9 @@ yargs
         }
 
         if (argv._[0] === 'video') {
+            if (!argv.download && !argv.filetype) {
+                argv.filetype = 'csv';
+            }
             if (!/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))$/.test(argv.id)) {
                 throw new Error('Enter a valid TikTok video URL. For example: https://www.tiktok.com/@tiktok/video/6807491984882765062');
             }

@@ -11,7 +11,8 @@ export type ScrapeType =
     | 'single_user'
     | 'single_hashtag'
     | 'signature'
-    | 'video_meta';
+    | 'video_meta'
+    | 'video';
 
 export interface Proxy {
     socks: boolean;
@@ -39,6 +40,7 @@ export interface Options {
     fileName?: string;
     historyPath?: string;
     timeout?: number;
+    hdVideo?: boolean;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -48,6 +50,7 @@ export interface TikTokConstructor {
     asyncDownload: number;
     asyncScraping: number;
     cli?: boolean;
+    zip?: boolean;
     event?: boolean;
     progress?: boolean;
     bulk?: boolean;
@@ -58,10 +61,11 @@ export interface TikTokConstructor {
     store_history?: boolean;
     historyPath?: string;
     userAgent: string;
-    test?: boolean;
     noWaterMark?: boolean;
     fileName?: string;
     timeout?: number;
+    test?: boolean;
+    hdVideo: boolean;
 }
 
 export interface Hashtags {
@@ -115,6 +119,7 @@ export interface PostCollector {
     shareCount: number;
     playCount: number;
     commentCount: number;
+    mentions: string[] | null;
     hashtags: Hashtags[];
     repeated?: boolean;
     downloaded: boolean;

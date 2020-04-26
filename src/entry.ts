@@ -13,6 +13,7 @@ import CONST from './constant';
 const INIT_OPTIONS = {
     number: 20,
     download: false,
+    zip: false,
     asyncDownload: 5,
     asyncScraping: 3,
     proxy: [],
@@ -22,6 +23,7 @@ const INIT_OPTIONS = {
     event: false,
     by_user_id: false,
     noWaterMark: false,
+    hdVideo: false,
     timeout: 0,
     userAgent: CONST.userAgent,
 };
@@ -51,9 +53,9 @@ const promiseScraper = async (input: string, type: ScrapeType, options?: Options
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
 
-    const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type, input } };
+    const constructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type, input } };
 
-    const scraper = new TikTokScraper(contructor);
+    const scraper = new TikTokScraper(constructor);
 
     const result = await scraper.scrape();
     return result;
@@ -144,8 +146,26 @@ export const video = async (input: string, options?: Options): Promise<any> => {
     const scraper = new TikTokScraper(contructor);
     const result: PostCollector = await scraper.getVideoMeta();
 
-    await scraper.Downloader.downloadSingleVideo(result);
-    return { message: `Video was saved in: ${contructor.filepath}/${result.id}.mp4` };
+    const path = options?.filepath ? `${options?.filepath}/${result.id}` : result.id;
+    let outputMessage = {};
+
+    if (options?.filetype) {
+        await scraper.saveMetadata({ json: `${path}.json`, csv: `${path}.csv` });
+
+        outputMessage = {
+            ...(options?.filetype === 'all' ? { json: `${path}.json`, csv: `${path}.csv` } : {}),
+            ...(options?.filetype === 'json' ? { json: `${path}.json` } : {}),
+            ...(options?.filetype === 'csv' ? { csv: `${path}.csv` } : {}),
+        };
+    }
+
+    if (options?.download) {
+        await scraper.Downloader.downloadSingleVideo(result);
+    }
+    return {
+        ...(options?.download ? { message: `Video location: ${contructor.filepath}/${result.id}.mp4` } : {}),
+        ...outputMessage,
+    };
 };
 
 // eslint-disable-next-line no-unused-vars
