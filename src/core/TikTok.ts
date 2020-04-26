@@ -667,7 +667,7 @@ export class TikTokScraper extends EventEmitter {
                     playCount: posts[i].itemInfos.playCount,
                     commentCount: posts[i].itemInfos.commentCount,
                     downloaded: false,
-                    mentions: posts[i].itemInfos.text.match(/(@\w+)/g),
+                    mentions: posts[i].itemInfos.text.match(/(@\w+)/g) || [],
                     hashtags: posts[i].challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
                         id: challengeId,
                         name: challengeName,
@@ -962,7 +962,7 @@ export class TikTokScraper extends EventEmitter {
                     playCount: videoProps.props.pageProps.videoData.itemInfos.playCount,
                     commentCount: videoProps.props.pageProps.videoData.itemInfos.commentCount,
                     downloaded: false,
-                    mentions: videoProps.props.pageProps.videoData.itemInfos.text.match(/(@\w+)/g),
+                    mentions: videoProps.props.pageProps.videoData.itemInfos.text.match(/(@\w+)/g) || [],
                     hashtags: videoProps.props.pageProps.videoData.challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
                         id: challengeId,
                         name: challengeName,

@@ -112,6 +112,7 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                 commentCount: 46142,
                 downloaded: false,
                 hashtags: [],
+                mentions: [],
             });
             done();
         });
@@ -469,6 +470,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             userAgent: 'http',
             proxy: '',
             number: 5,
+            hdVideo: false,
         });
     });
     it('getVideoMeta should return a valid Object', async () => {
@@ -494,6 +496,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             },
             downloaded: false,
             hashtags: [{ id: '609365', name: 'happyathome', title: undefined, cover: undefined }],
+            mentions: [],
         });
     });
 

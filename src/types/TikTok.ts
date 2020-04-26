@@ -65,7 +65,7 @@ export interface TikTokConstructor {
     fileName?: string;
     timeout?: number;
     test?: boolean;
-    hdVideo: boolean;
+    hdVideo?: boolean;
 }
 
 export interface Hashtags {
