@@ -15,6 +15,7 @@ const startScraper = async argv => {
         argv.cli = true;
         argv.input = argv.id;
         argv.store_history = argv.store;
+        argv.randomUa = true;
         if (argv.filename) {
             argv.fileName = argv.filename;
         }
@@ -134,7 +135,7 @@ yargs
             describe: 'File path to save all output files.',
         },
         filetype: {
-            alias: ['type', 't'],
+            alias: ['t'],
             default: '',
             choices: ['csv', 'json', 'all', ''],
             describe:
@@ -190,15 +191,14 @@ yargs
             if (!async) {
                 throw new Error('You need to set number of task that should be executed at the same time');
             }
+            if (!argv.type && !argv.d) {
+                throw new Error('You need to specify file type(-t) where data will be saved AND/OR if posts should be downloaded (-d)');
+            }
         }
 
         if (argv.hd && !argv.noWaterMark && argv._[0] !== 'video') {
             throw new Error(`--hd option won't work without -w option`);
         }
-
-        // if (argv._[0] === 'video' && argv.download) {
-        //     throw new Error('Use this command with the --download, -d flags');
-        // }
 
         if (process.env.SCRAPING_FROM_DOCKER && (argv.historypath || argv.filepath)) {
             throw new Error(`Can't set custom path when running from Docker`);

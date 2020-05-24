@@ -46,8 +46,6 @@ export class TikTokScraper extends EventEmitter {
 
     private input: string;
 
-    // private agent: SocksProxyAgent | string;
-
     private proxy: string[] | string;
 
     private number: number;
@@ -466,10 +464,6 @@ export class TikTokScraper extends EventEmitter {
         try {
             const result = await this.scrapeData(query, item);
 
-            if (result.statusCode !== 0) {
-                throw new Error('No result');
-            }
-
             await this.collectPosts(result.body.itemListData);
 
             if (!result.body.hasMore) {
@@ -698,7 +692,7 @@ export class TikTokScraper extends EventEmitter {
 
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id;
 
-        const query = {
+        const options = {
             uri: `${this.mainHost}share/item/list`,
             method: 'GET',
             qs: {
@@ -712,9 +706,8 @@ export class TikTokScraper extends EventEmitter {
             },
             json: true,
         };
-
         try {
-            const response = await this.request<ItemListData>(query);
+            const response = await this.request<ItemListData>(options);
 
             if (response.statusCode === 0) {
                 return response;
@@ -934,7 +927,7 @@ export class TikTokScraper extends EventEmitter {
                 const videoProps = JSON.parse(regex[1]);
                 let videoItem = {} as PostCollector;
                 if (videoProps.props.pageProps.statusCode) {
-                    throw new Error(`Can't find video: ${this.input}`);
+                    throw new Error();
                 }
                 videoItem = {
                     id: videoProps.props.pageProps.videoData.itemInfos.id,
@@ -981,9 +974,9 @@ export class TikTokScraper extends EventEmitter {
 
                 return videoItem;
             }
-            throw new Error(`Can't extract video meta data`);
+            throw new Error();
         } catch (error) {
-            throw error.message;
+            throw `Can't extract metadata from the video: ${this.input}`;
         }
     }
 }

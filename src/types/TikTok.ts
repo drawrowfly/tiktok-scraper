@@ -41,6 +41,7 @@ export interface Options {
     historyPath?: string;
     timeout?: number;
     hdVideo?: boolean;
+    randomUa?: boolean;
 }
 export interface TikTokConstructor {
     download: boolean;

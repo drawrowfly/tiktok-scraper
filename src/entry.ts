@@ -29,6 +29,14 @@ const INIT_OPTIONS = {
 };
 
 /**
+ * Randomize user-agent version
+ * Only if {randomUa} is set to {true}
+ */
+const randomUserAgent = () =>
+    `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${Math.floor(Math.random() * 14) +
+        65}.0.4044.113 Safari/537.36`;
+
+/**
  * Load proxys from a file
  * @param file
  */
@@ -53,6 +61,10 @@ const promiseScraper = async (input: string, type: ScrapeType, options?: Options
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
 
+    if (options?.randomUa) {
+        options.userAgent = randomUserAgent();
+    }
+
     const constructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type, input } };
 
     const scraper = new TikTokScraper(constructor);
@@ -64,6 +76,9 @@ const promiseScraper = async (input: string, type: ScrapeType, options?: Options
 const eventScraper = (input: string, type: ScrapeType, options?: Options): TikTokScraper => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
+    }
+    if (options?.randomUa) {
+        options.userAgent = randomUserAgent();
     }
     const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type, input, event: true } };
     return new TikTokScraper(contructor);

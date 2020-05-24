@@ -262,6 +262,10 @@ const options = {
     // {string default: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36' }
     userAgent: '',
 
+    // Randomize user-agent version: {boolean default: false}
+    // Can be usefull against TikTok blockings
+    randomUa: false,
+    
     // Download video without the watermark: {boolean default: false}
     // Set to true to download without the watermark
     // This option will affect the execution speed
