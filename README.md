@@ -61,6 +61,8 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] CLI: Scrape and download in batch
 -   [x] CLi: Load proxies from a file
 -   [x] CLI: Optional ZIP
+-   [ ] Renew API
+-   [ ] Add Manual Pagination
 -   [ ] Improve documentation
 -   [ ] Download audio files
 -   [ ] Add account authorization
