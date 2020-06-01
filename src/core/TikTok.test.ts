@@ -76,6 +76,7 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                 createTime: '1584953968',
                 authorMeta: {
                     id: '5831967',
+                    secUid: 'MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s',
                     name: 'charlidamelio',
                     nickName: 'charli d’amelio',
                     following: 932,
