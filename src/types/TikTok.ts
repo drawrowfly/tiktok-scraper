@@ -82,6 +82,7 @@ export interface PostCollector {
     createTime: number;
     authorMeta: {
         id: string;
+        secUid: string;
         name: string;
         nickName: string;
         following: number;
