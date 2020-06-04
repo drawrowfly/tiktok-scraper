@@ -120,6 +120,7 @@ export class TikTokScraper extends EventEmitter {
         zip = false,
         test = false,
         hdVideo = false,
+        tac = '',
     }: TikTokConstructor) {
         super();
         this.mainHost = 'https://m.tiktok.com/';
@@ -135,6 +136,7 @@ export class TikTokScraper extends EventEmitter {
         this.number = number;
         this.zip = zip;
         this.hdVideo = hdVideo;
+        this.tacValue = tac;
         this.asyncDownload = asyncDownload || 5;
         this.asyncScraping = (): number => {
             switch (this.scrapeType) {
@@ -895,7 +897,9 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        await this.extractTac();
+        if (!this.tacValue) {
+            await this.extractTac();
+        }
 
         return generateSignature(this.input, this.userAgent, this.tacValue);
     }

@@ -26,6 +26,7 @@ const INIT_OPTIONS = {
     hdVideo: false,
     timeout: 0,
     userAgent: CONST.userAgent,
+    tac: '',
 };
 
 /**

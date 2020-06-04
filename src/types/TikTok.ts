@@ -42,6 +42,7 @@ export interface Options {
     timeout?: number;
     hdVideo?: boolean;
     randomUa?: boolean;
+    tac?: string;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -67,6 +68,7 @@ export interface TikTokConstructor {
     timeout?: number;
     test?: boolean;
     hdVideo?: boolean;
+    tac?: string;
 }
 
 export interface Hashtags {
