@@ -43,6 +43,7 @@ export interface Options {
     hdVideo?: boolean;
     randomUa?: boolean;
     tac?: string;
+    signature?: string;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -69,6 +70,7 @@ export interface TikTokConstructor {
     test?: boolean;
     hdVideo?: boolean;
     tac?: string;
+    signature?: string;
 }
 
 export interface Hashtags {

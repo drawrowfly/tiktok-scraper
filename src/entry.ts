@@ -27,6 +27,7 @@ const INIT_OPTIONS = {
     timeout: 0,
     userAgent: CONST.userAgent,
     tac: '',
+    signature: '',
 };
 
 /**
@@ -34,8 +35,8 @@ const INIT_OPTIONS = {
  * Only if {randomUa} is set to {true}
  */
 const randomUserAgent = () =>
-    `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${Math.floor(Math.random() * 14) +
-        65}.0.4044.113 Safari/537.36`;
+    `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${Math.floor(Math.random() * 4) +
+        79}.0.4044.113 Safari/537.36`;
 
 /**
  * Load proxys from a file
@@ -113,6 +114,10 @@ export const getUserProfileInfo = async (input: string, options?: Options): Prom
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
+    if (options?.randomUa) {
+        options.userAgent = randomUserAgent();
+    }
+
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
@@ -141,6 +146,9 @@ export const getVideoMeta = async (input: string, options?: Options): Promise<Po
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
+    if (options?.randomUa) {
+        options.userAgent = randomUserAgent();
+    }
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
@@ -154,6 +162,9 @@ export const getVideoMeta = async (input: string, options?: Options): Promise<Po
 export const video = async (input: string, options?: Options): Promise<any> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
+    }
+    if (options?.randomUa) {
+        options.userAgent = randomUserAgent();
     }
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
@@ -345,7 +356,9 @@ export const fromfile = async (input: string, options: Options) => {
     if (!batch.length) {
         throw `File is empty: ${input}`;
     }
-
+    if (options?.randomUa) {
+        options.userAgent = randomUserAgent();
+    }
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }

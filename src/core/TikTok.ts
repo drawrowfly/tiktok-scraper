@@ -96,6 +96,8 @@ export class TikTokScraper extends EventEmitter {
 
     private hdVideo: boolean;
 
+    private signature: string;
+
     constructor({
         download,
         filepath,
@@ -121,6 +123,7 @@ export class TikTokScraper extends EventEmitter {
         test = false,
         hdVideo = false,
         tac = '',
+        signature = '',
     }: TikTokConstructor) {
         super();
         this.mainHost = 'https://m.tiktok.com/';
@@ -138,6 +141,7 @@ export class TikTokScraper extends EventEmitter {
         this.hdVideo = hdVideo;
         this.tacValue = tac;
         this.asyncDownload = asyncDownload || 5;
+        this.signature = signature;
         this.asyncScraping = (): number => {
             switch (this.scrapeType) {
                 case 'user':
@@ -246,7 +250,6 @@ export class TikTokScraper extends EventEmitter {
                 ...(form ? { form } : {}),
                 headers: {
                     'User-Agent': this.userAgent,
-                    referer: 'https://www.tiktok.com/',
                     ...headers,
                 },
                 ...(json ? { json: true } : {}),
@@ -256,7 +259,6 @@ export class TikTokScraper extends EventEmitter {
                 ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
                 timeout: 10000,
             } as OptionsWithUri;
-
             try {
                 const response = await rp(query);
                 setTimeout(() => {
@@ -301,7 +303,7 @@ export class TikTokScraper extends EventEmitter {
                 // eslint-disable-next-line prefer-destructuring
                 this.tacValue = tacRegex[1];
             } else {
-                throw new TypeError("Can't extract Tac value");
+                this.tacValue = '1'; // throw new TypeError("Can't extract Tac value");
             }
         } catch (error) {
             this.returnInitError(error.message);
@@ -685,14 +687,16 @@ export class TikTokScraper extends EventEmitter {
 
     private async scrapeData(qs: RequestQuery, maxCursor: number): Promise<ItemListData> {
         const shareUid = qs.type === 4 || qs.type === 5 ? '&shareUid=' : '';
-        const signature = generateSignature(
-            `${this.mainHost}share/item/list?secUid=${qs.secUid}&id=${qs.id}&type=${qs.type}&count=${qs.count}&minCursor=${
-                qs.minCursor
-            }&maxCursor=${maxCursor || 0}${shareUid}&lang=${qs.lang}&shareUid=${qs.shareUid}&verifyFp=${qs.verifyFp}`,
-            this.userAgent,
-            this.tacValue,
-        );
-
+        const signature = this.signature
+            ? this.signature
+            : generateSignature(
+                  `${this.mainHost}share/item/list?secUid=${qs.secUid}&id=${qs.id}&type=${qs.type}&count=${qs.count}&minCursor=${
+                      qs.minCursor
+                  }&maxCursor=${maxCursor || 0}${shareUid}&lang=${qs.lang}&shareUid=${qs.shareUid}&verifyFp=${qs.verifyFp}`,
+                  this.userAgent,
+                  this.tacValue,
+              );
+        this.signature = '';
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id;
 
         const options = {
