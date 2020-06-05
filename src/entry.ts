@@ -86,6 +86,9 @@ const eventScraper = (input: string, type: ScrapeType, options?: Options): TikTo
     if (options?.randomUa) {
         options.userAgent = randomUserAgent();
     }
+
+    options!.sign! = sign(options!.userAgent!);
+
     const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type, input, event: true } };
     return new TikTokScraper(contructor);
 };
@@ -139,6 +142,8 @@ export const signUrl = async (input: string, options?: Options): Promise<string>
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
+    options!.sign! = sign(options!.userAgent!);
+
     const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type: 'signature' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
 
@@ -366,6 +371,7 @@ export const fromfile = async (input: string, options: Options) => {
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
+    options!.sign! = sign(options!.userAgent!);
     const result = await batchProcessor(batch, options);
 
     return { table: result };

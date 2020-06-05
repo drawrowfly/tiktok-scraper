@@ -12,6 +12,25 @@ import { forEachLimit } from 'async';
 
 import CONST from '../constant';
 
+import {
+    PostCollector,
+    ScrapeType,
+    TikTokConstructor,
+    Result,
+    ItemListData,
+    ApiResponse,
+    Challenge,
+    UserData,
+    RequestQuery,
+    Item,
+    History,
+    Proxy,
+    ItemAPIV2,
+    ItemListDataAPIV2,
+} from '../types';
+
+import { Downloader } from '../core';
+
 declare global {
     namespace NodeJS {
         interface Global {
@@ -33,25 +52,6 @@ global.location = {
     href: 'https://www.tiktok.com/',
     protocol: 'https:',
 };
-
-import {
-    PostCollector,
-    ScrapeType,
-    TikTokConstructor,
-    Result,
-    ItemListData,
-    ApiResponse,
-    Challenge,
-    UserData,
-    RequestQuery,
-    Item,
-    History,
-    Proxy,
-    ItemAPIV2,
-    ItemListDataAPIV2,
-} from '../types';
-
-import { Downloader } from '../core';
 
 export class TikTokScraper extends EventEmitter {
     private mainHost: string;
@@ -688,7 +688,7 @@ export class TikTokScraper extends EventEmitter {
                     mentions: posts[i].desc.match(/(@\w+)/g) || [],
                     hashtags: posts[i].challenges
                         ? posts[i].challenges.map(({ id, title, desc, coverLarger }) => ({
-                              id: id,
+                              id,
                               name: title,
                               title: desc,
                               cover: coverLarger,
@@ -705,6 +705,7 @@ export class TikTokScraper extends EventEmitter {
             }
         }
     }
+
     /**
      * Collecting posts from API V1
      * This method will be removed in the future
@@ -988,7 +989,7 @@ export class TikTokScraper extends EventEmitter {
             throw `Url is missing`;
         }
 
-        return 'ss'; //generateSignature(this.input, this.userAgent);
+        return this.sign({ url: this.input });
     }
 
     /**
