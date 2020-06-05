@@ -303,7 +303,7 @@ export class TikTokScraper extends EventEmitter {
                 // eslint-disable-next-line prefer-destructuring
                 this.tacValue = tacRegex[1];
             } else {
-                this.tacValue = '1'; // throw new TypeError("Can't extract Tac value");
+                throw new TypeError("Can't extract Tac value");
             }
         } catch (error) {
             this.returnInitError(error.message);
