@@ -335,8 +335,6 @@ export class TikTokScraper extends EventEmitter {
             return this.emit('done', 'completed');
         }
 
-        const [json, csv, zip] = await this.saveCollectorData();
-
         if (this.storeHistory) {
             await this.storeDownlodProgress();
         }
@@ -344,6 +342,8 @@ export class TikTokScraper extends EventEmitter {
         if (this.noWaterMark && this.scrapeType === 'hashtag') {
             await this.withoutWatermark();
         }
+
+        const [json, csv, zip] = await this.saveCollectorData();
 
         return {
             collector: this.collector,
@@ -628,6 +628,10 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
+    /**
+     * Collect post from new API
+     * @param posts
+     */
     private collectPostsV2(posts: ItemAPIV2[]) {
         for (let i = 0; i < posts.length; i += 1) {
             if (this.number) {

@@ -37,9 +37,6 @@ const startScraper = async argv => {
         }
         const scraper = await TikTokScraper[argv.type](argv.input, argv);
 
-        if (!scraper.collector.length) {
-            console.log(`Result is empty. Try with different input data(username,hashtag and etc)`);
-        }
         if (scraper.zip) {
             console.log(argv.zip ? `ZIP path: ${scraper.zip}` : `Folder Path: ${scraper.zip}`);
         }
