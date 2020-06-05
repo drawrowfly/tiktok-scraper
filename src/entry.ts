@@ -10,6 +10,8 @@ import { TikTokScraper } from './core';
 import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem } from './types';
 import CONST from './constant';
 
+import { sign } from './helpers';
+
 const INIT_OPTIONS = {
     number: 20,
     download: false,
@@ -66,6 +68,8 @@ const promiseScraper = async (input: string, type: ScrapeType, options?: Options
     if (options?.randomUa) {
         options.userAgent = randomUserAgent();
     }
+
+    options!.sign! = sign(options!.userAgent!);
 
     const constructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type, input } };
 

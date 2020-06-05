@@ -98,7 +98,7 @@ export class Downloader {
                 r = request.defaults({ agent: proxy.proxy as Agent });
             }
             r.get({
-                url: this.noWaterMark ? item.videoUrlNoWaterMark || item.videoUrl : item.videoUrl,
+                url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
                 headers: {
                     'user-agent': this.userAgent,
                 },

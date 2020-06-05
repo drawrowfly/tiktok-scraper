@@ -12,7 +12,27 @@ import { forEachLimit } from 'async';
 
 import CONST from '../constant';
 
-import { generateSignature } from '../helpers';
+declare global {
+    namespace NodeJS {
+        interface Global {
+            location: {
+                href: string;
+                protocol: string;
+            };
+            navigator: {
+                userAgent: string;
+            };
+        }
+    }
+}
+
+/**
+ * global scope is being used by the signer
+ */
+global.location = {
+    href: 'https://www.tiktok.com/',
+    protocol: 'https:',
+};
 
 import {
     PostCollector,
@@ -27,6 +47,8 @@ import {
     Item,
     History,
     Proxy,
+    ItemAPIV2,
+    ItemListDataAPIV2,
 } from '../types';
 
 import { Downloader } from '../core';
@@ -74,8 +96,6 @@ export class TikTokScraper extends EventEmitter {
 
     public Downloader: Downloader;
 
-    private tacValue: string = '';
-
     private storeValue: string = '';
 
     private maxCursor: number;
@@ -97,6 +117,8 @@ export class TikTokScraper extends EventEmitter {
     private hdVideo: boolean;
 
     private signature: string;
+
+    private sign: ({ url: string }) => string;
 
     constructor({
         download,
@@ -122,10 +144,11 @@ export class TikTokScraper extends EventEmitter {
         zip = false,
         test = false,
         hdVideo = false,
-        tac = '',
         signature = '',
+        sign,
     }: TikTokConstructor) {
         super();
+        this.sign = sign!;
         this.mainHost = 'https://m.tiktok.com/';
         this.userAgent = userAgent || CONST.userAgent;
         this.download = download;
@@ -139,7 +162,6 @@ export class TikTokScraper extends EventEmitter {
         this.number = number;
         this.zip = zip;
         this.hdVideo = hdVideo;
-        this.tacValue = tac;
         this.asyncDownload = asyncDownload || 5;
         this.signature = signature;
         this.asyncScraping = (): number => {
@@ -282,39 +304,12 @@ export class TikTokScraper extends EventEmitter {
     }
 
     /**
-     * Extract new Tac value
-     * @param {*} uri
-     */
-    private async extractTac(uri = 'https://www.tiktok.com/discover') {
-        const query = {
-            uri,
-            method: 'GET',
-            headers: {
-                accept: 'application/json, text/plain, */*',
-                referer: 'https://www.tiktok.com/',
-            },
-            gzip: true,
-        };
-
-        try {
-            const response = await this.request<string>(query);
-            const tacRegex = /<script>tac='([^]*)'<\/script>/.exec(response);
-            if (tacRegex) {
-                // eslint-disable-next-line prefer-destructuring
-                this.tacValue = tacRegex[1];
-            } else {
-                throw new TypeError("Can't extract Tac value");
-            }
-        } catch (error) {
-            this.returnInitError(error.message);
-        }
-    }
-
-    /**
      * Initiate scraping process
      */
     // eslint-disable-next-line consistent-return
     public async scrape(): Promise<Result | any> {
+        global.navigator.userAgent = this.userAgent;
+
         if (this.cli && !this.bulk) {
             this.spinner.start();
         }
@@ -334,33 +329,29 @@ export class TikTokScraper extends EventEmitter {
             return this.returnInitError('Missing input');
         }
 
-        await this.extractTac();
+        await this.mainLoop();
 
-        if (this.tacValue) {
-            await this.mainLoop();
-
-            if (this.event) {
-                return this.emit('done', 'completed');
-            }
-
-            if (this.storeHistory) {
-                await this.storeDownlodProgress();
-            }
-
-            if (this.noWaterMark) {
-                await this.withoutWatermark();
-            }
-
-            const [json, csv, zip] = await this.saveCollectorData();
-
-            return {
-                collector: this.collector,
-                ...(this.download ? { zip } : {}),
-                ...(this.filetype === 'all' ? { json, csv } : {}),
-                ...(this.filetype === 'json' ? { json } : {}),
-                ...(this.filetype === 'csv' ? { csv } : {}),
-            };
+        if (this.event) {
+            return this.emit('done', 'completed');
         }
+
+        const [json, csv, zip] = await this.saveCollectorData();
+
+        if (this.storeHistory) {
+            await this.storeDownlodProgress();
+        }
+
+        if (this.noWaterMark && this.scrapeType === 'hashtag') {
+            await this.withoutWatermark();
+        }
+
+        return {
+            collector: this.collector,
+            ...(this.download ? { zip } : {}),
+            ...(this.filetype === 'all' ? { json, csv } : {}),
+            ...(this.filetype === 'json' ? { json } : {}),
+            ...(this.filetype === 'csv' ? { csv } : {}),
+        };
     }
 
     /**
@@ -415,11 +406,7 @@ export class TikTokScraper extends EventEmitter {
      */
     private mainLoop(): Promise<any> {
         return new Promise(resolve => {
-            let arrayLength = this.number % 27 ? Math.ceil(this.number / 27) : Math.ceil(this.number / 27) + 1;
-            if (!this.number) {
-                arrayLength = 1000;
-            }
-            const taskArray = Array.from({ length: arrayLength }, (v, k) => k + 1);
+            const taskArray = Array.from({ length: 1000 }, (v, k) => k + 1);
             forEachLimit(
                 taskArray,
                 this.asyncScraping(),
@@ -433,7 +420,7 @@ export class TikTokScraper extends EventEmitter {
                             break;
                         case 'hashtag':
                             this.getHashTagId()
-                                .then(query => this.submitScrapingRequest(query, item === 1 ? 0 : (item - 1) * query.count))
+                                .then(query => this.submitScrapingRequest(query, item === 1 ? 0 : (item - 1) * query.count, true))
                                 .then(() => cb(null))
                                 .catch(error => cb(error));
                             break;
@@ -464,16 +451,42 @@ export class TikTokScraper extends EventEmitter {
      * Submit request to the TikTok web API
      * Collect received metadata
      */
-    private async submitScrapingRequest(query, item): Promise<any> {
+    private async submitScrapingRequest(query: RequestQuery, item, apiv1 = false): Promise<any> {
         try {
-            const result = await this.scrapeData(query, item);
+            let hasMore = false;
+            let maxCursor = '';
+            if (apiv1) {
+                const result = await this.scrapeData<ItemListData>(query, item, apiv1);
+                if (result.statusCode !== 0) {
+                    throw new Error(`Can't scrape more posts`);
+                }
+                hasMore = result.body.hasMore;
+                maxCursor = result.body.maxCursor;
+                await this.collectPosts(result.body.itemListData);
+            } else {
+                const result = await this.scrapeData<ItemListDataAPIV2>(query, item, apiv1);
+                if (result.statusCode !== 0) {
+                    throw new Error(`Can't scrape more posts`);
+                }
+                hasMore = result.hasMore;
+                maxCursor = query.sourceType === 12 ? '0' : result.maxCursor;
+                if (!result.items) {
+                    throw new Error('No more posts');
+                }
+                try {
+                    await this.collectPostsV2(result.items);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
 
-            await this.collectPosts(result.body.itemListData);
-
-            if (!result.body.hasMore) {
+            if (!hasMore) {
                 throw new Error('No more posts');
             }
-            this.maxCursor = parseInt(result.body.maxCursor, 10);
+            if (this.collector.length >= this.number) {
+                throw new Error('Done');
+            }
+            this.maxCursor = parseInt(maxCursor, 10);
         } catch (error) {
             throw error.message;
         }
@@ -615,6 +628,88 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
+    private collectPostsV2(posts: ItemAPIV2[]) {
+        for (let i = 0; i < posts.length; i += 1) {
+            if (this.number) {
+                if (this.collector.length >= this.number) {
+                    break;
+                }
+            }
+
+            if (this.noDuplicates.indexOf(posts[i].id) === -1) {
+                this.noDuplicates.push(posts[i].id);
+                const item: PostCollector = {
+                    id: posts[i].id,
+                    text: posts[i].desc,
+                    createTime: posts[i].createTime,
+                    authorMeta: {
+                        id: posts[i].author.id,
+                        secUid: posts[i].author.secUid,
+                        name: posts[i].author.uniqueId,
+                        nickName: posts[i].author.nickname,
+                        verified: posts[i].author.verified,
+                        signature: posts[i].author.signature,
+                        avatar: posts[i].author.avatarLarger,
+                    },
+                    ...(posts[i].music
+                        ? {
+                              musicMeta: {
+                                  musicId: posts[i].music.id,
+                                  musicName: posts[i].music.title,
+                                  musicAuthor: posts[i].music.authorName,
+                                  musicOriginal: posts[i].music.original,
+                                  playUrl: posts[i].music.playUrl,
+                                  coverThumb: posts[i].music.coverThumb,
+                                  coverMedium: posts[i].music.coverMedium,
+                                  coverLarge: posts[i].music.coverLarge,
+                              },
+                          }
+                        : {}),
+                    covers: {
+                        default: posts[i].video.cover,
+                        origin: posts[i].video.originCover,
+                        dynamic: posts[i].video.dynamicCover,
+                    },
+                    webVideoUrl: `https://www.tiktok.com/@${posts[i].author.uniqueId}/video/${posts[i].id}`,
+                    videoUrl: posts[i].video.downloadAddr,
+                    videoUrlNoWaterMark: `https://api2.musical.ly/aweme/v1/playwm/?video_id=${posts[i].video.id}${
+                        this.hdVideo ? '&improve_bitrate=1&ratio=1080p' : ''
+                    }`,
+                    videoMeta: {
+                        height: posts[i].video.height,
+                        width: posts[i].video.width,
+                        duration: posts[i].video.duration,
+                    },
+                    diggCount: posts[i].stats.diggCount,
+                    shareCount: posts[i].stats.shareCount,
+                    playCount: posts[i].stats.playCount,
+                    commentCount: posts[i].stats.commentCount,
+                    downloaded: false,
+                    mentions: posts[i].desc.match(/(@\w+)/g) || [],
+                    hashtags: posts[i].challenges
+                        ? posts[i].challenges.map(({ id, title, desc, coverLarger }) => ({
+                              id: id,
+                              name: title,
+                              title: desc,
+                              cover: coverLarger,
+                          }))
+                        : [],
+                };
+
+                if (this.event) {
+                    this.emit('data', item);
+                    this.collector.push({} as PostCollector);
+                } else {
+                    this.collector.push(item);
+                }
+            }
+        }
+    }
+    /**
+     * Collecting posts from API V1
+     * This method will be removed in the future
+     * @param posts
+     */
     private collectPosts(posts: Item[]) {
         for (let i = 0; i < posts.length; i += 1) {
             if (this.number) {
@@ -685,22 +780,23 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
-    private async scrapeData(qs: RequestQuery, maxCursor: number): Promise<ItemListData> {
-        const shareUid = qs.type === 4 || qs.type === 5 ? '&shareUid=' : '';
-        const signature = this.signature
-            ? this.signature
-            : generateSignature(
-                  `${this.mainHost}share/item/list?secUid=${qs.secUid}&id=${qs.id}&type=${qs.type}&count=${qs.count}&minCursor=${
-                      qs.minCursor
-                  }&maxCursor=${maxCursor || 0}${shareUid}&lang=${qs.lang}&shareUid=${qs.shareUid}&verifyFp=${qs.verifyFp}`,
-                  this.userAgent,
-                  this.tacValue,
-              );
+    private async scrapeData<T>(qs: RequestQuery, maxCursor: number, apiv1 = false): Promise<T> {
+        /**
+         * API V1 is being used to collect data from hashtag
+         * With the current signature method, hashtag feed can return randomly empty result
+         */
+        const apiEndpoint = `${this.mainHost}${apiv1 ? 'share/item/list/' : 'api/item_list/'}`;
+        const urlToSign = `${apiEndpoint}?secUid=${qs.secUid}&id=${qs.id}&${apiv1 ? 'type' : 'sourceType'}=${
+            qs.sourceType ? qs.sourceType : qs.type
+        }&count=${qs.count}&minCursor=${qs.minCursor}&maxCursor=${maxCursor || 0}&lang=${qs.lang}&verifyFp=${qs.verifyFp}`;
+
+        const signature = this.signature ? this.signature : this.sign({ url: urlToSign });
+
         this.signature = '';
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id;
 
         const options = {
-            uri: `${this.mainHost}share/item/list`,
+            uri: apiEndpoint,
             method: 'GET',
             qs: {
                 ...qs,
@@ -714,12 +810,8 @@ export class TikTokScraper extends EventEmitter {
             json: true,
         };
         try {
-            const response = await this.request<ItemListData>(options);
-
-            if (response.statusCode === 0) {
-                return response;
-            }
-            throw new Error('Not more posts');
+            const response = await this.request<T>(options);
+            return response;
         } catch (error) {
             throw error.message;
         }
@@ -731,12 +823,11 @@ export class TikTokScraper extends EventEmitter {
     // eslint-disable-next-line class-methods-use-this
     private async getTrendingFeedQuery(): Promise<RequestQuery> {
         return {
-            id: '',
+            id: '1',
             secUid: '',
-            shareUid: '',
             lang: '',
-            type: 5,
-            count: 30,
+            sourceType: CONST.sourceType.trend,
+            count: this.number > 30 ? 50 : 30,
             minCursor: 0,
             verifyFp: '',
         };
@@ -749,10 +840,9 @@ export class TikTokScraper extends EventEmitter {
         return {
             id: this.input,
             secUid: '',
-            shareUid: '',
             lang: '',
-            type: 4,
-            count: 30,
+            sourceType: CONST.sourceType.music,
+            count: this.number > 30 ? 50 : 30,
             minCursor: 0,
             verifyFp: '',
         };
@@ -767,11 +857,10 @@ export class TikTokScraper extends EventEmitter {
                 id: this.idStore,
                 secUid: '',
                 type: 3,
-                count: 30,
+                count: 100,
                 minCursor: 0,
                 lang: '',
                 verifyFp: '',
-                shareUid: '',
             };
         }
         const query = {
@@ -789,11 +878,10 @@ export class TikTokScraper extends EventEmitter {
                 id: response.body.challengeData.challengeId,
                 secUid: '',
                 type: 3,
-                count: 30,
+                count: 100,
                 minCursor: 0,
                 lang: '',
                 verifyFp: '',
-                shareUid: '',
             };
         } catch (error) {
             throw error.message;
@@ -808,12 +896,11 @@ export class TikTokScraper extends EventEmitter {
             return {
                 id: this.idStore ? this.idStore : this.input,
                 secUid: '',
-                type: 1,
-                count: 30,
+                sourceType: CONST.sourceType.user,
+                count: this.number > 30 ? 50 : 30,
                 minCursor: 0,
                 lang: '',
                 verifyFp: '',
-                shareUid: '',
             };
         }
 
@@ -825,19 +912,18 @@ export class TikTokScraper extends EventEmitter {
         try {
             const response = await this.request<ApiResponse<'userData', UserData>>(query);
             if (response.statusCode !== 0 || !response.body.userData) {
-                throw new Error(`Can not find the user: ${this.input}`);
+                throw new Error(`Can't find the user: ${this.input}`);
             }
             this.idStore = response.body.userData.userId;
 
             return {
                 id: response.body.userData.userId,
                 secUid: '',
-                type: 1,
-                count: 30,
+                sourceType: CONST.sourceType.user,
+                count: this.number > 30 ? 50 : 30,
                 minCursor: 0,
                 lang: '',
                 verifyFp: '',
-                shareUid: '',
             };
         } catch (error) {
             throw error.message;
@@ -901,11 +987,8 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        if (!this.tacValue) {
-            await this.extractTac();
-        }
 
-        return generateSignature(this.input, this.userAgent, this.tacValue);
+        return 'ss'; //generateSignature(this.input, this.userAgent);
     }
 
     /**

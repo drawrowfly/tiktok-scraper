@@ -42,8 +42,7 @@ export interface Options {
     timeout?: number;
     hdVideo?: boolean;
     randomUa?: boolean;
-    tac?: string;
-    signature?: string;
+    sign?: ({ url: string }) => string;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -69,15 +68,15 @@ export interface TikTokConstructor {
     timeout?: number;
     test?: boolean;
     hdVideo?: boolean;
-    tac?: string;
     signature?: string;
+    sign?: ({ url: string }) => string;
 }
 
 export interface Hashtags {
     id: string;
     name: string;
     title: string;
-    cover: string[];
+    cover: string[] | string;
 }
 
 export interface PostCollector {
@@ -89,36 +88,39 @@ export interface PostCollector {
         secUid: string;
         name: string;
         nickName: string;
-        following: number;
-        fans: number;
-        heart: number;
-        video: number;
-        digg: number;
+        following?: number;
+        fans?: number;
+        heart?: number;
+        video?: number;
+        digg?: number;
         verified: boolean;
-        private: boolean;
+        private?: boolean;
         signature: string;
         avatar: string;
     };
-    musicMeta: {
+    musicMeta?: {
         musicId: string;
         musicName: string;
         musicAuthor: string;
         musicOriginal: boolean;
         playUrl: string;
+        coverThumb?: string;
+        coverMedium?: string;
+        coverLarge?: string;
     };
     covers: {
         default: string;
         origin: string;
         dynamic: string;
     };
-    imageUrl: string;
+    imageUrl?: string;
     webVideoUrl?: string;
     videoUrl: string;
     videoUrlNoWaterMark: string;
     videoMeta: {
         width: number;
         height: number;
-        ratio: number;
+        ratio?: number;
         duration: number;
     };
     diggCount: number;

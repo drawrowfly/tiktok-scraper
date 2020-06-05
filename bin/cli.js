@@ -37,6 +37,9 @@ const startScraper = async argv => {
         }
         const scraper = await TikTokScraper[argv.type](argv.input, argv);
 
+        if (!scraper.collector.length) {
+            console.log(`Result is empty. Try with different input data(username,hashtag and etc)`);
+        }
         if (scraper.zip) {
             console.log(argv.zip ? `ZIP path: ${scraper.zip}` : `Folder Path: ${scraper.zip}`);
         }
@@ -150,7 +153,8 @@ yargs
             alias: ['w'],
             boolean: true,
             default: false,
-            describe: 'Download video without the watermark. This option will affect the execution speed',
+            describe:
+                'Download video without the watermark. NOTE: With the recent update you only need to use this option if you are scraping Hashtag Feed. User/Trend/Music feeds will have this url by default',
         },
         store: {
             alias: ['s'],
