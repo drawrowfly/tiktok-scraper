@@ -57,7 +57,7 @@ const proxyFromFile = async (file: string) => {
     }
 };
 
-const promiseScraper = async (input: string, type: ScrapeType, options?: Options): Promise<Result> => {
+const promiseScraper = async (input: string, type: ScrapeType, options = {} as Options): Promise<Result> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
@@ -65,8 +65,8 @@ const promiseScraper = async (input: string, type: ScrapeType, options?: Options
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
 
-    if (options?.randomUa) {
-        options.userAgent = randomUserAgent();
+    if (!options?.userAgent) {
+        options!.userAgent = randomUserAgent();
     }
 
     options!.sign! = sign(options!.userAgent!);
@@ -79,12 +79,13 @@ const promiseScraper = async (input: string, type: ScrapeType, options?: Options
     return result;
 };
 
-const eventScraper = (input: string, type: ScrapeType, options?: Options): TikTokScraper => {
+const eventScraper = (input: string, type: ScrapeType, options = {} as Options): TikTokScraper => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
-    if (options?.randomUa) {
-        options.userAgent = randomUserAgent();
+
+    if (!options?.userAgent) {
+        options!.userAgent = randomUserAgent();
     }
 
     options!.sign! = sign(options!.userAgent!);
@@ -103,12 +104,16 @@ export const userEvent = (input: string, options: Options): TikTokScraper => eve
 export const musicEvent = (input: string, options: Options): TikTokScraper => eventScraper(input, 'music', options);
 export const trendEvent = (input: string, options: Options): TikTokScraper => eventScraper(input, 'trend', options);
 
-export const getHashtagInfo = async (input: string, options?: Options): Promise<Challenge> => {
+export const getHashtagInfo = async (input: string, options = {} as Options): Promise<Challenge> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
+    }
+
+    if (!options?.userAgent) {
+        options!.userAgent = randomUserAgent();
     }
     const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type: 'signle_hashtag' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
@@ -117,7 +122,7 @@ export const getHashtagInfo = async (input: string, options?: Options): Promise<
     return result;
 };
 
-export const getUserProfileInfo = async (input: string, options?: Options): Promise<UserData> => {
+export const getUserProfileInfo = async (input: string, options = {} as Options): Promise<UserData> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
@@ -135,13 +140,14 @@ export const getUserProfileInfo = async (input: string, options?: Options): Prom
     return result;
 };
 
-export const signUrl = async (input: string, options?: Options): Promise<string> => {
+export const signUrl = async (input: string, options = {} as Options): Promise<string> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
+
     options!.sign! = sign(options!.userAgent!);
 
     const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type: 'signature' as ScrapeType, input } };
@@ -151,7 +157,7 @@ export const signUrl = async (input: string, options?: Options): Promise<string>
     return result;
 };
 
-export const getVideoMeta = async (input: string, options?: Options): Promise<PostCollector> => {
+export const getVideoMeta = async (input: string, options = {} as Options): Promise<PostCollector> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
@@ -168,7 +174,7 @@ export const getVideoMeta = async (input: string, options?: Options): Promise<Po
     return result;
 };
 
-export const video = async (input: string, options?: Options): Promise<any> => {
+export const video = async (input: string, options = {} as Options): Promise<any> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
@@ -205,7 +211,7 @@ export const video = async (input: string, options?: Options): Promise<any> => {
 };
 
 // eslint-disable-next-line no-unused-vars
-export const history = async (input: string, options?: Options) => {
+export const history = async (input: string, options = {} as Options) => {
     let store: string;
 
     const historyPath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : options?.historyPath || tmpdir();
@@ -260,7 +266,7 @@ interface Batcher {
     by_user_id?: boolean;
 }
 
-const batchProcessor = (batch: Batcher[], options: Options): Promise<any[]> => {
+const batchProcessor = (batch: Batcher[], options = {} as Options): Promise<any[]> => {
     return new Promise(resolve => {
         console.log('TikTok Bulk Scraping Started');
         const result: any[] = [];
@@ -320,7 +326,7 @@ const batchProcessor = (batch: Batcher[], options: Options): Promise<any[]> => {
     });
 };
 
-export const fromfile = async (input: string, options: Options) => {
+export const fromfile = async (input: string, options = {} as Options) => {
     let inputFile: string;
     try {
         inputFile = (await fromCallback(cb => readFile(input, { encoding: 'utf-8' }, cb))) as string;

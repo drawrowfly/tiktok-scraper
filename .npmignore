@@ -20,3 +20,5 @@ ex.js
 ex.ts
 proxy
 bulk
+yarn.lock
+yarn-error.log

@@ -31,28 +31,6 @@ import {
 
 import { Downloader } from '../core';
 
-declare global {
-    namespace NodeJS {
-        interface Global {
-            location: {
-                href: string;
-                protocol: string;
-            };
-            navigator: {
-                userAgent: string;
-            };
-        }
-    }
-}
-
-/**
- * global scope is being used by the signer
- */
-global.location = {
-    href: 'https://www.tiktok.com/',
-    protocol: 'https:',
-};
-
 export class TikTokScraper extends EventEmitter {
     private mainHost: string;
 
@@ -120,13 +98,21 @@ export class TikTokScraper extends EventEmitter {
 
     private sign: ({ url: string }) => string;
 
+    private webHookUrl: string;
+
+    private method: string;
+
+    private httpRequests: {
+        good: number;
+        bad: number;
+    };
+
     constructor({
         download,
         filepath,
         filetype,
         proxy,
         asyncDownload,
-        asyncScraping,
         cli = false,
         event = false,
         progress = false,
@@ -146,6 +132,8 @@ export class TikTokScraper extends EventEmitter {
         hdVideo = false,
         signature = '',
         sign,
+        webHookUrl = '',
+        method = 'POST',
     }: TikTokConstructor) {
         super();
         this.sign = sign!;
@@ -170,7 +158,7 @@ export class TikTokScraper extends EventEmitter {
                 case 'trend':
                     return 1;
                 default:
-                    return asyncScraping || 3;
+                    return 1;
             }
         };
         this.collector = [];
@@ -195,6 +183,12 @@ export class TikTokScraper extends EventEmitter {
             filepath: process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '',
             bulk,
         });
+        this.webHookUrl = webHookUrl;
+        this.method = method;
+        this.httpRequests = {
+            good: 0,
+            bad: 0,
+        };
     }
 
     /**
@@ -202,13 +196,22 @@ export class TikTokScraper extends EventEmitter {
      */
     private get fileDestination(): string {
         if (this.fileName) {
+            if (!this.zip && this.download) {
+                return `${this.folderDestination}/${this.fileName}`;
+            }
             return this.filepath ? `${this.filepath}/${this.fileName}` : this.fileName;
         }
         switch (this.scrapeType) {
             case 'user':
             case 'hashtag':
+                if (!this.zip && this.download) {
+                    return `${this.folderDestination}/${this.input}_${Date.now()}`;
+                }
                 return this.filepath ? `${this.filepath}/${this.input}_${Date.now()}` : `${this.input}_${Date.now()}`;
             default:
+                if (!this.zip && this.download) {
+                    return `${this.folderDestination}/${this.scrapeType}_${Date.now()}`;
+                }
                 return this.filepath ? `${this.filepath}/${this.scrapeType}_${Date.now()}` : `${this.scrapeType}_${Date.now()}`;
         }
     }
@@ -264,7 +267,7 @@ export class TikTokScraper extends EventEmitter {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
             const proxy = this.getProxy;
-            const query = {
+            const query = ({
                 uri,
                 method,
                 ...(qs ? { qs } : {}),
@@ -280,7 +283,7 @@ export class TikTokScraper extends EventEmitter {
                 ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
                 ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
                 timeout: 10000,
-            } as OptionsWithUri;
+            } as unknown) as OptionsWithUri;
             try {
                 const response = await rp(query);
                 setTimeout(() => {
@@ -308,7 +311,7 @@ export class TikTokScraper extends EventEmitter {
      */
     // eslint-disable-next-line consistent-return
     public async scrape(): Promise<Result | any> {
-        global.navigator.userAgent = this.userAgent;
+        // global.navigator.userAgent = this.userAgent;
 
         if (this.cli && !this.bulk) {
             this.spinner.start();
@@ -345,12 +348,17 @@ export class TikTokScraper extends EventEmitter {
 
         const [json, csv, zip] = await this.saveCollectorData();
 
+        if (this.webHookUrl) {
+            await this.sendDataToWebHookUrl();
+        }
+
         return {
             collector: this.collector,
             ...(this.download ? { zip } : {}),
             ...(this.filetype === 'all' ? { json, csv } : {}),
             ...(this.filetype === 'json' ? { json } : {}),
             ...(this.filetype === 'csv' ? { csv } : {}),
+            ...(this.webHookUrl ? { webhook: this.httpRequests } : {}),
         };
     }
 
@@ -473,17 +481,13 @@ export class TikTokScraper extends EventEmitter {
                 if (!result.items) {
                     throw new Error('No more posts');
                 }
-                try {
-                    await this.collectPostsV2(result.items);
-                } catch (error) {
-                    console.log(error);
-                }
+                await this.collectPostsV2(result.items);
             }
 
             if (!hasMore) {
                 throw new Error('No more posts');
             }
-            if (this.collector.length >= this.number) {
+            if (this.collector.length >= this.number && this.number !== 0) {
                 throw new Error('Done');
             }
             this.maxCursor = parseInt(maxCursor, 10);
@@ -1075,5 +1079,39 @@ export class TikTokScraper extends EventEmitter {
         } catch (error) {
             throw `Can't extract metadata from the video: ${this.input}`;
         }
+    }
+
+    /**
+     * If webhook url was provided then send POST/GET request to the URL with the data from the this.collector
+     */
+    private sendDataToWebHookUrl() {
+        return new Promise(resolve => {
+            forEachLimit(
+                this.collector,
+                3,
+                (item, cb) => {
+                    rp({
+                        uri: this.webHookUrl,
+                        method: this.method,
+                        headers: {
+                            'user-agent': 'TikTok-Scraper',
+                        },
+                        ...(this.method === 'POST' ? { body: item } : {}),
+                        ...(this.method === 'GET' ? { qs: { json: encodeURIComponent(JSON.stringify(item)) } } : {}),
+                        json: true,
+                    })
+                        .then(() => {
+                            this.httpRequests.good += 1;
+                        })
+                        .catch(() => {
+                            this.httpRequests.bad += 1;
+                        })
+                        .finally(() => cb(null));
+                },
+                () => {
+                    resolve();
+                },
+            );
+        });
     }
 }

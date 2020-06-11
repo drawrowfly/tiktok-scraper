@@ -3,8 +3,6 @@ import response from './response';
 const request = options => {
     const { uri } = options;
     switch (true) {
-        case uri === 'https://www.tiktok.com/discover':
-            return { body: response.tac };
         case /^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))$/.test(uri):
             return { body: response.videoMeta };
         case /^https:\/\/m.tiktok.com\/node\/share\/user\/@(\w+)$/.test(uri): {
@@ -21,8 +19,10 @@ const request = options => {
             }
             return { body: null };
         }
-        case uri === 'https://m.tiktok.com/share/item/list':
-            return { body: response.list() };
+        case uri === 'https://m.tiktok.com/share/item/list/':
+            return { body: response.list };
+        case uri === 'https://m.tiktok.com/api/item_list/':
+            return { body: response.listV2 };
         case /^https:\/\/v([0-9]){2}.muscdn.com.+$/.test(uri):
             return Promise.resolve(
                 'vid:v09044ae0000bk2qm0ivfsko76kvric01�gen)dataaweme_6647277225529838341]�mdatok�E���H��,� �#��x264 - core 152 r2854 e9a5903 - H.264/MPEG-4 AVC codec - Copy',

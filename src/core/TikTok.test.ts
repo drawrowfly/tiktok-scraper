@@ -3,6 +3,7 @@ import fs from 'fs';
 import { ScrapeType, Result, RequestQuery, Challenge, UserData, PostCollector } from '../types';
 import { TikTokScraper } from './TikTok';
 import CONST from '../constant';
+import { sign } from '../helpers';
 
 jest.mock('request-promise-native');
 jest.mock('request-promise');
@@ -23,6 +24,8 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
             proxy: '',
             number: 5,
         });
+
+        instance!.sign! = sign(instance!.userAgent);
     });
 
     it('user input should not be empty', async () => {
@@ -35,13 +38,9 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
         expect(instance.userAgent).toContain('Custom User-Agent');
     });
 
-    it('tac value should not be empty', async () => {
-        expect(instance.tacValue).not.toEqual(undefined);
-    });
-
     it('getUserId should return a valid Object', async () => {
         const userId: RequestQuery = await instance.getUserId();
-        expect(userId).toEqual({ id: '5831967', secUid: '', shareUid: '', type: 1, verifyFp: '', count: 30, minCursor: 0, lang: '' });
+        expect(userId).toEqual({ id: '5831967', secUid: '', sourceType: 8, verifyFp: '', count: 30, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {
@@ -66,54 +65,54 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
             number: 1,
             event: true,
         });
+        instance!.sign! = sign(instance!.userAgent);
     });
 
     it('result should emit "data" event with the result', done => {
         instance.on('data', data => {
             expect(data).toEqual({
-                id: '6807325450981969158',
-                text: '',
-                createTime: '1584953968',
+                id: '6833468102982798598',
+                text: 'To our community, a message from our CEO...',
+                createTime: 1591040777,
                 authorMeta: {
-                    id: '5831967',
-                    secUid: 'MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s',
-                    name: 'charlidamelio',
-                    nickName: 'charli d’amelio',
-                    following: 932,
-                    fans: 40431380,
-                    heart: '2426012173',
-                    video: 1072,
-                    digg: 3555,
+                    id: '107955',
+                    secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
+                    name: 'tiktok',
+                    nickName: 'TikTok',
                     verified: true,
-                    private: false,
-                    signature: 'don’t worry i don’t get the hype either',
-                    avatar: 'https://p16.muscdn.com/img/musically-maliva-obj/1655662764778502~c5_720x720.jpeg',
+                    signature: 'Make Your Day',
+                    avatar: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg',
                 },
                 musicMeta: {
-                    musicId: '6799337212367407877',
-                    musicName: 'FOLLOW MY IG... SEWSHIII',
-                    musicAuthor: 'sewshiii',
+                    musicId: '6833468087698803462',
+                    musicName: 'original sound',
+                    musicAuthor: 'tiktok',
                     musicOriginal: true,
-                    playUrl: 'https://p16.muscdn.com/obj/musically-maliva-obj/1659997213465654.mp3',
+                    playUrl: 'https://p16-va-tiktok.ibyteimg.com/obj/musically-maliva-obj/8933750c078b6b0702864cd3004f989f.mp3',
+                    coverThumb: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_100x100.jpeg',
+                    coverMedium: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_720x720.jpeg',
+                    coverLarge: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg',
                 },
                 covers: {
-                    default: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/23d8be88ee6b4cd09d44facd18ef86d4_1584953972',
-                    origin: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/a43b061c19c445d78587fb775e7c0175_1584953972',
-                    dynamic: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/f0c6b5ea5c2244b2b8f28cef8e70a0cd_1584953973',
+                    default:
+                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/57cf33573b3348b9a44b12287601574d_1591040780?x-expires=1591862400&x-signature=dF7jR2iPW2St4BWqBgxi78FvMP0%3D',
+                    origin:
+                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/1fca8a4bd2cd49eabfc2290a5f3befab_1591040779?x-expires=1591862400&x-signature=ckP5WHRjaPHlD%2FhGJTm0s6%2BS6bo%3D',
+                    dynamic:
+                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/6f08a25103584cac821e15727c625f65_1591040779?x-expires=1591862400&x-signature=sP2%2BauyoM39NP%2BrUAgCZdh1KilI%3D',
                 },
-                imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/a43b061c19c445d78587fb775e7c0175_1584953972',
-                webVideoUrl: 'https://www.tiktok.com/@charlidamelio/video/6807325450981969158',
+                webVideoUrl: 'https://www.tiktok.com/@tiktok/video/6833468102982798598',
                 videoUrl:
-                    'https://v16.muscdn.com/a01ef53a726eea58a7ce538ee46f8d5f/5e793956/video/tos/useast2a/tos-useast2a-ve-0068c004/6372449d2b1f4236b06a56da83e54b44/?a=1233&br=1944&bt=972&cr=0&cs=0&dr=0&ds=3&er=&l=202003231633420101890741591D500B49&lr=tiktok_m&qs=0&rc=andsa3N1d3U6czMzOzczM0ApNDk4ZmVlOTw1NzloNDpoNGc1YDI0ay0xaHBfLS0wMTZzc18wMjEtY14xYV80Y14xM2I6Yw%3D%3D&vl=&vr=',
-                videoUrlNoWaterMark: '',
-                videoMeta: { width: 576, height: 1024, ratio: 15, duration: 15 },
-                diggCount: 1563781,
-                shareCount: 6728,
-                playCount: 5893701,
-                commentCount: 46142,
+                    'https://v19.tiktokcdn.com/270ac5f1885ae68e7bcf5d2fedf02282/5edf9875/video/tos/useast2a/tos-useast2a-ve-0068c001/76cda2fd993649878b0099e4e0d064b3/?a=1233&br=572&bt=286&cr=0&cs=0&dr=0&ds=3&er=&l=2020060908104601018907106605015433&lr=tiktok_m&mime_type=video_mp4&qs=0&rc=anhneHdkeDRvdTMzZjczM0ApOjg5NWk8PGQ2N2Q5Njs2aGdjY2VxZGAwal5fLS00MTZzczJhYGMxMDMxNTBeNi8wYTA6Yw%3D%3D&vl=&vr=',
+                videoUrlNoWaterMark: 'https://api2.musical.ly/aweme/v1/playwm/?video_id=v090447c0000bralm13ucagttuhdfufg',
+                videoMeta: { height: 1024, width: 576, duration: 15 },
+                diggCount: 201200,
+                shareCount: 2537,
+                playCount: 1800000,
+                commentCount: 15700,
                 downloaded: false,
-                hashtags: [],
                 mentions: [],
+                hashtags: [],
             });
             done();
         });
@@ -225,7 +224,7 @@ describe('TikTok Scraper MODULE(promise): user(save to a file)', () => {
             proxy: '',
             number: 5,
         });
-
+        instance!.sign! = sign(instance!.userAgent);
         posts = await instance.scrape();
     });
 
@@ -258,6 +257,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
             proxy: '',
             number: 5,
         });
+        instance!.sign! = sign(instance!.userAgent);
     });
 
     it('hashtag input should not be empty', async () => {
@@ -267,7 +267,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
 
     it('getHashTagId should return a valid Object', async () => {
         const hashtag: RequestQuery = await instance.getHashTagId();
-        expect(hashtag).toEqual({ id: '4100', secUid: '', shareUid: '', type: 3, verifyFp: '', count: 30, minCursor: 0, lang: '' });
+        expect(hashtag).toEqual({ id: '4100', secUid: '', type: 3, verifyFp: '', count: 100, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {
@@ -291,10 +291,11 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
             proxy: '',
             number: 5,
         });
+        instance!.sign! = sign(instance!.userAgent);
     });
     it('signUrl should return a valid signature', async () => {
         const signature: string = await instance.signUrl();
-        expect(signature).toEqual('TYYDvAAgEBpthLe7v6.DM02GAqAABQA');
+        expect(signature).not.toBeNull();
     });
 
     it('Throw error if input url is empty', async () => {
@@ -437,6 +438,7 @@ describe('TikTok Scraper CLI: user(save progress)', () => {
             proxy: '',
             number: 5,
         });
+        instance!.sign! = sign(instance!.userAgent);
         posts = await instance.scrape();
     });
 

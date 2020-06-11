@@ -61,13 +61,12 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] CLI: Scrape and download in batch
 -   [x] CLi: Load proxies from a file
 -   [x] CLI: Optional ZIP
--   [ ] Renew API
+-   [x] Renew API
+-   [x] Set WebHook URL (CLI)
+-   [ ] Add new method to collect music metadata
 -   [ ] Add Manual Pagination
 -   [ ] Improve documentation
 -   [ ] Download audio files
--   [ ] Add account authorization
--   [ ] AUTH ONLY: Scrape post comments
--   [ ] AUTH ONLY: Scrape users/hashtags
 -   [ ] Web interface
 
 ## Contribution
@@ -135,7 +134,7 @@ Options:
   --zip, -z               ZIP all downloaded video posts
                                                       [boolean] [default: false]
   --filepath              File path to save all output files.
-      [default: "/Users/karl.wint/Documents/projects/javascript/tiktok-scraper"]
+      [default: "/Users/blah/blah"]
   --filetype, --type, -t  Type of the output file where post information will
                           be saved. 'all' - save information about all posts to
                           the` 'json' and 'csv'
@@ -152,7 +151,11 @@ Options:
   --remove, -r            Delete the history record by entering "TYPE:INPUT" or
                           "all" to clean all the history. For example: user:bob
                                                                    [default: ""]
-  --help                  Show help                                    [boolean]
+  --webHookUrl       Set webhook url to receive scraper result as HTTP requests.
+                     For example to your own API                   [default: ""]
+  --method           Receive data to your webhook url as POST or GET request
+                                      [choices: "GET", "POST"] [default: "POST"]
+  --help             Show help                                         [boolean]
 
 Examples:
   tiktok-scraper user USERNAME -d -n 100
@@ -261,12 +264,8 @@ const options = {
     filetype: `na`,
 
     // Custom User-Agent
-    // {string default: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36' }
+    // {string default: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{RANDOM_VERSION}.0.3987.122 Safari/537.36' }
     userAgent: '',
-
-    // Randomize user-agent version: {boolean default: false}
-    // Can be usefull against TikTok blockings
-    randomUa: false,
     
     // Download video without the watermark: {boolean default: false}
     // Set to true to download without the watermark

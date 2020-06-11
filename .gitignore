@@ -9,5 +9,7 @@ garbage/
 *.zip
 ex.js
 ex.ts
+yarn.lock
+yarn-error.log
 proxy
 bulk

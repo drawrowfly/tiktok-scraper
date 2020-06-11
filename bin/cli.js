@@ -49,6 +49,10 @@ const startScraper = async argv => {
         if (scraper.message) {
             console.log(scraper.message);
         }
+        if (scraper.webhook) {
+            console.log('HTTP REQUEST: ');
+            console.table(scraper.webhook);
+        }
         if (scraper.table) {
             console.table(scraper.table);
         }
@@ -169,6 +173,15 @@ yargs
             default: '',
             describe: 'Delete the history record by entering "TYPE:INPUT" or "all" to clean all the history. For example: user:bob',
         },
+        webHookUrl: {
+            default: '',
+            describe: 'Set webhook url to receive scraper result as HTTP requests. For example to your own API',
+        },
+        method: {
+            default: 'POST',
+            choices: ['GET', 'POST'],
+            describe: 'Receive data to your webhook url as POST or GET request',
+        },
     })
     .check(argv => {
         if (CONST.scrape.indexOf(argv._[0]) === -1) {
@@ -192,7 +205,7 @@ yargs
             if (!async) {
                 throw new Error('You need to set number of task that should be executed at the same time');
             }
-            if (!argv.type && !argv.d) {
+            if (!argv.t && !argv.d) {
                 throw new Error('You need to specify file type(-t) where data will be saved AND/OR if posts should be downloaded (-d)');
             }
         }

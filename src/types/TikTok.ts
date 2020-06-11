@@ -43,6 +43,8 @@ export interface Options {
     hdVideo?: boolean;
     randomUa?: boolean;
     sign?: ({ url: string }) => string;
+    webHookUrl?: string;
+    method?: string;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -70,6 +72,8 @@ export interface TikTokConstructor {
     hdVideo?: boolean;
     signature?: string;
     sign?: ({ url: string }) => string;
+    webHookUrl?: string;
+    method?: string;
 }
 
 export interface Hashtags {
