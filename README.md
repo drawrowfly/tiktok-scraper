@@ -127,6 +127,7 @@ Options:
                           proxy.                                   [default: ""]
   --download, -d          Download video posts to the folder with the name input
                           [id]                        [boolean] [default: false]
+  --asyncDownload, -a     Number of concurrent downloads            [default: 5]
   --hd                    Download video in HD. Video size will be x5-x10 times
                           larger and this will affect scraper execution speed.
                           This option only works in combination with -w flag

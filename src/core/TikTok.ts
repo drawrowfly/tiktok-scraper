@@ -165,7 +165,7 @@ export class TikTokScraper extends EventEmitter {
         this.event = event;
         this.scrapeType = type;
         this.cli = cli;
-        this.spinner = ora('TikTok Scraper Started');
+        this.spinner = ora({ text: 'TikTok Scraper Started', stream: process.stdout });
         this.byUserId = by_user_id;
         this.storeHistory = cli && download && store_history;
         this.historyPath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : historyPath || tmpdir();

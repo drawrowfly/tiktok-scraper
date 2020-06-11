@@ -122,6 +122,11 @@ yargs
             default: false,
             describe: 'Download video posts to the folder with the name input [id]',
         },
+        asyncDownload: {
+            alias: 'a',
+            default: 5,
+            describe: 'Number of concurrent downloads',
+        },
         hd: {
             boolean: true,
             default: false,
