@@ -165,7 +165,7 @@ export class TikTokScraper extends EventEmitter {
         this.event = event;
         this.scrapeType = type;
         this.cli = cli;
-        this.spinner = ora({ text: 'TikTok Scraper Started', stream: process.stdout });
+        this.spinner = ora('TikTok Scraper Started');
         this.byUserId = by_user_id;
         this.storeHistory = cli && download && store_history;
         this.historyPath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : historyPath || tmpdir();
@@ -284,6 +284,7 @@ export class TikTokScraper extends EventEmitter {
                 ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
                 timeout: 10000,
             } as unknown) as OptionsWithUri;
+
             try {
                 const response = await rp(query);
                 setTimeout(() => {
@@ -342,7 +343,7 @@ export class TikTokScraper extends EventEmitter {
             await this.storeDownlodProgress();
         }
 
-        if (this.noWaterMark && this.scrapeType === 'hashtag') {
+        if (this.noWaterMark) {
             await this.withoutWatermark();
         }
 
@@ -680,9 +681,7 @@ export class TikTokScraper extends EventEmitter {
                     },
                     webVideoUrl: `https://www.tiktok.com/@${posts[i].author.uniqueId}/video/${posts[i].id}`,
                     videoUrl: posts[i].video.downloadAddr,
-                    videoUrlNoWaterMark: `https://api2.musical.ly/aweme/v1/playwm/?video_id=${posts[i].video.id}${
-                        this.hdVideo ? '&improve_bitrate=1&ratio=1080p' : ''
-                    }`,
+                    videoUrlNoWaterMark: '',
                     videoMeta: {
                         height: posts[i].video.height,
                         width: posts[i].video.width,
