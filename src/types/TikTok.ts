@@ -42,7 +42,6 @@ export interface Options {
     timeout?: number;
     hdVideo?: boolean;
     randomUa?: boolean;
-    sign?: ({ url: string }) => string;
     webHookUrl?: string;
     method?: string;
 }
@@ -71,7 +70,6 @@ export interface TikTokConstructor {
     test?: boolean;
     hdVideo?: boolean;
     signature?: string;
-    sign?: ({ url: string }) => string;
     webHookUrl?: string;
     method?: string;
 }

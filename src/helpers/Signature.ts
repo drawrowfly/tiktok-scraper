@@ -1,6 +1,6 @@
 // @ts-nocheck
 /* eslint-disable */
-export function sign(userAgent: string) {
+export function sign(userAgent: string, url: string) {
     global.navigator = {
         userAgent,
     };
@@ -20,5 +20,5 @@ export function sign(userAgent: string) {
         })('var function ().length++return ));break;case ;else{'.split('')),
     )();
 
-    return byted_acrawler.sign as ({ url: string }) => string;
+    return byted_acrawler.sign({ url });
 }
