@@ -104,7 +104,7 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                 webVideoUrl: 'https://www.tiktok.com/@tiktok/video/6833468102982798598',
                 videoUrl:
                     'https://v19.tiktokcdn.com/270ac5f1885ae68e7bcf5d2fedf02282/5edf9875/video/tos/useast2a/tos-useast2a-ve-0068c001/76cda2fd993649878b0099e4e0d064b3/?a=1233&br=572&bt=286&cr=0&cs=0&dr=0&ds=3&er=&l=2020060908104601018907106605015433&lr=tiktok_m&mime_type=video_mp4&qs=0&rc=anhneHdkeDRvdTMzZjczM0ApOjg5NWk8PGQ2N2Q5Njs2aGdjY2VxZGAwal5fLS00MTZzczJhYGMxMDMxNTBeNi8wYTA6Yw%3D%3D&vl=&vr=',
-                videoUrlNoWaterMark: 'https://api2.musical.ly/aweme/v1/playwm/?video_id=v090447c0000bralm13ucagttuhdfufg',
+                videoUrlNoWaterMark: '',
                 videoMeta: { height: 1024, width: 576, duration: 15 },
                 diggCount: 201200,
                 shareCount: 2537,

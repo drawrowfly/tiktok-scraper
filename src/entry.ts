@@ -10,8 +10,6 @@ import { TikTokScraper } from './core';
 import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem } from './types';
 import CONST from './constant';
 
-import { sign } from './helpers';
-
 const INIT_OPTIONS = {
     number: 20,
     download: false,
@@ -27,7 +25,7 @@ const INIT_OPTIONS = {
     noWaterMark: false,
     hdVideo: false,
     timeout: 0,
-    userAgent: CONST.userAgent,
+    userAgent: CONST.userAgentList[Math.floor(Math.random() * CONST.userAgentList.length)],
     tac: '',
     signature: '',
 };
@@ -36,9 +34,7 @@ const INIT_OPTIONS = {
  * Randomize user-agent version
  * Only if {randomUa} is set to {true}
  */
-const randomUserAgent = () =>
-    `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${Math.floor(Math.random() * 4) +
-        79}.0.4044.113 Safari/537.36`;
+const randomUserAgent = () => CONST.userAgentList[Math.floor(Math.random() * CONST.userAgentList.length)];
 
 /**
  * Load proxys from a file
@@ -69,8 +65,6 @@ const promiseScraper = async (input: string, type: ScrapeType, options = {} as O
         options!.userAgent = randomUserAgent();
     }
 
-    options!.sign! = sign(options!.userAgent!);
-
     const constructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type, input } };
 
     const scraper = new TikTokScraper(constructor);
@@ -87,8 +81,6 @@ const eventScraper = (input: string, type: ScrapeType, options = {} as Options):
     if (!options?.userAgent) {
         options!.userAgent = randomUserAgent();
     }
-
-    options!.sign! = sign(options!.userAgent!);
 
     const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type, input, event: true } };
     return new TikTokScraper(contructor);
@@ -147,8 +139,6 @@ export const signUrl = async (input: string, options = {} as Options): Promise<s
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
-
-    options!.sign! = sign(options!.userAgent!);
 
     const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type: 'signature' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
@@ -377,7 +367,6 @@ export const fromfile = async (input: string, options = {} as Options) => {
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
-    options!.sign! = sign(options!.userAgent!);
     const result = await batchProcessor(batch, options);
 
     return { table: result };

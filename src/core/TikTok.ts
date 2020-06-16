@@ -11,6 +11,7 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 
 import CONST from '../constant';
+import { sign } from '../helpers';
 
 import {
     PostCollector,
@@ -96,8 +97,6 @@ export class TikTokScraper extends EventEmitter {
 
     private signature: string;
 
-    private sign: ({ url: string }) => string;
-
     private webHookUrl: string;
 
     private method: string;
@@ -131,14 +130,12 @@ export class TikTokScraper extends EventEmitter {
         test = false,
         hdVideo = false,
         signature = '',
-        sign,
         webHookUrl = '',
         method = 'POST',
     }: TikTokConstructor) {
         super();
-        this.sign = sign!;
         this.mainHost = 'https://m.tiktok.com/';
-        this.userAgent = userAgent || CONST.userAgent;
+        this.userAgent = userAgent;
         this.download = download;
         this.filepath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '';
         this.fileName = fileName;
@@ -798,7 +795,7 @@ export class TikTokScraper extends EventEmitter {
             qs.sourceType ? qs.sourceType : qs.type
         }&count=${qs.count}&minCursor=${qs.minCursor}&maxCursor=${maxCursor || 0}&lang=${qs.lang}&verifyFp=${qs.verifyFp}`;
 
-        const signature = this.signature ? this.signature : this.sign({ url: urlToSign });
+        const signature = this.signature ? this.signature : sign(this.userAgent, urlToSign);
 
         this.signature = '';
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id;
@@ -996,7 +993,7 @@ export class TikTokScraper extends EventEmitter {
             throw `Url is missing`;
         }
 
-        return this.sign({ url: this.input });
+        return sign(this.userAgent, this.input);
     }
 
     /**
