@@ -13,3 +13,4 @@ yarn.lock
 yarn-error.log
 proxy
 bulk
+/.idea/
