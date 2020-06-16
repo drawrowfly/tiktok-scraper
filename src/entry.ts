@@ -3,11 +3,11 @@
 /* eslint-disable no-throw-literal */
 /* eslint-disable no-restricted-syntax */
 import { tmpdir } from 'os';
-import { readFile, writeFile, unlink } from 'fs';
+import { readFile, unlink, writeFile } from 'fs';
 import { fromCallback } from 'bluebird';
 import { forEachLimit } from 'async';
 import { TikTokScraper } from './core';
-import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem } from './types';
+import { Challenge, History, HistoryItem, Options, PostCollector, Result, ScrapeType, TikTokConstructor, UserData } from './types';
 import CONST from './constant';
 
 const INIT_OPTIONS = {
@@ -53,12 +53,21 @@ const proxyFromFile = async (file: string) => {
     }
 };
 
+function superLuminatiProxy(usr, pwd) {
+    const port = 22225;
+    const session_id = (1000000 * Math.random()) | 0;
+    return `${usr}-session-${session_id}:${pwd}@zproxy.lum-superproxy.io:${port}`;
+}
+
 const promiseScraper = async (input: string, type: ScrapeType, options = {} as Options): Promise<Result> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
+    }
+    if (options?.luminatiUsername && options?.luminatiPassword) {
+        options.proxy = superLuminatiProxy(options?.luminatiUsername, options?.luminatiPassword);
     }
 
     if (!options?.userAgent) {

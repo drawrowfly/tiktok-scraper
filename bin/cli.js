@@ -116,6 +116,16 @@ yargs
             default: '',
             describe: 'Use proxies from a file. Scraper will use random proxies from the file per each request. 1 line 1 proxy.',
         },
+        luminatiUsername: {
+            alias: 'lUsr',
+            default: '',
+            describe: 'Set user for Luminati proxy',
+        },
+        luminatiPassword: {
+            alias: 'lPwd',
+            default: '',
+            describe: 'Set password for Luminati proxy',
+        },
         download: {
             alias: 'd',
             boolean: true,
@@ -213,6 +223,14 @@ yargs
             if (!argv.t && !argv.d) {
                 throw new Error('You need to specify file type(-t) where data will be saved AND/OR if posts should be downloaded (-d)');
             }
+        }
+
+        if (argv.proxyFile && (argv.luminatiUsername || argv.luminatiPassword)) {
+            throw new Error(`--proxy-file is incompatible with luminati credentials`);
+        }
+
+        if ((!argv.luminatiUsername && argv.luminatiPassword) || argv.luminatiUsername || !argv.luminatiPassword) {
+            throw new Error(`luminati credentials need --luminatiUsername and --luminatiPassword`);
         }
 
         if (argv.hd && !argv.noWaterMark && argv._[0] !== 'video') {
