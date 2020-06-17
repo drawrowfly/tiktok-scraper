@@ -399,7 +399,9 @@ export class TikTokScraper extends EventEmitter {
                 const id = Buffer.from(result)
                     .slice(position + 4, position + 36)
                     .toString();
-                return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}${this.hdVideo ? `&improve_bitrate=1&ratio=1080p` : ''}`;
+                return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${
+                    this.hdVideo ? `&ratio=540p` : ''
+                }`;
             }
             throw new Error(`Cant extract video id`);
         } catch (error) {
