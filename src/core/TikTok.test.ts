@@ -3,7 +3,6 @@ import fs from 'fs';
 import { ScrapeType, Result, RequestQuery, Challenge, UserData, PostCollector } from '../types';
 import { TikTokScraper } from './TikTok';
 import CONST from '../constant';
-import { sign } from '../helpers';
 
 jest.mock('request-promise-native');
 jest.mock('request-promise');
@@ -24,8 +23,6 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
             proxy: '',
             number: 5,
         });
-
-        instance!.sign! = sign(instance!.userAgent);
     });
 
     it('user input should not be empty', async () => {
@@ -65,7 +62,6 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
             number: 1,
             event: true,
         });
-        instance!.sign! = sign(instance!.userAgent);
     });
 
     it('result should emit "data" event with the result', done => {
@@ -224,7 +220,7 @@ describe('TikTok Scraper MODULE(promise): user(save to a file)', () => {
             proxy: '',
             number: 5,
         });
-        instance!.sign! = sign(instance!.userAgent);
+
         posts = await instance.scrape();
     });
 
@@ -257,7 +253,6 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
             proxy: '',
             number: 5,
         });
-        instance!.sign! = sign(instance!.userAgent);
     });
 
     it('hashtag input should not be empty', async () => {
@@ -291,7 +286,6 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
             proxy: '',
             number: 5,
         });
-        instance!.sign! = sign(instance!.userAgent);
     });
     it('signUrl should return a valid signature', async () => {
         const signature: string = await instance.signUrl();
@@ -438,7 +432,7 @@ describe('TikTok Scraper CLI: user(save progress)', () => {
             proxy: '',
             number: 5,
         });
-        instance!.sign! = sign(instance!.userAgent);
+
         posts = await instance.scrape();
     });
 
@@ -487,7 +481,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/d1b00294a06e488b851ad6553cad41a0_1584992746',
             videoUrl:
                 'https://v16.muscdn.com/f950058182bcefa15345108bd9ab241f/5e7e615a/video/tos/useast2a/tos-useast2a-ve-0068c003/0dc9964505df43288febb6aac33ac6a0/?a=1233&br=472&bt=236&cr=0&cs=0&dr=0&ds=3&er=&l=20200327142546010115115156167B9215&lr=tiktok_m&qs=0&rc=M3Vna3N1d3FrczMzOzczM0ApO2Q6NjZnOzs0N2k7aGhpaGcxaDM0ay1gMHBfLS0wMTZzc182MWI1YzEtYTY2LWNjXzU6Yw%3D%3D&vl=&vr=',
-            videoUrlNoWaterMark: 'https://api2.musical.ly/aweme/v1/playwm/?video_id=v09044ae0000bk2qm0ivfsko76kvric0',
+            videoUrlNoWaterMark: 'https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=v09044ae0000bk2qm0ivfsko76kvric0',
             videoMeta: { width: 576, height: 1024, ratio: 16, duration: 16 },
             diggCount: 35650,
             shareCount: 256,

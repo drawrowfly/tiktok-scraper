@@ -99,9 +99,9 @@ export class Downloader {
             }
             r.get({
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
-                headers: {
-                    'user-agent': this.userAgent,
-                },
+                // headers: {
+                //     'user-agent': this.userAgent,
+                // },
             })
                 .on('response', response => {
                     if (this.progress && !this.bulk) {
