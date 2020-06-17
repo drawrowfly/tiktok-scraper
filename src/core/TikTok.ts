@@ -1004,56 +1004,72 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        if (!/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))$/.test(this.input)) {
-            throw `Not supported url format`;
-        }
         const query = {
             uri: this.input,
             method: 'GET',
             json: true,
         };
         try {
+            let short = false;
+            let regex: RegExpExecArray | null;
             const response = await this.request<string>(query);
             if (!response) {
                 throw new Error(`Can't extract video meta data`);
             }
-            const regex = /<script id="__NEXT_DATA__" type="application\/json" crossorigin="anonymous">([^]*)<\/script><script crossorigin="anonymous" nomodule=/.exec(
-                response,
-            );
+
+            if (response.indexOf('<script>window.__INIT_PROPS__ = ') > -1) {
+                short = true;
+            }
+
+            if (short) {
+                regex = /<script>window.__INIT_PROPS__ = ([^]*)\}<\/script>/.exec(response);
+            } else {
+                regex = /<script id="__NEXT_DATA__" type="application\/json" crossorigin="anonymous">([^]*)<\/script><script crossorigin="anonymous" nomodule=/.exec(
+                    response,
+                );
+            }
+
             if (regex) {
-                const videoProps = JSON.parse(regex[1]);
+                const videoProps = JSON.parse(short ? `${regex[1]}}` : regex[1]);
                 let videoItem = {} as PostCollector;
-                if (videoProps.props.pageProps.statusCode) {
+
+                if (short) {
+                    if (videoProps['/v/:id'].statusCode) {
+                        throw new Error();
+                    }
+                } else if (videoProps.props.pageProps.statusCode) {
                     throw new Error();
                 }
+                const videoData = short ? videoProps['/v/:id'].videoData : videoProps.props.pageProps.videoData;
+
                 videoItem = {
-                    id: videoProps.props.pageProps.videoData.itemInfos.id,
-                    text: videoProps.props.pageProps.videoData.itemInfos.text,
-                    createTime: videoProps.props.pageProps.videoData.itemInfos.createTime,
+                    id: videoData.itemInfos.id,
+                    text: videoData.itemInfos.text,
+                    createTime: videoData.itemInfos.createTime,
                     authorMeta: {
-                        id: videoProps.props.pageProps.videoData.itemInfos.authorId,
-                        name: videoProps.props.pageProps.videoData.authorInfos.uniqueId,
+                        id: videoData.itemInfos.authorId,
+                        name: videoData.authorInfos.uniqueId,
                     },
                     musicMeta: {
-                        musicId: videoProps.props.pageProps.videoData.musicInfos.musicId,
-                        musicName: videoProps.props.pageProps.videoData.musicInfos.musicName,
-                        musicAuthor: videoProps.props.pageProps.videoData.musicInfos.authorName,
+                        musicId: videoData.musicInfos.musicId,
+                        musicName: videoData.musicInfos.musicName,
+                        musicAuthor: videoData.musicInfos.authorName,
                     },
-                    imageUrl: videoProps.props.pageProps.videoData.itemInfos.coversOrigin[0],
-                    videoUrl: videoProps.props.pageProps.videoData.itemInfos.video.urls[0],
+                    imageUrl: videoData.itemInfos.coversOrigin[0],
+                    videoUrl: videoData.itemInfos.video.urls[0],
                     videoUrlNoWaterMark: '',
-                    videoMeta: videoProps.props.pageProps.videoData.itemInfos.video.videoMeta,
+                    videoMeta: videoData.itemInfos.video.videoMeta,
                     covers: {
-                        default: videoProps.props.pageProps.videoData.itemInfos.covers[0],
-                        origin: videoProps.props.pageProps.videoData.itemInfos.coversOrigin[0],
+                        default: videoData.itemInfos.covers[0],
+                        origin: videoData.itemInfos.coversOrigin[0],
                     },
-                    diggCount: videoProps.props.pageProps.videoData.itemInfos.diggCount,
-                    shareCount: videoProps.props.pageProps.videoData.itemInfos.shareCount,
-                    playCount: videoProps.props.pageProps.videoData.itemInfos.playCount,
-                    commentCount: videoProps.props.pageProps.videoData.itemInfos.commentCount,
+                    diggCount: videoData.itemInfos.diggCount,
+                    shareCount: videoData.itemInfos.shareCount,
+                    playCount: videoData.itemInfos.playCount,
+                    commentCount: videoData.itemInfos.commentCount,
                     downloaded: false,
-                    mentions: videoProps.props.pageProps.videoData.itemInfos.text.match(/(@\w+)/g) || [],
-                    hashtags: videoProps.props.pageProps.videoData.challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
+                    mentions: videoData.itemInfos.text.match(/(@\w+)/g) || [],
+                    hashtags: videoData.challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
                         id: challengeId,
                         name: challengeName,
                         title: text,

@@ -242,9 +242,6 @@ yargs
             if (!argv.download && !argv.filetype) {
                 argv.filetype = 'csv';
             }
-            if (!/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))$/.test(argv.id)) {
-                throw new Error('Enter a valid TikTok video URL. For example: https://www.tiktok.com/@tiktok/video/6807491984882765062');
-            }
         }
 
         return true;

@@ -511,7 +511,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
         try {
             await instance.getVideoMeta();
         } catch (error) {
-            expect(error).toEqual(`Not supported url format`);
+            expect(error).toEqual(`Can't extract metadata from the video: na`);
         }
     });
 });

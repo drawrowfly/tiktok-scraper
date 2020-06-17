@@ -99,9 +99,6 @@ export class Downloader {
             }
             r.get({
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
-                // headers: {
-                //     'user-agent': this.userAgent,
-                // },
             })
                 .on('response', response => {
                     if (this.progress && !this.bulk) {
@@ -182,9 +179,6 @@ export class Downloader {
         const proxy = this.getProxy;
         const options = ({
             uri: post.videoUrlNoWaterMark,
-            headers: {
-                'user-agent': this.userAgent,
-            },
             encoding: null,
             ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
             ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
