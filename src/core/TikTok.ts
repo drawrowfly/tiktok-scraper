@@ -987,6 +987,38 @@ export class TikTokScraper extends EventEmitter {
     }
 
     /**
+     * Get music information
+     * @param {} music link
+     */
+    public async getMusicInfo(): Promise<Challenge> {
+        if (!this.input) {
+            throw `Music is missing`;
+        }
+
+        const regex = /music\/([^\?]+)/.exec(this.input);
+
+        if (!regex) {
+            throw `Music is missing`;
+        }
+
+        const query = {
+            uri: `${this.mainHost}node/share/music/${regex[0]}`,
+            method: 'GET',
+            json: true,
+        };
+
+        try {
+            const response = await this.request<ApiResponse<'musicData', Challenge>>(query);
+            if (response.statusCode !== 0 || !response.body.musicData) {
+                throw new Error(`Can't find music: ${this.input}`);
+            }
+            return response.body.musicData;
+        } catch (error) {
+            throw error.message;
+        }
+    }
+
+    /**
      * Sign URL
      * @param {}
      */

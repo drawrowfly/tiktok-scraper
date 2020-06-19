@@ -114,6 +114,24 @@ export const getHashtagInfo = async (input: string, options = {} as Options): Pr
     return result;
 };
 
+export const getMusicInfo = async (input: string, options = {} as Options): Promise<Challenge> => {
+    if (options && typeof options !== 'object') {
+        throw new TypeError('Object is expected');
+    }
+    if (options?.proxyFile) {
+        options.proxy = await proxyFromFile(options?.proxyFile);
+    }
+
+    if (!options?.userAgent) {
+        options!.userAgent = randomUserAgent();
+    }
+    const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type: 'single_music' as ScrapeType, input } };
+    const scraper = new TikTokScraper(contructor);
+
+    const result = await scraper.getMusicInfo();
+    return result;
+};
+
 export const getUserProfileInfo = async (input: string, options = {} as Options): Promise<UserData> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
