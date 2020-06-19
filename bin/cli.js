@@ -229,7 +229,11 @@ yargs
             throw new Error(`--proxy-file is incompatible with luminati credentials`);
         }
 
-        if ((!argv.luminatiUsername && argv.luminatiPassword) || argv.luminatiUsername || !argv.luminatiPassword) {
+        if (argv.proxy && (argv.luminatiUsername || argv.luminatiPassword)) {
+            throw new Error(`--proxy is incompatible with luminati credentials`);
+        }
+
+        if ((!argv.luminatiUsername && argv.luminatiPassword) || (argv.luminatiUsername && !argv.luminatiPassword)) {
             throw new Error(`luminati credentials need --luminatiUsername and --luminatiPassword`);
         }
 
