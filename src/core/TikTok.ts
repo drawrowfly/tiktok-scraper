@@ -995,7 +995,7 @@ export class TikTokScraper extends EventEmitter {
             throw `Music is missing`;
         }
 
-        const regex = /music\/([^\?]+)/.exec(this.input);
+        const regex = /music\/([^?]+)/.exec(this.input);
 
         if (!regex) {
             throw `Music is missing`;
