@@ -2,11 +2,8 @@ import { getMusicInfo } from '../src';
 
 (async () => {
     try {
-        // const hashtagMeta = await getHashtagInfo('summer', {});
-        // console.log(hashtagMeta);
-
-        const hashtagMeta = await getMusicInfo('https://www.tiktok.com/music/Say-So-6763054442704145158?lang=en', {});
-        console.log(hashtagMeta);
+        const musicMeta = await getMusicInfo('https://www.tiktok.com/music/Say-So-6763054442704145158?lang=en', {});
+        console.log(musicMeta);
     } catch (error) {
         console.log(error);
     }
