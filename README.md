@@ -125,6 +125,10 @@ Options:
   --proxy-file            Use proxies from a file. Scraper will use random
                           proxies from the file per each request. 1 line 1
                           proxy.                                   [default: ""]
+  --luminatiUsername,     Set username for Luminati proxy          [default: ""]
+    -lUsr            
+  --luminatiPassword,     Set password for Luminati proxy          [default: ""]
+    -lPwd   
   --download, -d          Download video posts to the folder with the name input
                           [id]                        [boolean] [default: false]
   --asyncDownload, -a     Number of concurrent downloads            [default: 5]
