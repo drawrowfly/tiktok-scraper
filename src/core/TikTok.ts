@@ -28,6 +28,7 @@ import {
     Proxy,
     ItemAPIV2,
     ItemListDataAPIV2,
+    MusicInfos,
 } from '../types';
 
 import { Downloader } from '../core';
@@ -990,7 +991,7 @@ export class TikTokScraper extends EventEmitter {
      * Get music information
      * @param {} music link
      */
-    public async getMusicInfo(): Promise<Challenge> {
+    public async getMusicInfo(): Promise<MusicInfos> {
         if (!this.input) {
             throw `Music is missing`;
         }
@@ -1008,7 +1009,7 @@ export class TikTokScraper extends EventEmitter {
         };
 
         try {
-            const response = await this.request<ApiResponse<'musicData', Challenge>>(query);
+            const response = await this.request<ApiResponse<'musicData', MusicInfos>>(query);
             if (response.statusCode !== 0 || !response.body.musicData) {
                 throw new Error(`Can't find music: ${this.input}`);
             }

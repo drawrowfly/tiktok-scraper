@@ -7,7 +7,7 @@ import { readFile, writeFile, unlink } from 'fs';
 import { fromCallback } from 'bluebird';
 import { forEachLimit } from 'async';
 import { TikTokScraper } from './core';
-import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem } from './types';
+import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem, MusicInfos } from './types';
 import CONST from './constant';
 
 const INIT_OPTIONS = {
@@ -114,7 +114,7 @@ export const getHashtagInfo = async (input: string, options = {} as Options): Pr
     return result;
 };
 
-export const getMusicInfo = async (input: string, options = {} as Options): Promise<Challenge> => {
+export const getMusicInfo = async (input: string, options = {} as Options): Promise<MusicInfos> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
