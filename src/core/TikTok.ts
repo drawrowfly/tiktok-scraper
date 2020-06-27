@@ -400,7 +400,7 @@ export class TikTokScraper extends EventEmitter {
                     .slice(position + 4, position + 36)
                     .toString();
                 return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${
-                    this.hdVideo ? `&ratio=540p` : ''
+                    this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
                 }`;
             }
             throw new Error(`Cant extract video id`);
