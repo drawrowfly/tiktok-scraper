@@ -65,6 +65,7 @@ export interface MusicInfos {
     covers: string[];
     coversMedium: string[];
     coversLarger: string[];
+    posts: number;
 }
 
 export interface Challenge {
