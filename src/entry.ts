@@ -7,7 +7,7 @@ import { readFile, writeFile, unlink } from 'fs';
 import { fromCallback } from 'bluebird';
 import { forEachLimit } from 'async';
 import { TikTokScraper } from './core';
-import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem } from './types';
+import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem, MusicInfos } from './types';
 import CONST from './constant';
 
 const INIT_OPTIONS = {
@@ -111,6 +111,24 @@ export const getHashtagInfo = async (input: string, options = {} as Options): Pr
     const scraper = new TikTokScraper(contructor);
 
     const result = await scraper.getHashtagInfo();
+    return result;
+};
+
+export const getMusicInfo = async (input: string, options = {} as Options): Promise<MusicInfos> => {
+    if (options && typeof options !== 'object') {
+        throw new TypeError('Object is expected');
+    }
+    if (options?.proxyFile) {
+        options.proxy = await proxyFromFile(options?.proxyFile);
+    }
+
+    if (!options?.userAgent) {
+        options!.userAgent = randomUserAgent();
+    }
+    const contructor: TikTokConstructor = { ...INIT_OPTIONS, ...options, ...{ type: 'single_music' as ScrapeType, input } };
+    const scraper = new TikTokScraper(contructor);
+
+    const result = await scraper.getMusicInfo();
     return result;
 };
 

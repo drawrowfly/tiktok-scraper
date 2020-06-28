@@ -28,6 +28,7 @@ import {
     Proxy,
     ItemAPIV2,
     ItemListDataAPIV2,
+    MusicInfos,
 } from '../types';
 
 import { Downloader } from '../core';
@@ -981,6 +982,38 @@ export class TikTokScraper extends EventEmitter {
                 throw new Error(`Can't find hashtag: ${this.input}`);
             }
             return response.body.challengeData;
+        } catch (error) {
+            throw error.message;
+        }
+    }
+
+    /**
+     * Get music information
+     * @param {} music link
+     */
+    public async getMusicInfo(): Promise<MusicInfos> {
+        if (!this.input) {
+            throw `Music is missing`;
+        }
+
+        const regex = /music\/([^?]+)/.exec(this.input);
+
+        if (!regex) {
+            throw `Music is missing`;
+        }
+
+        const query = {
+            uri: `${this.mainHost}node/share/music/${regex[0]}`,
+            method: 'GET',
+            json: true,
+        };
+
+        try {
+            const response = await this.request<ApiResponse<'musicData', MusicInfos>>(query);
+            if (response.statusCode !== 0 || !response.body.musicData) {
+                throw new Error(`Can't find music: ${this.input}`);
+            }
+            return response.body.musicData;
         } catch (error) {
             throw error.message;
         }

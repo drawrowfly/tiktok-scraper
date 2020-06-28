@@ -10,6 +10,7 @@ export type ScrapeType =
     | 'discover_music'
     | 'single_user'
     | 'single_hashtag'
+    | 'single_music'
     | 'signature'
     | 'video_meta'
     | 'video';
