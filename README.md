@@ -37,7 +37,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 	        - [getUserProfileInfo](#getUserProfileInfo)
 	        - [getHashtagInfo](#getHashtagInfo)
 	        - [getVideoMeta](#getVideoMeta)
-            - [getMusicInfo] (#getMusicInfo)
+            - [getMusicInfo](#getMusicInfo)
 ## Features
 
 -   Download **unlimited** post metadata from the User, Hashtag, Trends, or Music-Id pages
