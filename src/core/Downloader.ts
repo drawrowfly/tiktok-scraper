@@ -97,8 +97,12 @@ export class Downloader {
             if (proxy.proxy && proxy.socks) {
                 r = request.defaults({ agent: (proxy.proxy as unknown) as Agent });
             }
+
             r.get({
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
+                headers: {
+                    'user-agent': 'okhttp',
+                },
             })
                 .on('response', response => {
                     if (this.progress && !this.bulk) {
