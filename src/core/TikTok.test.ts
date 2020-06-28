@@ -481,7 +481,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/d1b00294a06e488b851ad6553cad41a0_1584992746',
             videoUrl:
                 'https://v16.muscdn.com/f950058182bcefa15345108bd9ab241f/5e7e615a/video/tos/useast2a/tos-useast2a-ve-0068c003/0dc9964505df43288febb6aac33ac6a0/?a=1233&br=472&bt=236&cr=0&cs=0&dr=0&ds=3&er=&l=20200327142546010115115156167B9215&lr=tiktok_m&qs=0&rc=M3Vna3N1d3FrczMzOzczM0ApO2Q6NjZnOzs0N2k7aGhpaGcxaDM0ay1gMHBfLS0wMTZzc182MWI1YzEtYTY2LWNjXzU6Yw%3D%3D&vl=&vr=',
-            videoUrlNoWaterMark: 'https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=v09044ae0000bk2qm0ivfsko76kvric0',
+            videoUrlNoWaterMark: 'https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=v09044ae0000bk2qm0ivfsko76kvric0&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4',
             videoMeta: { width: 576, height: 1024, ratio: 16, duration: 16 },
             diggCount: 35650,
             shareCount: 256,
