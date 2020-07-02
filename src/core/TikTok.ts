@@ -953,6 +953,9 @@ export class TikTokScraper extends EventEmitter {
         };
         try {
             const response = await this.request<ApiResponse<'userData', UserData>>(query);
+            if (!response) {
+                throw new Error(`Can't find user: ${this.input}`);
+            }
             if (response.statusCode !== 0 || !response.body.userData) {
                 throw new Error(`Can't find user: ${this.input}`);
             }
@@ -1066,18 +1069,27 @@ export class TikTokScraper extends EventEmitter {
 
             if (regex) {
                 const videoProps = JSON.parse(short ? `${regex[1]}}` : regex[1]);
-                let videoItem = {} as PostCollector;
+                let shortKey = '/v/:id';
 
                 if (short) {
-                    if (videoProps['/v/:id'].statusCode) {
+                    if (videoProps['/v/:id']) {
+                        if (videoProps['/v/:id'].statusCode) {
+                            throw new Error();
+                        }
+                    } else if (videoProps['/i18n/share/video/:id']) {
+                        shortKey = '/i18n/share/video/:id';
+                        if (videoProps['/i18n/share/video/:id'].statusCode) {
+                            throw new Error();
+                        }
+                    } else {
                         throw new Error();
                     }
                 } else if (videoProps.props.pageProps.statusCode) {
                     throw new Error();
                 }
-                const videoData = short ? videoProps['/v/:id'].videoData : videoProps.props.pageProps.videoData;
+                const videoData = short ? videoProps[shortKey].videoData : videoProps.props.pageProps.videoData;
 
-                videoItem = {
+                const videoItem = {
                     id: videoData.itemInfos.id,
                     text: videoData.itemInfos.text,
                     createTime: videoData.itemInfos.createTime,

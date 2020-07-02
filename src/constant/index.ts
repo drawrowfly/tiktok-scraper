@@ -1,5 +1,17 @@
 export = {
-    scrape: ['user', 'hashtag', 'trend', 'music', 'discover_user', 'discover_hashtag', 'discover_music', 'history', 'video', 'from-file'],
+    scrape: [
+        'user',
+        'hashtag',
+        'trend',
+        'music',
+        'discover_user',
+        'discover_hashtag',
+        'discover_music',
+        'history',
+        'video',
+        'from-file',
+        'userprofile',
+    ],
     history: ['user', 'hashtag', 'trend', 'music'],
     sourceType: {
         user: 8,

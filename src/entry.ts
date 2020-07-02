@@ -352,7 +352,7 @@ export const fromfile = async (input: string, options = {} as Options) => {
                     input: item.split('#')[1],
                 };
             }
-            if (/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))$/.test(item)) {
+            if (/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(\w.+)\/video\/(\d+))$/.test(item)) {
                 return {
                     type: 'video',
                     input: item,
