@@ -281,6 +281,7 @@ export class TikTokScraper extends EventEmitter {
                 ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
                 ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
                 timeout: 10000,
+                rejectUnauthorized: false,
             } as unknown) as OptionsWithUri;
 
             try {
