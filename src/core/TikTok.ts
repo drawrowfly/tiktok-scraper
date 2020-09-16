@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-throw-literal */
 /* eslint-disable no-await-in-loop */
 import rp, { OptionsWithUri } from 'request-promise';
@@ -392,7 +393,7 @@ export class TikTokScraper extends EventEmitter {
      * @param uri
      */
     // eslint-disable-next-line class-methods-use-this
-    private async extractVideoId(uri): Promise<string> {
+    private async extractVideoId(uri): Promise<string | null> {
         try {
             const result = await rp({ uri });
             const position = Buffer.from(result).indexOf('vid:');
@@ -404,10 +405,11 @@ export class TikTokScraper extends EventEmitter {
                     this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
                 }`;
             }
-            throw new Error(`Cant extract video id`);
         } catch (error) {
-            return '';
+            console.error(error);
         }
+        console.warn(`Couldn't get video without watermark`);
+        return null;
     }
 
     /**
@@ -1095,6 +1097,7 @@ export class TikTokScraper extends EventEmitter {
                     createTime: videoData.itemInfos.createTime,
                     authorMeta: {
                         id: videoData.itemInfos.authorId,
+                        secUid: videoData.authorInfos.secUid,
                         name: videoData.authorInfos.uniqueId,
                     },
                     musicMeta: {
@@ -1104,7 +1107,7 @@ export class TikTokScraper extends EventEmitter {
                     },
                     imageUrl: videoData.itemInfos.coversOrigin[0],
                     videoUrl: videoData.itemInfos.video.urls[0],
-                    videoUrlNoWaterMark: '',
+                    videoUrlNoWaterMark: null,
                     videoMeta: videoData.itemInfos.video.videoMeta,
                     covers: {
                         default: videoData.itemInfos.covers[0],

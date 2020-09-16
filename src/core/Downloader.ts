@@ -102,6 +102,7 @@ export class Downloader {
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
                 headers: {
                     'user-agent': 'okhttp',
+                    referer: 'https://www.tiktok.com/',
                 },
             })
                 .on('response', response => {
@@ -181,18 +182,19 @@ export class Downloader {
      */
     public async downloadSingleVideo(post: PostCollector) {
         const proxy = this.getProxy;
+        let url = post.videoUrlNoWaterMark;
+        if (!url) {
+            url = post.videoUrl;
+        }
         const options = ({
-            uri: post.videoUrlNoWaterMark,
+            uri: url,
             encoding: null,
             ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
             ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
         } as unknown) as OptionsWithUri;
-        try {
-            const result = await rp(options);
 
-            await fromCallback(cb => writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
-        } catch (error) {
-            throw error.message;
-        }
+        const result = await rp(options);
+
+        await fromCallback(cb => writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
     }
 }
