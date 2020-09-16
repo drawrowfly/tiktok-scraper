@@ -1097,6 +1097,7 @@ export class TikTokScraper extends EventEmitter {
                     createTime: videoData.itemInfos.createTime,
                     authorMeta: {
                         id: videoData.itemInfos.authorId,
+                        secUid: videoData.authorInfos.secUid,
                         name: videoData.authorInfos.uniqueId,
                     },
                     musicMeta: {
