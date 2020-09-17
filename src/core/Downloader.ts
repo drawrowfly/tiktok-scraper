@@ -68,9 +68,9 @@ export class Downloader {
      * Add new bar to indicate download progress
      * @param {number} len
      */
-    public addBar(len: number): any[] {
+    public addBar(type: boolean, len: number): any[] {
         this.progressBar.push(
-            this.mbars.newBar('Downloading :id [:bar] :percent', {
+            this.mbars.newBar(`Downloading (${!type ? 'WITH WM' : 'WITHOUT WM'}) :id [:bar] :percent`, {
                 complete: '=',
                 incomplete: ' ',
                 width: 30,
@@ -107,7 +107,7 @@ export class Downloader {
             })
                 .on('response', response => {
                     if (this.progress && !this.bulk) {
-                        barIndex = this.addBar(parseInt(response.headers['content-length'] as string, 10));
+                        barIndex = this.addBar(!!item.videoUrlNoWaterMark, parseInt(response.headers['content-length'] as string, 10));
                     }
                 })
                 .on('data', chunk => {
