@@ -188,6 +188,10 @@ export class Downloader {
         }
         const options = ({
             uri: url,
+            headers: {
+                'user-agent': 'okhttp',
+                referer: 'https://www.tiktok.com/',
+            },
             encoding: null,
             ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
             ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),

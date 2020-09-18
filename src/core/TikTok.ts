@@ -1057,6 +1057,10 @@ export class TikTokScraper extends EventEmitter {
         }
         const query = {
             uri: this.input,
+            headers: {
+                'user-agent': 'okhttp',
+                referer: 'https://www.tiktok.com/',
+            },
             method: 'GET',
             json: true,
         };
