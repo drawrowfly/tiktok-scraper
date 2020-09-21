@@ -1,4 +1,3 @@
-/* eslint-disable */
 import fs from 'fs';
 import { ScrapeType, Result, RequestQuery, Challenge, UserData, PostCollector } from '../types';
 import { TikTokScraper } from './TikTok';
@@ -294,11 +293,7 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
 
     it('Throw error if input url is empty', async () => {
         instance.input = '';
-        try {
-            await instance.signUrl();
-        } catch (error) {
-            expect(error).toEqual(`Url is missing`);
-        }
+        await expect(instance.signUrl()).rejects.toBe(`Url is missing`);
     });
 });
 
@@ -336,20 +331,12 @@ describe('TikTok Scraper MODULE(promise): getHashtagInfo', () => {
 
     it('Throw error if input hashtag is empty', async () => {
         instance.input = '';
-        try {
-            await instance.getHashtagInfo();
-        } catch (error) {
-            expect(error).toEqual(`Hashtag is missing`);
-        }
+        await expect(instance.getHashtagInfo()).rejects.toBe(`Hashtag is missing`);
     });
 
     it(`Throw error if hashtag doesn't exist`, async () => {
         instance.input = 'na';
-        try {
-            await instance.getHashtagInfo();
-        } catch (error) {
-            expect(error).toEqual(`Can't find hashtag: na`);
-        }
+        await expect(instance.getHashtagInfo()).rejects.toBe(`Can't find hashtag: na`);
     });
 });
 
@@ -392,20 +379,12 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
 
     it('Throw error if input username is empty', async () => {
         instance.input = '';
-        try {
-            await instance.getUserProfileInfo();
-        } catch (error) {
-            expect(error).toEqual(`Username is missing`);
-        }
+        await expect(instance.getUserProfileInfo()).rejects.toBe(`Username is missing`);
     });
 
     it(`Throw error if username doesn't exist`, async () => {
         instance.input = 'na';
-        try {
-            await instance.getUserProfileInfo();
-        } catch (error) {
-            expect(error).toEqual(`Can't find user: na`);
-        }
+        await expect(instance.getUserProfileInfo()).rejects.toBe(`Can't find user: na`);
     });
 });
 
@@ -476,7 +455,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             id: '6807491984882765062',
             text: 'We’re kicking off the #happyathome live stream series today at 5pm PT!',
             createTime: '1584992742',
-            authorMeta: { id: '107955', name: 'tiktok' },
+            authorMeta: { id: '107955', secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM', name: 'tiktok' },
             musicMeta: { musicId: '6807487887634909957', musicName: 'original sound', musicAuthor: 'tiktok' },
             imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/d1b00294a06e488b851ad6553cad41a0_1584992746',
             videoUrl:
@@ -500,19 +479,11 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
 
     it('Throw error if input url is empty', async () => {
         instance.input = '';
-        try {
-            await instance.getVideoMeta();
-        } catch (error) {
-            expect(error).toEqual(`Url is missing`);
-        }
+        await expect(instance.getVideoMeta()).rejects.toBe(`Url is missing`);
     });
 
     it(`Throw error if user has provided incorrect URL`, async () => {
         instance.input = 'na';
-        try {
-            await instance.getVideoMeta();
-        } catch (error) {
-            expect(error).toEqual(`Can't extract metadata from the video: na`);
-        }
+        await expect(instance.getVideoMeta()).rejects.toBe(`Can't extract metadata from the video: na`);
     });
 });

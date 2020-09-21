@@ -1,9 +1,15 @@
-// @ts-nocheck
-/* eslint-disable */
 import ProgressBar from 'progress';
 import * as readline from 'readline';
 
 export class MultipleBar {
+    public stream: any;
+
+    public cursor: number;
+
+    public bars: ProgressBar[];
+
+    public terminates: number;
+
     constructor() {
         this.stream = process.stderr;
         this.cursor = 1;
@@ -12,6 +18,7 @@ export class MultipleBar {
     }
 
     newBar(schema, options) {
+        // eslint-disable-next-line no-param-reassign
         options.stream = this.stream;
         const bar = new ProgressBar(schema, options);
         this.bars.push(bar);
@@ -23,16 +30,16 @@ export class MultipleBar {
         this.cursor += 1;
 
         // replace original
-        const self = this;
-        bar.otick = bar.tick;
-        bar.oterminate = bar.terminate;
-        bar.tick = (value, options) => {
-            self.tick(index, value, options);
+        const barObj = bar as any;
+        barObj.otick = bar.tick;
+        barObj.oterminate = bar.terminate;
+        barObj.tick = (value, opts) => {
+            this.tick(index, value, opts);
         };
-        bar.terminate = () => {
-            self.terminates += 1;
-            if (self.terminates === self.bars.length) {
-                self.terminate();
+        barObj.terminate = () => {
+            this.terminates += 1;
+            if (this.terminates === this.bars.length) {
+                this.terminate();
             }
         };
 
@@ -42,7 +49,7 @@ export class MultipleBar {
     terminate() {
         this.move(this.bars.length);
 
-        readline.clearLine();
+        readline.clearLine(this.stream, 0);
         if (!this.stream.isTTY) return;
         this.stream.cursorTo(0);
     }
@@ -57,7 +64,7 @@ export class MultipleBar {
         const bar = this.bars[index];
         if (bar) {
             this.move(index);
-            bar.otick(value, options);
+            (bar as any).otick(value, options);
         }
     }
 }
