@@ -311,8 +311,6 @@ export class TikTokScraper extends EventEmitter {
      */
     // eslint-disable-next-line consistent-return
     public async scrape(): Promise<Result | any> {
-        // global.navigator.userAgent = this.userAgent;
-
         if (this.cli && !this.bulk) {
             this.spinner.start();
         }
