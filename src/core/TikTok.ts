@@ -1049,6 +1049,7 @@ export class TikTokScraper extends EventEmitter {
      * Get video url without the watermark
      * @param {}
      */
+
     public async getVideoMeta(): Promise<PostCollector> {
         if (!this.input) {
             throw `Url is missing`;
@@ -1056,7 +1057,7 @@ export class TikTokScraper extends EventEmitter {
         const query = {
             uri: this.input,
             headers: {
-                'user-agent': 'okhttp',
+                'user-agent': this.userAgent,
                 referer: 'https://www.tiktok.com/',
             },
             method: 'GET',
