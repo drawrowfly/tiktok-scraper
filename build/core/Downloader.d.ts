@@ -12,7 +12,7 @@ export declare class Downloader {
     bulk: boolean;
     constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk }: DownloaderConstructor);
     private get getProxy();
-    addBar(len: number): any[];
+    addBar(type: boolean, len: number): any[];
     toBuffer(item: PostCollector): Promise<Buffer>;
     downloadPosts({ zip, folder, collector, fileName, asyncDownload }: DownloadParams): Promise<unknown>;
     downloadSingleVideo(post: PostCollector): Promise<void>;
