@@ -21,8 +21,6 @@ import {
     Result,
     ItemListData,
     ApiResponse,
-    Challenge,
-    UserData,
     RequestQuery,
     Item,
     History,
@@ -30,6 +28,9 @@ import {
     ItemAPIV2,
     ItemListDataAPIV2,
     MusicInfos,
+    TikTokMetadata,
+    UserMetadata,
+    HashtagMetadata,
 } from '../types';
 
 import { Downloader } from '../core';
@@ -312,8 +313,6 @@ export class TikTokScraper extends EventEmitter {
      */
     // eslint-disable-next-line consistent-return
     public async scrape(): Promise<Result | any> {
-        // global.navigator.userAgent = this.userAgent;
-
         if (this.cli && !this.bulk) {
             this.spinner.start();
         }
@@ -886,18 +885,18 @@ export class TikTokScraper extends EventEmitter {
             };
         }
         const query = {
-            uri: `${this.mainHost}node/share/tag/${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<ApiResponse<'challengeData', Challenge>>(query);
-            if (response.statusCode !== 0 || !response.body.challengeData) {
+            const response = await this.request<TikTokMetadata<HashtagMetadata>>(query);
+            if (response.statusCode !== 0) {
                 throw new Error(`Can not find the hashtag: ${this.input}`);
             }
-            this.idStore = response.body.challengeData.challengeId;
+            this.idStore = response.challengeInfo.challenge.id;
             return {
-                id: response.body.challengeData.challengeId,
+                id: this.idStore,
                 secUid: '',
                 type: 3,
                 count: 100,
@@ -927,19 +926,19 @@ export class TikTokScraper extends EventEmitter {
         }
 
         const query = {
-            uri: `${this.mainHost}node/share/user/@${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/user/@c?uniqueId=${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<ApiResponse<'userData', UserData>>(query);
-            if (response.statusCode !== 0 || !response.body.userData) {
+            const response = await this.request<TikTokMetadata<UserMetadata>>(query);
+            if (response.statusCode !== 0) {
                 throw new Error(`Can't find the user: ${this.input}`);
             }
-            this.idStore = response.body.userData.userId;
+            this.idStore = response.userInfo.user.id;
 
             return {
-                id: response.body.userData.userId,
+                id: this.idStore,
                 secUid: '',
                 sourceType: CONST.sourceType.user,
                 count: this.number > 30 ? 50 : 30,
@@ -956,24 +955,25 @@ export class TikTokScraper extends EventEmitter {
      * Get user profile information
      * @param {} username
      */
-    public async getUserProfileInfo(): Promise<UserData> {
+    public async getUserProfileInfo(): Promise<UserMetadata> {
         if (!this.input) {
             throw `Username is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@${this.input}`,
+            uri: `${this.mainHost}node/share/user/@c?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<ApiResponse<'userData', UserData>>(query);
+            const response = await this.request<TikTokMetadata<UserMetadata>>(query);
+
             if (!response) {
                 throw new Error(`Can't find user: ${this.input}`);
             }
-            if (response.statusCode !== 0 || !response.body.userData) {
+            if (response.statusCode !== 0) {
                 throw new Error(`Can't find user: ${this.input}`);
             }
-            return response.body.userData;
+            return response.userInfo;
         } catch (error) {
             throw error.message;
         }
@@ -983,22 +983,25 @@ export class TikTokScraper extends EventEmitter {
      * Get hashtag information
      * @param {} hashtag
      */
-    public async getHashtagInfo(): Promise<Challenge> {
+    public async getHashtagInfo(): Promise<HashtagMetadata> {
         if (!this.input) {
             throw `Hashtag is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/tag/${this.input}`,
+            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
 
         try {
-            const response = await this.request<ApiResponse<'challengeData', Challenge>>(query);
-            if (response.statusCode !== 0 || !response.body.challengeData) {
+            const response = await this.request<TikTokMetadata<HashtagMetadata>>(query);
+            if (!response) {
                 throw new Error(`Can't find hashtag: ${this.input}`);
             }
-            return response.body.challengeData;
+            if (response.statusCode !== 0) {
+                throw new Error(`Can't find hashtag: ${this.input}`);
+            }
+            return response.challengeInfo;
         } catch (error) {
             throw error.message;
         }
@@ -1052,6 +1055,7 @@ export class TikTokScraper extends EventEmitter {
      * Get video url without the watermark
      * @param {}
      */
+
     public async getVideoMeta(): Promise<PostCollector> {
         if (!this.input) {
             throw `Url is missing`;
@@ -1059,7 +1063,7 @@ export class TikTokScraper extends EventEmitter {
         const query = {
             uri: this.input,
             headers: {
-                'user-agent': 'okhttp',
+                'user-agent': this.userAgent,
                 referer: 'https://www.tiktok.com/',
             },
             method: 'GET',
@@ -1080,9 +1084,7 @@ export class TikTokScraper extends EventEmitter {
             if (short) {
                 regex = /<script>window.__INIT_PROPS__ = ([^]*)\}<\/script>/.exec(response);
             } else {
-                regex = /<script id="__NEXT_DATA__" type="application\/json" crossorigin="anonymous">([^]*)<\/script><script crossorigin="anonymous" nomodule=/.exec(
-                    response,
-                );
+                regex = /<script id="__NEXT_DATA__" type="application\/json" crossorigin="anonymous">(.+)<\/script><script cros/.exec(response);
             }
 
             if (regex) {
@@ -1105,42 +1107,64 @@ export class TikTokScraper extends EventEmitter {
                 } else if (videoProps.props.pageProps.statusCode) {
                     throw new Error();
                 }
-                const videoData = short ? videoProps[shortKey].videoData : videoProps.props.pageProps.videoData;
+
+                const videoData = short ? videoProps[shortKey].videoData : videoProps.props.pageProps.itemInfo.itemStruct;
 
                 const videoItem = {
-                    id: videoData.itemInfos.id,
-                    text: videoData.itemInfos.text,
-                    createTime: videoData.itemInfos.createTime,
+                    id: videoData.id,
+                    text: videoData.desc,
+                    createTime: videoData.createTime,
                     authorMeta: {
-                        id: videoData.itemInfos.authorId,
-                        secUid: videoData.authorInfos.secUid,
-                        name: videoData.authorInfos.uniqueId,
+                        id: videoData.author.id,
+                        secUid: videoData.author.secUid,
+                        name: videoData.author.uniqueId,
+                        nickName: videoData.author.nickname,
+                        following: videoData.authorStats.followingCount,
+                        fans: videoData.authorStats.followerCount,
+                        heart: videoData.authorStats.heart,
+                        video: videoData.authorStats.videoCount,
+                        digg: videoData.authorStats.diggCount,
+                        verified: videoData.author.verified,
+                        private: videoData.author.secret,
+                        signature: videoData.author.signature,
+                        avatar: videoData.author.avatarLarger,
                     },
                     musicMeta: {
-                        musicId: videoData.musicInfos.musicId,
-                        musicName: videoData.musicInfos.musicName,
-                        musicAuthor: videoData.musicInfos.authorName,
+                        musicId: videoData.music.id,
+                        musicName: videoData.music.title,
+                        musicAuthor: videoData.music.authorName,
+                        musicOriginal: videoData.music.original,
+                        coverThumb: videoData.music.coverThumb,
+                        coverMedium: videoData.music.coverMedium,
+                        coverLarge: videoData.music.coverLarge,
                     },
-                    imageUrl: videoData.itemInfos.coversOrigin[0],
-                    videoUrl: videoData.itemInfos.video.urls[0],
+                    imageUrl: videoData.video.cover,
+                    videoUrl: videoData.video.playAddr,
                     videoUrlNoWaterMark: null,
-                    videoMeta: videoData.itemInfos.video.videoMeta,
-                    covers: {
-                        default: videoData.itemInfos.covers[0],
-                        origin: videoData.itemInfos.coversOrigin[0],
+                    videoMeta: {
+                        width: videoData.video.width,
+                        height: videoData.video.height,
+                        ratio: videoData.video.ratio,
+                        duration: videoData.video.duration,
                     },
-                    diggCount: videoData.itemInfos.diggCount,
-                    shareCount: videoData.itemInfos.shareCount,
-                    playCount: videoData.itemInfos.playCount,
-                    commentCount: videoData.itemInfos.commentCount,
+                    covers: {
+                        default: videoData.video.cover,
+                        origin: videoData.video.originCover,
+                    },
+                    diggCount: videoData.stats.diggCount,
+                    shareCount: videoData.stats.shareCount,
+                    playCount: videoData.stats.commentCount,
+                    commentCount: videoData.stats.playCount,
                     downloaded: false,
-                    mentions: videoData.itemInfos.text.match(/(@\w+)/g) || [],
-                    hashtags: videoData.challengeInfoList.map(({ challengeId, challengeName, text, coversLarger }) => ({
-                        id: challengeId,
-                        name: challengeName,
-                        title: text,
-                        cover: coversLarger,
-                    })),
+                    mentions: videoData.desc.match(/(@\w+)/g) || [],
+                    hashtags: videoData.challenges
+                        ? videoData.challenges.map(({ id, title, desc, profileLarger }) => ({
+                              id,
+                              name: title,
+                              title: desc,
+                              cover: profileLarger,
+                          }))
+                        : [],
                 } as PostCollector;
 
                 try {
