@@ -21,8 +21,6 @@ import {
     Result,
     ItemListData,
     ApiResponse,
-    Challenge,
-    UserData,
     RequestQuery,
     Item,
     History,
@@ -30,8 +28,9 @@ import {
     ItemAPIV2,
     ItemListDataAPIV2,
     MusicInfos,
-    TikTokUserMetadata,
-    TikTokUserMetadataUserInfo,
+    TikTokMetadata,
+    UserMetadata,
+    HashtagMetadata,
 } from '../types';
 
 import { Downloader } from '../core';
@@ -885,18 +884,18 @@ export class TikTokScraper extends EventEmitter {
             };
         }
         const query = {
-            uri: `${this.mainHost}node/share/tag/${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<ApiResponse<'challengeData', Challenge>>(query);
-            if (response.statusCode !== 0 || !response.body.challengeData) {
+            const response = await this.request<TikTokMetadata<HashtagMetadata>>(query);
+            if (response.statusCode !== 0) {
                 throw new Error(`Can not find the hashtag: ${this.input}`);
             }
-            this.idStore = response.body.challengeData.challengeId;
+            this.idStore = response.challengeInfo.challenge.id;
             return {
-                id: response.body.challengeData.challengeId,
+                id: this.idStore,
                 secUid: '',
                 type: 3,
                 count: 100,
@@ -926,19 +925,19 @@ export class TikTokScraper extends EventEmitter {
         }
 
         const query = {
-            uri: `${this.mainHost}node/share/user/@${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/user/@c?uniqueId=${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<ApiResponse<'userData', UserData>>(query);
-            if (response.statusCode !== 0 || !response.body.userData) {
+            const response = await this.request<TikTokMetadata<UserMetadata>>(query);
+            if (response.statusCode !== 0) {
                 throw new Error(`Can't find the user: ${this.input}`);
             }
-            this.idStore = response.body.userData.userId;
+            this.idStore = response.userInfo.user.id;
 
             return {
-                id: response.body.userData.userId,
+                id: this.idStore,
                 secUid: '',
                 sourceType: CONST.sourceType.user,
                 count: this.number > 30 ? 50 : 30,
@@ -955,7 +954,7 @@ export class TikTokScraper extends EventEmitter {
      * Get user profile information
      * @param {} username
      */
-    public async getUserProfileInfo(): Promise<TikTokUserMetadataUserInfo> {
+    public async getUserProfileInfo(): Promise<UserMetadata> {
         if (!this.input) {
             throw `Username is missing`;
         }
@@ -965,7 +964,7 @@ export class TikTokScraper extends EventEmitter {
             json: true,
         };
         try {
-            const response = await this.request<TikTokUserMetadata>(query);
+            const response = await this.request<TikTokMetadata<UserMetadata>>(query);
 
             if (!response) {
                 throw new Error(`Can't find user: ${this.input}`);
@@ -983,7 +982,7 @@ export class TikTokScraper extends EventEmitter {
      * Get hashtag information
      * @param {} hashtag
      */
-    public async getHashtagInfo(): Promise<Challenge> {
+    public async getHashtagInfo(): Promise<HashtagMetadata> {
         if (!this.input) {
             throw `Hashtag is missing`;
         }
@@ -994,11 +993,14 @@ export class TikTokScraper extends EventEmitter {
         };
 
         try {
-            const response = await this.request<ApiResponse<'challengeData', Challenge>>(query);
-            if (response.statusCode !== 0 || !response.body.challengeData) {
+            const response = await this.request<TikTokMetadata<HashtagMetadata>>(query);
+            if (!response) {
                 throw new Error(`Can't find hashtag: ${this.input}`);
             }
-            return response.body.challengeData;
+            if (response.statusCode !== 0) {
+                throw new Error(`Can't find hashtag: ${this.input}`);
+            }
+            return response.challengeInfo;
         } catch (error) {
             throw error.message;
         }

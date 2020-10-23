@@ -12,8 +12,8 @@ import {
     Options,
     ScrapeType,
     Result,
-    TikTokUserMetadataUserInfo,
-    Challenge,
+    UserMetadata,
+    HashtagMetadata,
     PostCollector,
     History,
     HistoryItem,
@@ -107,7 +107,7 @@ export const userEvent = (input: string, options: Options): TikTokScraper => eve
 export const musicEvent = (input: string, options: Options): TikTokScraper => eventScraper(input, 'music', options);
 export const trendEvent = (input: string, options: Options): TikTokScraper => eventScraper(input, 'trend', options);
 
-export const getHashtagInfo = async (input: string, options = {} as Options): Promise<Challenge> => {
+export const getHashtagInfo = async (input: string, options = {} as Options): Promise<HashtagMetadata> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
@@ -143,7 +143,7 @@ export const getMusicInfo = async (input: string, options = {} as Options): Prom
     return result;
 };
 
-export const getUserProfileInfo = async (input: string, options = {} as Options): Promise<TikTokUserMetadataUserInfo> => {
+export const getUserProfileInfo = async (input: string, options = {} as Options): Promise<UserMetadata> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }

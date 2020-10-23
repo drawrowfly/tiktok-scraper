@@ -223,22 +223,22 @@ export interface ItemAPIV2 {
     vl1: boolean;
 }
 
-export interface TikTokUserMetadata {
+// export interface TikTokUserMetadata {
+//     statusCode: number;
+//     userInfo: UserMetadata;
+//     challengeInfo: HashtagMetadata;
+//     predictedLanguage: string;
+// }
+
+type MetaTypes = 'userInfo' | 'challengeInfo';
+
+type MetaTypeBuilder<I> = { [K in MetaTypes]: I };
+
+export interface TikTokMetadata<I> extends MetaTypeBuilder<I> {
     statusCode: number;
-    userInfo: TikTokUserMetadataUserInfo;
-    predictedLanguage: string;
-    metaParams: {
-        title: string;
-        keywords: string;
-        description: string;
-        canonicalHref: string;
-        robotsContent: string;
-        applicableDevice: string;
-    };
-    descVideo: {};
 }
 
-export interface TikTokUserMetadataUserInfo {
+export interface UserMetadata {
     user: {
         id: string;
         uniqueId: string;
@@ -270,4 +270,20 @@ export interface TikTokUserMetadataUserInfo {
         title: string;
         desc: string;
     };
+}
+
+export interface HashtagMetadata {
+    challenge: {
+        id: string;
+        title: string;
+        desc: string;
+        profileThumb: string;
+        profileMedium: string;
+        profileLarger: string;
+        coverThumb: string;
+        coverMedium: string;
+        coverLarger: string;
+        isCommerce: boolean;
+    };
+    stats: { videoCount: number; viewCount: number };
 }
