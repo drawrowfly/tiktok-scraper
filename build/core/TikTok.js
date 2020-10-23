@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TikTokScraper = void 0;
 const request_promise_1 = __importDefault(require("request-promise"));
 const os_1 = require("os");
 const fs_1 = require("fs");
@@ -635,7 +636,7 @@ class TikTokScraper extends events_1.EventEmitter {
             };
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@c?uniqueId=${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
@@ -664,7 +665,7 @@ class TikTokScraper extends events_1.EventEmitter {
             throw `Username is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@c?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };

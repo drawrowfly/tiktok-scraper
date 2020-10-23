@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.sign = void 0;
 function sign(userAgent, url) {
     global.navigator = {
         userAgent,
