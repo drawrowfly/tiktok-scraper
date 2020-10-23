@@ -7,7 +7,18 @@ import { readFile, writeFile, unlink } from 'fs';
 import { fromCallback } from 'bluebird';
 import { forEachLimit } from 'async';
 import { TikTokScraper } from './core';
-import { TikTokConstructor, Options, ScrapeType, Result, UserData, Challenge, PostCollector, History, HistoryItem, MusicInfos } from './types';
+import {
+    TikTokConstructor,
+    Options,
+    ScrapeType,
+    Result,
+    TikTokUserMetadataUserInfo,
+    Challenge,
+    PostCollector,
+    History,
+    HistoryItem,
+    MusicInfos,
+} from './types';
 import CONST from './constant';
 
 const INIT_OPTIONS = {
@@ -132,7 +143,7 @@ export const getMusicInfo = async (input: string, options = {} as Options): Prom
     return result;
 };
 
-export const getUserProfileInfo = async (input: string, options = {} as Options): Promise<UserData> => {
+export const getUserProfileInfo = async (input: string, options = {} as Options): Promise<TikTokUserMetadataUserInfo> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }

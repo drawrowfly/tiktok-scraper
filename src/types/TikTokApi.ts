@@ -222,3 +222,52 @@ export interface ItemAPIV2 {
     showNotPass: boolean;
     vl1: boolean;
 }
+
+export interface TikTokUserMetadata {
+    statusCode: number;
+    userInfo: TikTokUserMetadataUserInfo;
+    predictedLanguage: string;
+    metaParams: {
+        title: string;
+        keywords: string;
+        description: string;
+        canonicalHref: string;
+        robotsContent: string;
+        applicableDevice: string;
+    };
+    descVideo: {};
+}
+
+export interface TikTokUserMetadataUserInfo {
+    user: {
+        id: string;
+        uniqueId: string;
+        nickname: string;
+        avatarThumb: string;
+        avatarMedium: string;
+        avatarLarger: string;
+        signature: string;
+        verified: boolean;
+        secUid: string;
+        secret: boolean;
+        ftc: boolean;
+        relation: number;
+        openFavorite: boolean;
+        commentSetting: number;
+        duetSetting: number;
+        stitchSetting: number;
+        privateAccount: boolean;
+    };
+    stats: {
+        followingCount: number;
+        followerCount: number;
+        heartCount: number;
+        videoCount: number;
+        diggCount: number;
+        heart: number;
+    };
+    shareMeta: {
+        title: string;
+        desc: string;
+    };
+}
