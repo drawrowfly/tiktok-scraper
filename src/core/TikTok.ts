@@ -20,14 +20,13 @@ import {
     TikTokConstructor,
     Result,
     ItemListData,
-    ApiResponse,
+    MusicMetadata,
     RequestQuery,
     Item,
     History,
     Proxy,
     ItemAPIV2,
     ItemListDataAPIV2,
-    MusicInfos,
     TikTokMetadata,
     UserMetadata,
     HashtagMetadata,
@@ -857,6 +856,11 @@ export class TikTokScraper extends EventEmitter {
      * Get music feed query
      */
     private async getMusicFeedQuery(): Promise<RequestQuery> {
+        const musicIdRegex = /.com\/music\/[\w+-]+-(\d{15,22})/.exec(this.input);
+        if (musicIdRegex) {
+            this.input = musicIdRegex[1] as string;
+        }
+        console.log(this.input);
         return {
             id: this.input,
             secUid: '',
@@ -883,13 +887,14 @@ export class TikTokScraper extends EventEmitter {
                 verifyFp: '',
             };
         }
+        const id = encodeURIComponent(this.input);
         const query = {
-            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/tag/${id}?uniqueId=${id}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<TikTokMetadata<HashtagMetadata>>(query);
+            const response = await this.request<TikTokMetadata>(query);
             if (response.statusCode !== 0) {
                 throw new Error(`Can not find the hashtag: ${this.input}`);
             }
@@ -924,18 +929,18 @@ export class TikTokScraper extends EventEmitter {
             };
         }
 
+        const id = encodeURIComponent(this.input);
         const query = {
-            uri: `${this.mainHost}node/share/user/@c?uniqueId=${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/user/@${id}?uniqueId=${id}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<TikTokMetadata<UserMetadata>>(query);
+            const response = await this.request<TikTokMetadata>(query);
             if (response.statusCode !== 0) {
                 throw new Error(`Can't find the user: ${this.input}`);
             }
             this.idStore = response.userInfo.user.id;
-
             return {
                 id: this.idStore,
                 secUid: '',
@@ -959,12 +964,12 @@ export class TikTokScraper extends EventEmitter {
             throw `Username is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@c?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<TikTokMetadata<UserMetadata>>(query);
+            const response = await this.request<TikTokMetadata>(query);
 
             if (!response) {
                 throw new Error(`Can't find user: ${this.input}`);
@@ -987,13 +992,13 @@ export class TikTokScraper extends EventEmitter {
             throw `Hashtag is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/tag/${this.input}?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
 
         try {
-            const response = await this.request<TikTokMetadata<HashtagMetadata>>(query);
+            const response = await this.request<TikTokMetadata>(query);
             if (!response) {
                 throw new Error(`Can't find hashtag: ${this.input}`);
             }
@@ -1010,29 +1015,29 @@ export class TikTokScraper extends EventEmitter {
      * Get music information
      * @param {} music link
      */
-    public async getMusicInfo(): Promise<MusicInfos> {
+    public async getMusicInfo(): Promise<MusicMetadata> {
         if (!this.input) {
             throw `Music is missing`;
         }
 
-        const regex = /music\/([^?]+)/.exec(this.input);
+        // const regex = /music\/([^?]+)/.exec(this.input);
 
-        if (!regex) {
-            throw `Music is missing`;
-        }
+        // if (!regex) {
+        //     throw `Music is missing`;
+        // }
 
         const query = {
-            uri: `${this.mainHost}node/share/music/${regex[0]}`,
+            uri: `${this.mainHost}node/share/music/-${this.input}`,
             method: 'GET',
             json: true,
         };
 
         try {
-            const response = await this.request<ApiResponse<'musicData', MusicInfos>>(query);
-            if (response.statusCode !== 0 || !response.body.musicData) {
-                throw new Error(`Can't find music: ${this.input}`);
+            const response = await this.request<TikTokMetadata>(query);
+            if (response.statusCode !== 0) {
+                throw new Error(`Can't find music data: ${this.input}`);
             }
-            return response.body.musicData;
+            return response.musicInfo;
         } catch (error) {
             throw error.message;
         }
