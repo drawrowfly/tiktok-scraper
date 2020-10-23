@@ -206,3 +206,62 @@ export interface ItemAPIV2 {
     showNotPass: boolean;
     vl1: boolean;
 }
+declare type MetaTypes = 'userInfo' | 'challengeInfo';
+declare type MetaTypeBuilder<I> = {
+    [K in MetaTypes]: I;
+};
+export interface TikTokMetadata<I> extends MetaTypeBuilder<I> {
+    statusCode: number;
+}
+export interface UserMetadata {
+    user: {
+        id: string;
+        uniqueId: string;
+        nickname: string;
+        avatarThumb: string;
+        avatarMedium: string;
+        avatarLarger: string;
+        signature: string;
+        verified: boolean;
+        secUid: string;
+        secret: boolean;
+        ftc: boolean;
+        relation: number;
+        openFavorite: boolean;
+        commentSetting: number;
+        duetSetting: number;
+        stitchSetting: number;
+        privateAccount: boolean;
+    };
+    stats: {
+        followingCount: number;
+        followerCount: number;
+        heartCount: number;
+        videoCount: number;
+        diggCount: number;
+        heart: number;
+    };
+    shareMeta: {
+        title: string;
+        desc: string;
+    };
+}
+export interface HashtagMetadata {
+    challenge: {
+        id: string;
+        title: string;
+        desc: string;
+        profileThumb: string;
+        profileMedium: string;
+        profileLarger: string;
+        coverThumb: string;
+        coverMedium: string;
+        coverLarger: string;
+        isCommerce: boolean;
+    };
+    stats: {
+        videoCount: number;
+        viewCount: number;
+    };
+}
+export {};

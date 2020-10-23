@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
-import { PostCollector, TikTokConstructor, Result, Challenge, UserData, MusicInfos } from '../types';
+import { PostCollector, TikTokConstructor, Result, MusicInfos, UserMetadata, HashtagMetadata } from '../types';
 import { Downloader } from '../core';
 export declare class TikTokScraper extends EventEmitter {
     private mainHost;
@@ -62,8 +62,8 @@ export declare class TikTokScraper extends EventEmitter {
     private getMusicFeedQuery;
     private getHashTagId;
     private getUserId;
-    getUserProfileInfo(): Promise<UserData>;
-    getHashtagInfo(): Promise<Challenge>;
+    getUserProfileInfo(): Promise<UserMetadata>;
+    getHashtagInfo(): Promise<HashtagMetadata>;
     getMusicInfo(): Promise<MusicInfos>;
     signUrl(): Promise<any>;
     getVideoMeta(): Promise<PostCollector>;

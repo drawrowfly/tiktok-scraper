@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Downloader = void 0;
 const request_1 = __importDefault(require("request"));
 const request_promise_1 = __importDefault(require("request-promise"));
 const fs_1 = require("fs");
@@ -42,8 +41,8 @@ class Downloader {
             proxy: this.proxy,
         };
     }
-    addBar(len) {
-        this.progressBar.push(this.mbars.newBar('Downloading :id [:bar] :percent', {
+    addBar(type, len) {
+        this.progressBar.push(this.mbars.newBar(`Downloading (${!type ? 'WITH WM' : 'WITHOUT WM'}) :id [:bar] :percent`, {
             complete: '=',
             incomplete: ' ',
             width: 30,
@@ -67,11 +66,12 @@ class Downloader {
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
                 headers: {
                     'user-agent': 'okhttp',
+                    referer: 'https://www.tiktok.com/',
                 },
             })
                 .on('response', response => {
                 if (this.progress && !this.bulk) {
-                    barIndex = this.addBar(parseInt(response.headers['content-length'], 10));
+                    barIndex = this.addBar(!!item.videoUrlNoWaterMark, parseInt(response.headers['content-length'], 10));
                 }
             })
                 .on('data', chunk => {
@@ -131,14 +131,16 @@ class Downloader {
     }
     async downloadSingleVideo(post) {
         const proxy = this.getProxy;
-        const options = Object.assign(Object.assign({ uri: post.videoUrlNoWaterMark, encoding: null }, (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}));
-        try {
-            const result = await request_promise_1.default(options);
-            await bluebird_1.fromCallback(cb => fs_1.writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
+        let url = post.videoUrlNoWaterMark;
+        if (!url) {
+            url = post.videoUrl;
         }
-        catch (error) {
-            throw error.message;
-        }
+        const options = Object.assign(Object.assign({ uri: url, headers: {
+                'user-agent': 'okhttp',
+                referer: 'https://www.tiktok.com/',
+            }, encoding: null }, (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}));
+        const result = await request_promise_1.default(options);
+        await bluebird_1.fromCallback(cb => fs_1.writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
     }
 }
 exports.Downloader = Downloader;
