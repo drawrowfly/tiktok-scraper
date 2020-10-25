@@ -210,6 +210,14 @@ export const video = async (input: string, options = {} as Options): Promise<any
     const path = options?.filepath ? `${options?.filepath}/${result.id}` : result.id;
     let outputMessage = {};
 
+    if (options?.download) {
+        try {
+            await scraper.Downloader.downloadSingleVideo(result);
+        } catch {
+            throw new Error('Unable to download the video');
+        }
+    }
+
     if (options?.filetype) {
         await scraper.saveMetadata({ json: `${path}.json`, csv: `${path}.csv` });
 
@@ -220,9 +228,6 @@ export const video = async (input: string, options = {} as Options): Promise<any
         };
     }
 
-    if (options?.download) {
-        await scraper.Downloader.downloadSingleVideo(result);
-    }
     return {
         ...(options?.download ? { message: `Video location: ${contructor.filepath}/${result.id}.mp4` } : {}),
         ...outputMessage,

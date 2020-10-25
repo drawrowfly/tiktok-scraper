@@ -30,7 +30,9 @@ export class Downloader {
 
     public bulk: boolean;
 
-    constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk }: DownloaderConstructor) {
+    public tt_webid_v2: string;
+
+    constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk, tt_webid_v2 }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
         this.noWaterMark = noWaterMark;
@@ -39,6 +41,7 @@ export class Downloader {
         this.mbars = new MultipleBar();
         this.proxy = proxy;
         this.bulk = bulk;
+        this.tt_webid_v2 = tt_webid_v2;
     }
 
     /**
@@ -187,9 +190,11 @@ export class Downloader {
         }
         const options = ({
             uri: url,
+            method: 'GET',
             headers: {
-                'user-agent': 'okhttp',
-                referer: 'https://www.tiktok.com/',
+                'user-agent': this.userAgent,
+                Referer: 'https://www.tiktok.com/',
+                Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
             },
             encoding: null,
             ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),

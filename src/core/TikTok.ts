@@ -12,7 +12,7 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 
 import CONST from '../constant';
-import { sign } from '../helpers';
+import { makeid, sign } from '../helpers';
 
 import {
     PostCollector,
@@ -103,6 +103,8 @@ export class TikTokScraper extends EventEmitter {
 
     private method: string;
 
+    private tt_webid_v2: string;
+
     private httpRequests: {
         good: number;
         bad: number;
@@ -174,6 +176,7 @@ export class TikTokScraper extends EventEmitter {
         this.noDuplicates = [];
         this.timeout = timeout;
         this.bulk = bulk;
+        this.tt_webid_v2 = `68${makeid(16)}`;
         this.Downloader = new Downloader({
             progress,
             proxy,
@@ -181,6 +184,7 @@ export class TikTokScraper extends EventEmitter {
             userAgent,
             filepath: process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '',
             bulk,
+            tt_webid_v2: this.tt_webid_v2,
         });
         this.webHookUrl = webHookUrl;
         this.method = method;
@@ -860,7 +864,6 @@ export class TikTokScraper extends EventEmitter {
         if (musicIdRegex) {
             this.input = musicIdRegex[1] as string;
         }
-        console.log(this.input);
         return {
             id: this.input,
             secUid: '',
@@ -1064,19 +1067,21 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        const query = {
+        const options = {
             uri: this.input,
             headers: {
                 'user-agent': this.userAgent,
-                referer: 'https://www.tiktok.com/',
+                Referer: 'https://www.tiktok.com/',
+                Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
             },
             method: 'GET',
             json: true,
         };
+
         try {
             let short = false;
             let regex: RegExpExecArray | null;
-            const response = await this.request<string>(query);
+            const response = await this.request<string>(options);
             if (!response) {
                 throw new Error(`Can't extract video meta data`);
             }
