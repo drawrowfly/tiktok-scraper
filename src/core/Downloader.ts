@@ -103,8 +103,9 @@ export class Downloader {
             r.get({
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
                 headers: {
-                    'user-agent': 'okhttp',
+                    'user-agent': this.userAgent,
                     referer: 'https://www.tiktok.com/',
+                    Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
                 },
             })
                 .on('response', response => {

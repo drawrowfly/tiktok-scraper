@@ -278,6 +278,7 @@ export class TikTokScraper extends EventEmitter {
                 ...(form ? { form } : {}),
                 headers: {
                     'User-Agent': this.userAgent,
+                    Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
                     ...headers,
                 },
                 ...(json ? { json: true } : {}),
