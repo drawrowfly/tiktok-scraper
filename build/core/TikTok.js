@@ -835,8 +835,8 @@ class TikTokScraper extends events_1.EventEmitter {
                     },
                     diggCount: videoData.stats.diggCount,
                     shareCount: videoData.stats.shareCount,
-                    playCount: videoData.stats.commentCount,
-                    commentCount: videoData.stats.playCount,
+                    playCount: videoData.stats.playCount,
+                    commentCount: videoData.stats.commentCount,
                     downloaded: false,
                     mentions: videoData.desc.match(/(@\w+)/g) || [],
                     hashtags: videoData.challenges
