@@ -926,7 +926,7 @@ export class TikTokScraper extends EventEmitter {
         }
 
         const query = {
-            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/user/@c?uniqueId=${encodeURIComponent(this.input)}`,
             method: 'GET',
             json: true,
         };
@@ -960,7 +960,7 @@ export class TikTokScraper extends EventEmitter {
             throw `Username is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/user/@c?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
