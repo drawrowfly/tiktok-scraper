@@ -11,7 +11,7 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 
 import { MultipleBar } from '../helpers';
-import { DownloaderConstructor, PostCollector, DownloadParams, Proxy } from '../types';
+import { DownloaderConstructor, PostCollector, DownloadParams, Proxy, Headers } from '../types';
 
 export class Downloader {
     public progress: boolean;
@@ -24,24 +24,21 @@ export class Downloader {
 
     public noWaterMark: boolean;
 
-    public userAgent: string;
-
     public filepath: string;
 
     public bulk: boolean;
 
-    public tt_webid_v2: string;
+    public headers: Headers;
 
-    constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk, tt_webid_v2 }: DownloaderConstructor) {
+    constructor({ progress, proxy, noWaterMark, headers, filepath, bulk }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
         this.noWaterMark = noWaterMark;
-        this.userAgent = userAgent;
+        this.headers = headers;
         this.filepath = filepath;
         this.mbars = new MultipleBar();
         this.proxy = proxy;
         this.bulk = bulk;
-        this.tt_webid_v2 = tt_webid_v2;
     }
 
     /**
@@ -102,11 +99,7 @@ export class Downloader {
             }
             r.get({
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
-                headers: {
-                    'user-agent': this.userAgent,
-                    referer: 'https://www.tiktok.com/',
-                    Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
-                },
+                headers: this.headers,
             })
                 .on('response', response => {
                     if (this.progress && !this.bulk) {
@@ -192,11 +185,7 @@ export class Downloader {
         const options = ({
             uri: url,
             method: 'GET',
-            headers: {
-                'user-agent': this.userAgent,
-                Referer: 'https://www.tiktok.com/',
-                Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
-            },
+            headers: this.headers,
             encoding: null,
             ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
             ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),

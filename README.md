@@ -35,12 +35,16 @@ This is not an official API support and etc. This is just a scraper that is usin
 	    - [Options](#options)
 	    - [Use with Promises](#promise)
 	    - [Use with Events](#event)
+	    - [How to access/download video](#download-video)
 	    - [Output Example](#json-output-example)
 	        - [Video Feed Methods](#video-feed)
 	        - [getUserProfileInfo](#getUserProfileInfo)
 	        - [getHashtagInfo](#getHashtagInfo)
 	        - [getVideoMeta](#getVideoMeta)
             - [getMusicInfo](#getMusicInfo)
+## Important notes
+- For now you won't be able to download video without the watermark
+
 ## Features
 
 -   Download **unlimited** post metadata from the User, Hashtag, Trends, or Music-Id pages
@@ -62,7 +66,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Download video without the watermark
 -   [x] Indicate in the output file(csv/json) if the video was downloaded or not
 -   [x] Build and run from Docker
--   [x] CLI: Scrape and download in batch
+-   [x] CLI: Scrape and download in batchu
 -   [x] CLi: Load proxies from a file
 -   [x] CLI: Optional ZIP
 -   [x] Renew API
@@ -269,9 +273,14 @@ const options = {
     // 'na' to skip this step
     filetype: `na`,
 
-    // Custom User-Agent
-    // {string default: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{RANDOM_VERSION}.0.3987.122 Safari/537.36' }
-    userAgent: '',
+    // Set custom headers: user-agent, cookie and etc
+    // NOTE: When you parse video feed or single video metadata then in return you will receive {headers} object
+    // that was used to extract the information and in order to access and download video through received {videoUrl} value you need to use same headers
+    headers: {
+        'User-Agent': "BLAH",
+        Referer: 'https://www.tiktok.com/',
+        Cookie: `tt_webid_v2=68dssds`,
+    },
     
     // Download video without the watermark: {boolean default: false}
     // Set to true to download without the watermark
@@ -366,7 +375,9 @@ const rp = require('request-promise');
         const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
         const url = 'https://m.tiktok.com/share/item/list?secUid=&id=355503&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&lang=';
 
-        const signature = await TikTokScraper.signUrl(url, { userAgent });
+        const signature = await TikTokScraper.signUrl(url, { headers:{
+            'User-Agent': userAgent,
+        } });
 
         const result = await rp({
             uri: `${url}&_signature=${signature}`,
@@ -423,6 +434,40 @@ hashtag.on('error', error => {
 });
 hashtag.scrape();
 ```
+### Download Video
+**This part is related to the MODULE usage (NOT THE CLI)**
+
+The **{videoUrl}** value is binded to the cookie value **{tt_webid_v2}** that can contain **any value**
+
+##### Method 1: default headers
+
+When you extract videos from the user, hashtag, music, trending feed or single video then in response besided the video metadata you will receive **headers** object that will contain params that were used to execute the requests. Here is the important part, **in order to access/download video through {videoUrl} value you need to use same {headers} values**.
+
+```json
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
+        Referer: 'https://www.tiktok.com/',
+        Cookie: 'tt_webid_v2=689854141086886123'
+    },
+```
+##### Method 2: custom headers
+
+You can pass your custom headers with the **{options}**.
+
+```javascript
+const headers = {
+        'User-Agent': 'BLAH',
+        Referer: 'https://www.tiktok.com/',
+        Cookie: 'tt_webid_v2=BLAH'
+}
+getVideoMeta('WEB_VIDEO_URL', {headers})
+user('WEB_VIDEO_URL', {headers})
+hashtag('WEB_VIDEO_URL', {headers})
+trend('WEB_VIDEO_URL', {headers})
+music('WEB_VIDEO_URL', {headers})
+// And after you can access video through {videoUrl} value by using same custom headers
+```
+
 
 ### Json Output Example
 
@@ -430,6 +475,11 @@ hashtag.scrape();
 Example output for the methods: **user, hashtag, trend, music, userEvent, hashtagEvent, musicEvent, trendEvent**
 ```javascript
 {
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
+        Referer: 'https://www.tiktok.com/',
+        Cookie: 'tt_webid_v2=689854141086886123'
+    },
     collector:[{
         id: 'VIDEO_ID',
         text: 'CAPTION',
@@ -525,29 +575,36 @@ Example output for the methods: **user, hashtag, trend, music, userEvent, hashta
 
 ```javascript
 {
-    id: '6807491984882765062',
-    text: 'We’re kicking off the #happyathome live stream series today at 5pm PT!',
-    createTime: '1584992742',
-    authorMeta: { id: '6812221792183403526', name: 'blah' },
-    musicMeta:{
-        musicId: '6822233276137213677',
-        musicName: 'blah',
-        musicAuthor: 'blah'
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
+        Referer: 'https://www.tiktok.com/',
+        Cookie: 'tt_webid_v2=689854141086886123'
     },
-    imageUrl: 'IMAGE_URL',
-    videoUrl: 'VIDEO_URL',
-    videoUrlNoWaterMark: 'VIDEO_URL_WITHOUT_THE_WATERMARK',
-    videoMeta: { width: 480, height: 864, ratio: 14, duration: 14 },
-    covers:{
-        default: 'COVER_URL',
-        origin: 'COVER_URL'
-    },
-    diggCount: 49292,
-    shareCount: 339,
-    playCount: 614678,
-    commentCount: 4023,
-    downloaded: false,
-    hashtags: [],
+    collector:[{
+        id: '6807491984882765062',
+        text: 'We’re kicking off the #happyathome live stream series today at 5pm PT!',
+        createTime: '1584992742',
+        authorMeta: { id: '6812221792183403526', name: 'blah' },
+        musicMeta:{
+            musicId: '6822233276137213677',
+            musicName: 'blah',
+            musicAuthor: 'blah'
+        },
+        imageUrl: 'IMAGE_URL',
+        videoUrl: 'VIDEO_URL',
+        videoUrlNoWaterMark: 'VIDEO_URL_WITHOUT_THE_WATERMARK',
+        videoMeta: { width: 480, height: 864, ratio: 14, duration: 14 },
+        covers:{
+            default: 'COVER_URL',
+            origin: 'COVER_URL'
+        },
+        diggCount: 49292,
+        shareCount: 339,
+        playCount: 614678,
+        commentCount: 4023,
+        downloaded: false,
+        hashtags: [],
+    }]
 }
 ```
 

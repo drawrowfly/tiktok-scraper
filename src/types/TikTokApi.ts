@@ -80,26 +80,20 @@ export interface Item {
     authorStats: AuthorStats;
 }
 
-export interface ItemListData {
-    statusCode: number;
-    body: {
-        itemListData: Item[];
-        hasMore: boolean;
-        maxCursor: string;
-        minCursor: string;
-    };
-}
-
 export interface RequestQuery {
-    id: string;
-    secUid: string;
+    id?: string;
+    secUid?: string;
     shareUid?: string;
     type?: number;
     sourceType?: number;
-    count: number;
-    minCursor: number;
-    lang: string;
-    verifyFp: string;
+    count?: number;
+    minCursor?: number;
+    maxCursor?: number;
+    lang?: string;
+    verifyFp?: string;
+    challengeID?: string;
+    cursor?: number;
+    aid?: number;
 }
 
 export interface VideoProps {
@@ -113,15 +107,16 @@ export interface VideoProps {
 /**
  * New API
  */
-export interface ItemListDataAPIV2 {
+export interface ItemListData {
     statusCode: number;
-    items: ItemAPIV2[];
+    items: FeedItems[];
+    itemList: FeedItems[];
     hasMore: boolean;
     maxCursor: string;
     minCursor: string;
 }
 
-export interface ItemAPIV2 {
+export interface FeedItems {
     id: string;
     desc: string;
     createTime: number;
