@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromfile = exports.history = exports.video = exports.getVideoMeta = exports.signUrl = exports.getUserProfileInfo = exports.getMusicInfo = exports.getHashtagInfo = exports.trendEvent = exports.musicEvent = exports.userEvent = exports.hashtagEvent = exports.music = exports.trend = exports.user = exports.hashtag = void 0;
 const os_1 = require("os");
 const fs_1 = require("fs");
 const bluebird_1 = require("bluebird");
@@ -163,12 +162,17 @@ exports.video = async (input, options = {}) => {
     const result = await scraper.getVideoMeta();
     const path = (options === null || options === void 0 ? void 0 : options.filepath) ? `${options === null || options === void 0 ? void 0 : options.filepath}/${result.id}` : result.id;
     let outputMessage = {};
+    if (options === null || options === void 0 ? void 0 : options.download) {
+        try {
+            await scraper.Downloader.downloadSingleVideo(result);
+        }
+        catch (_a) {
+            throw new Error('Unable to download the video');
+        }
+    }
     if (options === null || options === void 0 ? void 0 : options.filetype) {
         await scraper.saveMetadata({ json: `${path}.json`, csv: `${path}.csv` });
         outputMessage = Object.assign(Object.assign(Object.assign({}, ((options === null || options === void 0 ? void 0 : options.filetype) === 'all' ? { json: `${path}.json`, csv: `${path}.csv` } : {})), ((options === null || options === void 0 ? void 0 : options.filetype) === 'json' ? { json: `${path}.json` } : {})), ((options === null || options === void 0 ? void 0 : options.filetype) === 'csv' ? { csv: `${path}.csv` } : {}));
-    }
-    if (options === null || options === void 0 ? void 0 : options.download) {
-        await scraper.Downloader.downloadSingleVideo(result);
     }
     return Object.assign(Object.assign({}, ((options === null || options === void 0 ? void 0 : options.download) ? { message: `Video location: ${contructor.filepath}/${result.id}.mp4` } : {})), outputMessage);
 };

@@ -5,15 +5,15 @@ const request = options => {
     switch (true) {
         case /^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))$/.test(uri):
             return { body: response.videoMeta };
-        case /^https:\/\/m.tiktok.com\/node\/share\/user\/@(\w+)$/.test(uri): {
-            const user = /^https:\/\/m.tiktok.com\/node\/share\/user\/@(\w+)$/.exec(uri);
+        case /^https:\/\/m.tiktok.com\/node\/share\/user\/@\w+\?uniqueId=(\w+)$/.test(uri): {
+            const user = /^https:\/\/m.tiktok.com\/node\/share\/user\/@\w+\?uniqueId=(\w+)$/.exec(uri);
             if (user) {
                 return { body: response.user(user[1]) };
             }
             return { body: null };
         }
-        case /^https:\/\/m.tiktok.com\/node\/share\/tag\/(\w+)$/.test(uri): {
-            const hastag = /^https:\/\/m.tiktok.com\/node\/share\/tag\/(\w+)$/.exec(uri);
+        case /^https:\/\/m.tiktok.com\/node\/share\/tag\/\w+\?uniqueId=(\w+)$/.test(uri): {
+            const hastag = /^https:\/\/m.tiktok.com\/node\/share\/tag\/\w+\?uniqueId=(\w+)$/.exec(uri);
             if (hastag) {
                 return { body: response.hashtag(hastag[1]) };
             }

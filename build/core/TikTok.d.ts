@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
-import { PostCollector, TikTokConstructor, Result, MusicInfos, UserMetadata, HashtagMetadata } from '../types';
+import { PostCollector, TikTokConstructor, Result, MusicMetadata, UserMetadata, HashtagMetadata } from '../types';
 import { Downloader } from '../core';
 export declare class TikTokScraper extends EventEmitter {
     private mainHost;
@@ -37,6 +37,7 @@ export declare class TikTokScraper extends EventEmitter {
     private signature;
     private webHookUrl;
     private method;
+    private tt_webid_v2;
     private httpRequests;
     constructor({ download, filepath, filetype, proxy, asyncDownload, cli, event, progress, input, number, type, by_user_id, store_history, historyPath, userAgent, noWaterMark, fileName, timeout, bulk, zip, test, hdVideo, signature, webHookUrl, method, }: TikTokConstructor);
     private get fileDestination();
@@ -64,7 +65,7 @@ export declare class TikTokScraper extends EventEmitter {
     private getUserId;
     getUserProfileInfo(): Promise<UserMetadata>;
     getHashtagInfo(): Promise<HashtagMetadata>;
-    getMusicInfo(): Promise<MusicInfos>;
+    getMusicInfo(): Promise<MusicMetadata>;
     signUrl(): Promise<any>;
     getVideoMeta(): Promise<PostCollector>;
     private sendDataToWebHookUrl;

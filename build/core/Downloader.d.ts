@@ -10,7 +10,8 @@ export declare class Downloader {
     userAgent: string;
     filepath: string;
     bulk: boolean;
-    constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk }: DownloaderConstructor);
+    tt_webid_v2: string;
+    constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk, tt_webid_v2 }: DownloaderConstructor);
     private get getProxy();
     addBar(type: boolean, len: number): any[];
     toBuffer(item: PostCollector): Promise<Buffer>;
