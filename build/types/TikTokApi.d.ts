@@ -1,19 +1,3 @@
-export interface UserData {
-    secUid: string;
-    userId: string;
-    isSecret: boolean;
-    uniqueId: string;
-    nickName: string;
-    signature: string;
-    covers: string[];
-    coversMedium: string[];
-    following: number;
-    fans: number;
-    heart: number;
-    video: number;
-    verified: boolean;
-    digg: number;
-}
 export interface ItemInfos {
     id: string;
     text: string;
@@ -97,12 +81,6 @@ export interface ItemListData {
         hasMore: boolean;
         maxCursor: string;
         minCursor: string;
-    };
-}
-export interface ApiResponse<Key extends string, I> {
-    statusCode: number;
-    body: {
-        [key in Key]: I;
     };
 }
 export interface RequestQuery {
@@ -206,12 +184,55 @@ export interface ItemAPIV2 {
     showNotPass: boolean;
     vl1: boolean;
 }
-declare type MetaTypes = 'userInfo' | 'challengeInfo';
-declare type MetaTypeBuilder<I> = {
-    [K in MetaTypes]: I;
-};
-export interface TikTokMetadata<I> extends MetaTypeBuilder<I> {
+export interface TikTokMetadata {
     statusCode: number;
+    userInfo: UserMetadata;
+    challengeInfo: HashtagMetadata;
+    musicInfo: MusicMetadata;
+}
+export interface MusicMetadata {
+    music: {
+        id: string;
+        title: string;
+        playUrl: string;
+        coverThumb: string;
+        coverMedium: string;
+        coverLarge: string;
+        authorName: string;
+        original: boolean;
+        playToken: string;
+        keyToken: string;
+        audioURLWithCookie: boolean;
+        private: boolean;
+        duration: number;
+        album: string;
+    };
+    author: {
+        id: string;
+        uniqueId: string;
+        nickname: string;
+        avatarThumb: string;
+        avatarMedium: string;
+        avatarLarger: string;
+        signature: string;
+        verified: boolean;
+        secUid: string;
+        secret: boolean;
+        ftc: boolean;
+        relation: number;
+        openFavorite: boolean;
+        commentSetting: number;
+        duetSetting: number;
+        stitchSetting: number;
+        privateAccount: boolean;
+    };
+    stats: {
+        videoCount: number;
+    };
+    shareMeta: {
+        title: string;
+        desc: string;
+    };
 }
 export interface UserMetadata {
     user: {
@@ -264,4 +285,3 @@ export interface HashtagMetadata {
         viewCount: number;
     };
 }
-export {};

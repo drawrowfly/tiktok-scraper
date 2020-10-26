@@ -6,6 +6,7 @@ export interface DownloaderConstructor {
     userAgent: string;
     filepath: string;
     bulk: boolean;
+    tt_webid_v2: string;
 }
 export interface DownloadParams {
     zip: boolean;

@@ -57,6 +57,7 @@ class TikTokScraper extends events_1.EventEmitter {
         this.noDuplicates = [];
         this.timeout = timeout;
         this.bulk = bulk;
+        this.tt_webid_v2 = `68${helpers_1.makeid(16)}`;
         this.Downloader = new core_1.Downloader({
             progress,
             proxy,
@@ -64,6 +65,7 @@ class TikTokScraper extends events_1.EventEmitter {
             userAgent,
             filepath: process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '',
             bulk,
+            tt_webid_v2: this.tt_webid_v2,
         });
         this.webHookUrl = webHookUrl;
         this.method = method;
@@ -132,7 +134,7 @@ class TikTokScraper extends events_1.EventEmitter {
         return new Promise(async (resolve, reject) => {
             const proxy = this.getProxy;
             const query = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ uri,
-                method }, (qs ? { qs } : {})), (body ? { body } : {})), (form ? { form } : {})), { headers: Object.assign({ 'User-Agent': this.userAgent }, headers) }), (json ? { json: true } : {})), (gzip ? { gzip: true } : {})), { resolveWithFullResponse: true }), (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {})), { timeout: 10000, rejectUnauthorized: false });
+                method }, (qs ? { qs } : {})), (body ? { body } : {})), (form ? { form } : {})), { headers: Object.assign({ 'User-Agent': this.userAgent, Cookie: `tt_webid_v2=${this.tt_webid_v2}` }, headers) }), (json ? { json: true } : {})), (gzip ? { gzip: true } : {})), { resolveWithFullResponse: true }), (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {})), { timeout: 10000, rejectUnauthorized: false });
             try {
                 const response = await request_promise_1.default(query);
                 setTimeout(() => {
@@ -575,6 +577,10 @@ class TikTokScraper extends events_1.EventEmitter {
         };
     }
     async getMusicFeedQuery() {
+        const musicIdRegex = /.com\/music\/[\w+-]+-(\d{15,22})/.exec(this.input);
+        if (musicIdRegex) {
+            this.input = musicIdRegex[1];
+        }
         return {
             id: this.input,
             secUid: '',
@@ -597,8 +603,9 @@ class TikTokScraper extends events_1.EventEmitter {
                 verifyFp: '',
             };
         }
+        const id = encodeURIComponent(this.input);
         const query = {
-            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/tag/${id}?uniqueId=${id}`,
             method: 'GET',
             json: true,
         };
@@ -634,8 +641,9 @@ class TikTokScraper extends events_1.EventEmitter {
                 verifyFp: '',
             };
         }
+        const id = encodeURIComponent(this.input);
         const query = {
-            uri: `${this.mainHost}node/share/user/@c?uniqueId=${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/user/@${id}?uniqueId=${id}`,
             method: 'GET',
             json: true,
         };
@@ -664,7 +672,7 @@ class TikTokScraper extends events_1.EventEmitter {
             throw `Username is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@c?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
@@ -687,7 +695,7 @@ class TikTokScraper extends events_1.EventEmitter {
             throw `Hashtag is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/tag/${this.input}?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
@@ -709,21 +717,17 @@ class TikTokScraper extends events_1.EventEmitter {
         if (!this.input) {
             throw `Music is missing`;
         }
-        const regex = /music\/([^?]+)/.exec(this.input);
-        if (!regex) {
-            throw `Music is missing`;
-        }
         const query = {
-            uri: `${this.mainHost}node/share/music/${regex[0]}`,
+            uri: `${this.mainHost}node/share/music/-${this.input}`,
             method: 'GET',
             json: true,
         };
         try {
             const response = await this.request(query);
-            if (response.statusCode !== 0 || !response.body.musicData) {
-                throw new Error(`Can't find music: ${this.input}`);
+            if (response.statusCode !== 0) {
+                throw new Error(`Can't find music data: ${this.input}`);
             }
-            return response.body.musicData;
+            return response.musicInfo;
         }
         catch (error) {
             throw error.message;
@@ -739,11 +743,12 @@ class TikTokScraper extends events_1.EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        const query = {
+        const options = {
             uri: this.input,
             headers: {
                 'user-agent': this.userAgent,
-                referer: 'https://www.tiktok.com/',
+                Referer: 'https://www.tiktok.com/',
+                Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
             },
             method: 'GET',
             json: true,
@@ -751,7 +756,7 @@ class TikTokScraper extends events_1.EventEmitter {
         try {
             let short = false;
             let regex;
-            const response = await this.request(query);
+            const response = await this.request(options);
             if (!response) {
                 throw new Error(`Can't extract video meta data`);
             }
