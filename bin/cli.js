@@ -36,29 +36,33 @@ const startScraper = async argv => {
             argv.asyncBulk = argv.async;
         }
 
-        const scraper = await TikTokScraper[argv.type](argv.input, argv);
+        try {
+            const scraper = await TikTokScraper[argv.type](argv.input, argv);
 
-        if (scraper.zip) {
-            console.log(argv.zip ? `ZIP path: ${scraper.zip}` : `Folder Path: ${scraper.zip}`);
-        }
-        if (scraper.json) {
-            console.log(`JSON path: ${scraper.json}`);
-        }
-        if (scraper.csv) {
-            console.log(`CSV path: ${scraper.csv}`);
-        }
-        if (scraper.message) {
-            console.log(scraper.message);
-        }
-        if (scraper.webhook) {
-            console.log('HTTP REQUEST: ');
-            console.table(scraper.webhook);
-        }
-        if (scraper.table) {
-            console.table(scraper.table);
-        }
-        if (argv.cli && argv.type === 'getUserProfileInfo') {
-            console.log(scraper);
+            if (scraper.zip) {
+                console.log(argv.zip ? `ZIP path: ${scraper.zip}` : `Folder Path: ${scraper.zip}`);
+            }
+            if (scraper.json) {
+                console.log(`JSON path: ${scraper.json}`);
+            }
+            if (scraper.csv) {
+                console.log(`CSV path: ${scraper.csv}`);
+            }
+            if (scraper.message) {
+                console.log(scraper.message);
+            }
+            if (scraper.webhook) {
+                console.log('HTTP REQUEST: ');
+                console.table(scraper.webhook);
+            }
+            if (scraper.table) {
+                console.table(scraper.table);
+            }
+            if (argv.cli && argv.type === 'getUserProfileInfo') {
+                console.log(scraper);
+            }
+        } catch (error) {
+            console.error(error.message);
         }
     } catch (error) {
         console.log(error);

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { ScrapeType, Result, RequestQuery, Challenge, UserData, PostCollector } from '../types';
+import { ScrapeType, Result, RequestQuery, UserMetadata, PostCollector, HashtagMetadata } from '../types';
 import { TikTokScraper } from './TikTok';
 import CONST from '../constant';
 
@@ -36,7 +36,7 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
 
     it('getUserId should return a valid Object', async () => {
         const userId: RequestQuery = await instance.getUserId();
-        expect(userId).toEqual({ id: '5831967', secUid: '', sourceType: 8, verifyFp: '', count: 30, minCursor: 0, lang: '' });
+        expect(userId).toEqual({ id: '107955', secUid: '', sourceType: 8, verifyFp: '', count: 30, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {
@@ -261,7 +261,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
 
     it('getHashTagId should return a valid Object', async () => {
         const hashtag: RequestQuery = await instance.getHashTagId();
-        expect(hashtag).toEqual({ id: '4100', secUid: '', type: 3, verifyFp: '', count: 100, minCursor: 0, lang: '' });
+        expect(hashtag).toEqual({ id: '99770', secUid: '', type: 3, verifyFp: '', count: 100, minCursor: 0, lang: '' });
     });
 
     it('result should contain array value with the length 5', async () => {
@@ -315,17 +315,23 @@ describe('TikTok Scraper MODULE(promise): getHashtagInfo', () => {
         });
     });
     it('getHashtagInfo should return a valid Object', async () => {
-        const hashtag: Challenge = await instance.getHashtagInfo();
+        const hashtag: HashtagMetadata = await instance.getHashtagInfo();
         expect(hashtag).toEqual({
-            challengeId: '4100',
-            challengeName: hasthagName,
-            text: `Beach, sun, fun!\nDo you have some cool ${hasthagName} videos? Upload them with the hashtag #${hasthagName}.`,
-            covers: [],
-            coversMedium: [],
-            posts: 3088974,
-            views: '6226592362',
-            isCommerce: false,
-            splitTitle: '',
+            challenge: {
+                id: '99770',
+                title: 'duett',
+                desc: 'Habt ihr schon unsere neue Duett-Funktion gecheckt? Oben, unten, links, rechts alles möglich jetzt.',
+                profileThumb: 'https://p16-va-default.akamaized.net/obj/musically-maliva-obj/92760d2f9cce09720b20ae060081efc8',
+                profileMedium: 'https://p16-va-default.akamaized.net/obj/musically-maliva-obj/92760d2f9cce09720b20ae060081efc8',
+                profileLarger: 'https://p16-va-default.akamaized.net/obj/musically-maliva-obj/92760d2f9cce09720b20ae060081efc8',
+                coverThumb: 'https://p16-va-default.akamaized.net/obj/musically-maliva-obj/fa5fcd3ee0a9581fc26d9e3b811e428e',
+                coverMedium: 'https://p16-va-default.akamaized.net/obj/musically-maliva-obj/fa5fcd3ee0a9581fc26d9e3b811e428e',
+                coverLarger: 'https://p16-va-default.akamaized.net/obj/musically-maliva-obj/fa5fcd3ee0a9581fc26d9e3b811e428e',
+                isCommerce: false,
+            },
+            stats: { videoCount: 0, viewCount: 37100000000 },
+            shareMeta: { title: '#duett on TikTok', desc: '37099.0m views - Watch awesome short videos created with trending hashtag #duett' },
+            challengeAnnouncement: {},
         });
     });
 
@@ -358,22 +364,35 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
         });
     });
     it('getUserProfileInfo should return a valid Object', async () => {
-        const user: UserData = await instance.getUserProfileInfo();
+        const user: UserMetadata = await instance.getUserProfileInfo();
         expect(user).toEqual({
-            secUid: 'MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s',
-            userId: '5831967',
-            isSecret: false,
-            uniqueId: userName,
-            nickName: 'Test User',
-            signature: 'don’t worry i don’t get the hype either',
-            covers: ['https://p16.muscdn.com/img/musically-maliva-obj/1655662764778502~c5_100x100.jpeg'],
-            coversMedium: ['https://p16.muscdn.com/img/musically-maliva-obj/1655662764778502~c5_720x720.jpeg'],
-            following: 932,
-            fans: 40421477,
-            heart: '2425050211',
-            video: 1071,
-            verified: true,
-            digg: 3553,
+            user: {
+                id: '107955',
+                uniqueId: 'tiktok',
+                nickname: 'TikTok',
+                avatarThumb:
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_100x100.jpeg?x-expires=1603573200&x-signature=XGaOhkftgl2fNr%2BT1OpxPVWUWY4%3D',
+                avatarMedium:
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_720x720.jpeg?x-expires=1603573200&x-signature=bl%2BxXbD9ME6Tt4VNcWtPDAX4PZI%3D',
+                avatarLarger:
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg?x-expires=1603573200&x-signature=4%2FrCxmt8FiH7M9RY%2Bx%2F7WVzd0Og%3D',
+                signature: 'Make Your Day',
+                verified: true,
+                secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
+                secret: false,
+                ftc: false,
+                relation: 1,
+                openFavorite: true,
+                commentSetting: 0,
+                duetSetting: 0,
+                stitchSetting: 0,
+                privateAccount: false,
+            },
+            stats: { followingCount: 491, followerCount: 48300000, heartCount: 241100000, videoCount: 112, diggCount: 35, heart: 241100000 },
+            shareMeta: {
+                title: 'TikTok on TikTok',
+                desc: '@tiktok 48.0m Followers, 491 Following, 241.0m Likes - Watch awesome short videos created by TikTok',
+            },
         });
     });
 
@@ -452,28 +471,56 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
     it('getVideoMeta should return a valid Object', async () => {
         const post: PostCollector = await instance.getVideoMeta();
         expect(post).toEqual({
-            id: '6807491984882765062',
-            text: 'We’re kicking off the #happyathome live stream series today at 5pm PT!',
-            createTime: '1584992742',
-            authorMeta: { id: '107955', secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM', name: 'tiktok' },
-            musicMeta: { musicId: '6807487887634909957', musicName: 'original sound', musicAuthor: 'tiktok' },
-            imageUrl: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/d1b00294a06e488b851ad6553cad41a0_1584992746',
-            videoUrl:
-                'https://v16.muscdn.com/f950058182bcefa15345108bd9ab241f/5e7e615a/video/tos/useast2a/tos-useast2a-ve-0068c003/0dc9964505df43288febb6aac33ac6a0/?a=1233&br=472&bt=236&cr=0&cs=0&dr=0&ds=3&er=&l=20200327142546010115115156167B9215&lr=tiktok_m&qs=0&rc=M3Vna3N1d3FrczMzOzczM0ApO2Q6NjZnOzs0N2k7aGhpaGcxaDM0ay1gMHBfLS0wMTZzc182MWI1YzEtYTY2LWNjXzU6Yw%3D%3D&vl=&vr=',
-            videoUrlNoWaterMark:
-                'https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=v09044ae0000bk2qm0ivfsko76kvric0&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4',
-            videoMeta: { width: 576, height: 1024, ratio: 16, duration: 16 },
-            diggCount: 35650,
-            shareCount: 256,
-            playCount: 445444,
-            commentCount: 2543,
-            covers: {
-                default: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/2bc9c980bea7409698bd0acf0206bb8f_1584992746',
-                origin: 'https://p16-va-default.akamaized.net/obj/tos-maliva-p-0068/d1b00294a06e488b851ad6553cad41a0_1584992746',
+            id: '6881450806688664838',
+            text: 'Good vibes only 🤙 @420doggface208 @mickfleetwood @tomhayes603',
+            createTime: 1602212662,
+            authorMeta: {
+                id: '107955',
+                secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
+                name: 'tiktok',
+                nickName: 'TikTok',
+                following: 491,
+                fans: 48300000,
+                heart: 241100000,
+                video: 112,
+                digg: 35,
+                verified: true,
+                private: false,
+                signature: 'Make Your Day',
+                avatar:
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg?x-expires=1603573200&x-signature=4%2FrCxmt8FiH7M9RY%2Bx%2F7WVzd0Og%3D',
             },
+            musicMeta: {
+                musicId: '6881450829518293766',
+                musicName: 'original sound',
+                musicAuthor: 'TikTok',
+                musicOriginal: true,
+                coverThumb:
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_100x100.jpeg?x-expires=1603573200&x-signature=XGaOhkftgl2fNr%2BT1OpxPVWUWY4%3D',
+                coverMedium:
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_720x720.jpeg?x-expires=1603573200&x-signature=bl%2BxXbD9ME6Tt4VNcWtPDAX4PZI%3D',
+                coverLarge:
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg?x-expires=1603573200&x-signature=4%2FrCxmt8FiH7M9RY%2Bx%2F7WVzd0Og%3D',
+            },
+            imageUrl:
+                'https://p16-sign-sg.tiktokcdn.com/obj/tos-maliva-p-0068/5f1e128e900c4008bd6d612964ef7d1b?x-expires=1603508400&x-signature=lXSV%2BKG4%2B8G%2BGJREfeNEys6m3eg%3D',
+            videoUrl:
+                'https://v16-web-newkey.tiktokcdn.com/2ea83f8b07e61eb2844a644d0b1ff238/5f939968/video/tos/useast2a/tos-useast2a-pve-0068/2141262fa24c4f7687f2d6b0df121616/?a=1988&br=3316&bt=1658&cr=0&cs=0&cv=1&dr=0&ds=3&er=&l=202010232102490101902192101109C365&lr=tiktok_m&mime_type=video_mp4&qs=0&rc=anFwZTh4N2R3dzMzZzczM0ApNWY0O2QzaDszNzxlOTRlN2dkbzVlbGRkM3NfLS0xMTZzc2EwNC4vLWEuYS5hMmFiMy06Yw%3D%3D&vl=&vr=',
+            videoUrlNoWaterMark: null,
+            videoMeta: { width: 576, height: 1024, ratio: '720p', duration: 15 },
+            covers: {
+                default:
+                    'https://p16-sign-sg.tiktokcdn.com/obj/tos-maliva-p-0068/5f1e128e900c4008bd6d612964ef7d1b?x-expires=1603508400&x-signature=lXSV%2BKG4%2B8G%2BGJREfeNEys6m3eg%3D',
+                origin:
+                    'https://p16-sign-sg.tiktokcdn.com/obj/tos-maliva-p-0068/fe538f49b1334b75890ea3d741d3e357_1602212663?x-expires=1603508400&x-signature=JlLy1gxqASLp0msjeJSxMEFco7I%3D',
+            },
+            diggCount: 1300000,
+            shareCount: 13100,
+            playCount: 25700,
+            commentCount: 45100000,
             downloaded: false,
-            hashtags: [{ id: '609365', name: 'happyathome', title: undefined, cover: undefined }],
-            mentions: [],
+            mentions: ['@420doggface208', '@mickfleetwood', '@tomhayes603'],
+            hashtags: [],
         });
     });
 

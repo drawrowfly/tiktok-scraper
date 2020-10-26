@@ -12,7 +12,7 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 
 import CONST from '../constant';
-import { sign } from '../helpers';
+import { makeid, sign } from '../helpers';
 
 import {
     PostCollector,
@@ -20,14 +20,13 @@ import {
     TikTokConstructor,
     Result,
     ItemListData,
-    ApiResponse,
+    MusicMetadata,
     RequestQuery,
     Item,
     History,
     Proxy,
     ItemAPIV2,
     ItemListDataAPIV2,
-    MusicInfos,
     TikTokMetadata,
     UserMetadata,
     HashtagMetadata,
@@ -104,6 +103,8 @@ export class TikTokScraper extends EventEmitter {
 
     private method: string;
 
+    private tt_webid_v2: string;
+
     private httpRequests: {
         good: number;
         bad: number;
@@ -175,6 +176,7 @@ export class TikTokScraper extends EventEmitter {
         this.noDuplicates = [];
         this.timeout = timeout;
         this.bulk = bulk;
+        this.tt_webid_v2 = `68${makeid(16)}`;
         this.Downloader = new Downloader({
             progress,
             proxy,
@@ -182,6 +184,7 @@ export class TikTokScraper extends EventEmitter {
             userAgent,
             filepath: process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '',
             bulk,
+            tt_webid_v2: this.tt_webid_v2,
         });
         this.webHookUrl = webHookUrl;
         this.method = method;
@@ -275,6 +278,7 @@ export class TikTokScraper extends EventEmitter {
                 ...(form ? { form } : {}),
                 headers: {
                     'User-Agent': this.userAgent,
+                    Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
                     ...headers,
                 },
                 ...(json ? { json: true } : {}),
@@ -858,6 +862,10 @@ export class TikTokScraper extends EventEmitter {
      * Get music feed query
      */
     private async getMusicFeedQuery(): Promise<RequestQuery> {
+        const musicIdRegex = /.com\/music\/[\w+-]+-(\d{15,22})/.exec(this.input);
+        if (musicIdRegex) {
+            this.input = musicIdRegex[1] as string;
+        }
         return {
             id: this.input,
             secUid: '',
@@ -884,13 +892,14 @@ export class TikTokScraper extends EventEmitter {
                 verifyFp: '',
             };
         }
+        const id = encodeURIComponent(this.input);
         const query = {
-            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/tag/${id}?uniqueId=${id}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<TikTokMetadata<HashtagMetadata>>(query);
+            const response = await this.request<TikTokMetadata>(query);
             if (response.statusCode !== 0) {
                 throw new Error(`Can not find the hashtag: ${this.input}`);
             }
@@ -925,18 +934,18 @@ export class TikTokScraper extends EventEmitter {
             };
         }
 
+        const id = encodeURIComponent(this.input);
         const query = {
-            uri: `${this.mainHost}node/share/user/@c?uniqueId=${encodeURIComponent(this.input)}`,
+            uri: `${this.mainHost}node/share/user/@${id}?uniqueId=${id}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<TikTokMetadata<UserMetadata>>(query);
+            const response = await this.request<TikTokMetadata>(query);
             if (response.statusCode !== 0) {
                 throw new Error(`Can't find the user: ${this.input}`);
             }
             this.idStore = response.userInfo.user.id;
-
             return {
                 id: this.idStore,
                 secUid: '',
@@ -960,12 +969,12 @@ export class TikTokScraper extends EventEmitter {
             throw `Username is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@c?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
         try {
-            const response = await this.request<TikTokMetadata<UserMetadata>>(query);
+            const response = await this.request<TikTokMetadata>(query);
 
             if (!response) {
                 throw new Error(`Can't find user: ${this.input}`);
@@ -988,13 +997,13 @@ export class TikTokScraper extends EventEmitter {
             throw `Hashtag is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/tag/@c?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/tag/${this.input}?uniqueId=${this.input}`,
             method: 'GET',
             json: true,
         };
 
         try {
-            const response = await this.request<TikTokMetadata<HashtagMetadata>>(query);
+            const response = await this.request<TikTokMetadata>(query);
             if (!response) {
                 throw new Error(`Can't find hashtag: ${this.input}`);
             }
@@ -1011,29 +1020,29 @@ export class TikTokScraper extends EventEmitter {
      * Get music information
      * @param {} music link
      */
-    public async getMusicInfo(): Promise<MusicInfos> {
+    public async getMusicInfo(): Promise<MusicMetadata> {
         if (!this.input) {
             throw `Music is missing`;
         }
 
-        const regex = /music\/([^?]+)/.exec(this.input);
+        // const regex = /music\/([^?]+)/.exec(this.input);
 
-        if (!regex) {
-            throw `Music is missing`;
-        }
+        // if (!regex) {
+        //     throw `Music is missing`;
+        // }
 
         const query = {
-            uri: `${this.mainHost}node/share/music/${regex[0]}`,
+            uri: `${this.mainHost}node/share/music/-${this.input}`,
             method: 'GET',
             json: true,
         };
 
         try {
-            const response = await this.request<ApiResponse<'musicData', MusicInfos>>(query);
-            if (response.statusCode !== 0 || !response.body.musicData) {
-                throw new Error(`Can't find music: ${this.input}`);
+            const response = await this.request<TikTokMetadata>(query);
+            if (response.statusCode !== 0) {
+                throw new Error(`Can't find music data: ${this.input}`);
             }
-            return response.body.musicData;
+            return response.musicInfo;
         } catch (error) {
             throw error.message;
         }
@@ -1060,19 +1069,21 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        const query = {
+        const options = {
             uri: this.input,
             headers: {
                 'user-agent': this.userAgent,
-                referer: 'https://www.tiktok.com/',
+                Referer: 'https://www.tiktok.com/',
+                Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
             },
             method: 'GET',
             json: true,
         };
+
         try {
             let short = false;
             let regex: RegExpExecArray | null;
-            const response = await this.request<string>(query);
+            const response = await this.request<string>(options);
             if (!response) {
                 throw new Error(`Can't extract video meta data`);
             }
