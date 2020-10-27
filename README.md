@@ -439,26 +439,26 @@ hashtag.scrape();
 
 The **{videoUrl}** value is binded to the cookie value **{tt_webid_v2}** that can contain **any value**
 
-##### Method 1: default headers
+#### Method 1: default headers
 
-When you extract videos from the user, hashtag, music, trending feed or single video then in response besided the video metadata you will receive **headers** object that will contain params that were used to execute the requests. Here is the important part, **in order to access/download video through {videoUrl} value you need to use same {headers} values**.
+When you extract videos from the user, hashtag, music, trending feed or single video then in response besides the video metadata you will receive **headers** object that will contain params that were used to extract the data. Here is the important part, **in order to access/download video through {videoUrl} value you need to use same {headers} values**.
 
 ```json
     headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
-        Referer: 'https://www.tiktok.com/',
-        Cookie: 'tt_webid_v2=689854141086886123'
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36",
+        "Referer": "https://www.tiktok.com/",
+        "Cookie": "tt_webid_v2=689854141086886123"
     },
 ```
-##### Method 2: custom headers
+#### Method 2: custom headers
 
-You can pass your custom headers with the **{options}**.
+You can pass your own headers with the **{options}**.
 
 ```javascript
 const headers = {
-        'User-Agent': 'BLAH',
-        Referer: 'https://www.tiktok.com/',
-        Cookie: 'tt_webid_v2=BLAH'
+    "User-Agent": "BOB",
+    "Referer": "https://www.tiktok.com/",
+    "Cookie": "tt_webid_v2=BOB"
 }
 getVideoMeta('WEB_VIDEO_URL', {headers})
 user('WEB_VIDEO_URL', {headers})
