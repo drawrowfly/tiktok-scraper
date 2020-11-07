@@ -1,17 +1,16 @@
 /// <reference types="node" />
 import { MultipleBar } from '../helpers';
-import { DownloaderConstructor, PostCollector, DownloadParams } from '../types';
+import { DownloaderConstructor, PostCollector, DownloadParams, Headers } from '../types';
 export declare class Downloader {
     progress: boolean;
     mbars: MultipleBar;
     progressBar: any[];
     private proxy;
     noWaterMark: boolean;
-    userAgent: string;
     filepath: string;
     bulk: boolean;
-    tt_webid_v2: string;
-    constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk, tt_webid_v2 }: DownloaderConstructor);
+    headers: Headers;
+    constructor({ progress, proxy, noWaterMark, headers, filepath, bulk }: DownloaderConstructor);
     private get getProxy();
     addBar(type: boolean, len: number): any[];
     toBuffer(item: PostCollector): Promise<Buffer>;

@@ -4,7 +4,6 @@ import { PostCollector, TikTokConstructor, Result, MusicMetadata, UserMetadata, 
 import { Downloader } from '../core';
 export declare class TikTokScraper extends EventEmitter {
     private mainHost;
-    private userAgent;
     private download;
     private filepath;
     private json2csvParser;
@@ -37,9 +36,9 @@ export declare class TikTokScraper extends EventEmitter {
     private signature;
     private webHookUrl;
     private method;
-    private tt_webid_v2;
     private httpRequests;
-    constructor({ download, filepath, filetype, proxy, asyncDownload, cli, event, progress, input, number, type, by_user_id, store_history, historyPath, userAgent, noWaterMark, fileName, timeout, bulk, zip, test, hdVideo, signature, webHookUrl, method, }: TikTokConstructor);
+    private headers;
+    constructor({ download, filepath, filetype, proxy, asyncDownload, cli, event, progress, input, number, type, by_user_id, store_history, historyPath, noWaterMark, fileName, timeout, bulk, zip, test, hdVideo, signature, webHookUrl, method, headers, }: TikTokConstructor);
     private get fileDestination();
     private get folderDestination();
     private get getProxy();
@@ -56,7 +55,6 @@ export declare class TikTokScraper extends EventEmitter {
         csv: any;
     }): Promise<void>;
     private storeDownlodProgress;
-    private collectPostsV2;
     private collectPosts;
     private scrapeData;
     private getTrendingFeedQuery;

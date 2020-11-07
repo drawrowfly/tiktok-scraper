@@ -12,16 +12,15 @@ const socks_proxy_agent_1 = require("socks-proxy-agent");
 const async_1 = require("async");
 const helpers_1 = require("../helpers");
 class Downloader {
-    constructor({ progress, proxy, noWaterMark, userAgent, filepath, bulk, tt_webid_v2 }) {
+    constructor({ progress, proxy, noWaterMark, headers, filepath, bulk }) {
         this.progress = true || progress;
         this.progressBar = [];
         this.noWaterMark = noWaterMark;
-        this.userAgent = userAgent;
+        this.headers = headers;
         this.filepath = filepath;
         this.mbars = new helpers_1.MultipleBar();
         this.proxy = proxy;
         this.bulk = bulk;
-        this.tt_webid_v2 = tt_webid_v2;
     }
     get getProxy() {
         if (Array.isArray(this.proxy)) {
@@ -65,11 +64,7 @@ class Downloader {
             }
             r.get({
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
-                headers: {
-                    'user-agent': this.userAgent,
-                    referer: 'https://www.tiktok.com/',
-                    Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
-                },
+                headers: this.headers,
             })
                 .on('response', response => {
                 if (this.progress && !this.bulk) {
@@ -137,11 +132,7 @@ class Downloader {
         if (!url) {
             url = post.videoUrl;
         }
-        const options = Object.assign(Object.assign({ uri: url, method: 'GET', headers: {
-                'user-agent': this.userAgent,
-                Referer: 'https://www.tiktok.com/',
-                Cookie: `tt_webid_v2=${this.tt_webid_v2}`,
-            }, encoding: null }, (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}));
+        const options = Object.assign(Object.assign({ uri: url, method: 'GET', headers: this.headers, encoding: null }, (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}));
         const result = await request_promise_1.default(options);
         await bluebird_1.fromCallback(cb => fs_1.writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
     }

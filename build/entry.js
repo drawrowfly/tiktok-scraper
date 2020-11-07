@@ -9,8 +9,9 @@ const bluebird_1 = require("bluebird");
 const async_1 = require("async");
 const core_1 = require("./core");
 const constant_1 = __importDefault(require("./constant"));
+const helpers_1 = require("./helpers");
 const INIT_OPTIONS = {
-    number: 20,
+    number: 30,
     download: false,
     zip: false,
     asyncDownload: 5,
@@ -24,9 +25,13 @@ const INIT_OPTIONS = {
     noWaterMark: false,
     hdVideo: false,
     timeout: 0,
-    userAgent: constant_1.default.userAgentList[Math.floor(Math.random() * constant_1.default.userAgentList.length)],
     tac: '',
     signature: '',
+    headers: {
+        'User-Agent': constant_1.default.userAgentList[Math.floor(Math.random() * constant_1.default.userAgentList.length)],
+        Referer: 'https://www.tiktok.com/',
+        Cookie: `tt_webid_v2=68${helpers_1.makeid(16)}`,
+    },
 };
 const randomUserAgent = () => constant_1.default.userAgentList[Math.floor(Math.random() * constant_1.default.userAgentList.length)];
 const proxyFromFile = async (file) => {
@@ -49,9 +54,6 @@ const promiseScraper = async (input, type, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    if (!(options === null || options === void 0 ? void 0 : options.userAgent)) {
-        options.userAgent = randomUserAgent();
-    }
     const constructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type, input });
     const scraper = new core_1.TikTokScraper(constructor);
     const result = await scraper.scrape();
@@ -60,9 +62,6 @@ const promiseScraper = async (input, type, options = {}) => {
 const eventScraper = (input, type, options = {}) => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
-    }
-    if (!(options === null || options === void 0 ? void 0 : options.userAgent)) {
-        options.userAgent = randomUserAgent();
     }
     const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type, input, event: true });
     return new core_1.TikTokScraper(contructor);
@@ -82,9 +81,6 @@ exports.getHashtagInfo = async (input, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    if (!(options === null || options === void 0 ? void 0 : options.userAgent)) {
-        options.userAgent = randomUserAgent();
-    }
     const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'signle_hashtag', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.getHashtagInfo();
@@ -97,9 +93,6 @@ exports.getMusicInfo = async (input, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    if (!(options === null || options === void 0 ? void 0 : options.userAgent)) {
-        options.userAgent = randomUserAgent();
-    }
     const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'single_music', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.getMusicInfo();
@@ -110,7 +103,7 @@ exports.getUserProfileInfo = async (input, options = {}) => {
         throw new TypeError('Object is expected');
     }
     if (options === null || options === void 0 ? void 0 : options.randomUa) {
-        options.userAgent = randomUserAgent();
+        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
     }
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
@@ -124,7 +117,7 @@ exports.signUrl = async (input, options = {}) => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
-    if (options === null || options === void 0 ? void 0 : options.proxyFile) {
+    if (options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
     const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'signature', input });
@@ -137,7 +130,7 @@ exports.getVideoMeta = async (input, options = {}) => {
         throw new TypeError('Object is expected');
     }
     if (options === null || options === void 0 ? void 0 : options.randomUa) {
-        options.userAgent = randomUserAgent();
+        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
     }
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
@@ -145,14 +138,17 @@ exports.getVideoMeta = async (input, options = {}) => {
     const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'video_meta', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.getVideoMeta();
-    return result;
+    return {
+        headers: contructor.headers,
+        collector: [result],
+    };
 };
 exports.video = async (input, options = {}) => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
     if (options === null || options === void 0 ? void 0 : options.randomUa) {
-        options.userAgent = randomUserAgent();
+        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
     }
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
@@ -319,7 +315,7 @@ exports.fromfile = async (input, options = {}) => {
         throw `File is empty: ${input}`;
     }
     if (options === null || options === void 0 ? void 0 : options.randomUa) {
-        options.userAgent = randomUserAgent();
+        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
     }
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);

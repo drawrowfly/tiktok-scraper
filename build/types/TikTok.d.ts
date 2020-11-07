@@ -19,7 +19,6 @@ export interface Options {
     filetype?: string;
     progress?: boolean;
     number?: number;
-    userAgent?: string;
     noWaterMark?: boolean;
     remove?: string;
     fileName?: string;
@@ -29,6 +28,7 @@ export interface Options {
     randomUa?: boolean;
     webHookUrl?: string;
     method?: string;
+    headers?: Headers;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -48,7 +48,6 @@ export interface TikTokConstructor {
     by_user_id?: boolean;
     store_history?: boolean;
     historyPath?: string;
-    userAgent: string;
     noWaterMark?: boolean;
     fileName?: string;
     timeout?: number;
@@ -57,6 +56,7 @@ export interface TikTokConstructor {
     signature?: string;
     webHookUrl?: string;
     method?: string;
+    headers: Headers;
 }
 export interface Hashtags {
     id: string;
@@ -118,8 +118,14 @@ export interface PostCollector {
     downloaded: boolean;
 }
 export interface Result {
+    headers: Headers;
     collector: PostCollector[];
     zip?: string;
     json?: string;
     csv?: string;
+}
+export interface Headers {
+    'User-Agent': string;
+    Referer?: string;
+    Cookie?: string;
 }
