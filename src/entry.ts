@@ -40,17 +40,11 @@ const INIT_OPTIONS = {
     tac: '',
     signature: '',
     headers: {
-        'User-Agent': CONST.userAgentList[Math.floor(Math.random() * CONST.userAgentList.length)],
+        'User-Agent': CONST.userAgent(),
         Referer: 'https://www.tiktok.com/',
         Cookie: `tt_webid_v2=68${makeid(16)}`,
     },
 };
-
-/**
- * Randomize user-agent version
- * Only if {randomUa} is set to {true}
- */
-const randomUserAgent = () => CONST.userAgentList[Math.floor(Math.random() * CONST.userAgentList.length)];
 
 /**
  * Load proxys from a file
@@ -138,9 +132,6 @@ export const getUserProfileInfo = async (input: string, options = {} as Options)
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
-    if (options?.randomUa) {
-        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
-    }
 
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
@@ -171,9 +162,7 @@ export const getVideoMeta = async (input: string, options = {} as Options): Prom
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
-    if (options?.randomUa) {
-        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
-    }
+
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
@@ -191,9 +180,7 @@ export const video = async (input: string, options = {} as Options): Promise<any
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
-    if (options?.randomUa) {
-        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
-    }
+
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
@@ -389,9 +376,7 @@ export const fromfile = async (input: string, options = {} as Options) => {
     if (!batch.length) {
         throw `File is empty: ${input}`;
     }
-    if (options?.randomUa) {
-        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
-    }
+
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
