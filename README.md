@@ -290,6 +290,12 @@ const options = {
     // Create link to HD video: {boolean default: false}
     // This option will only work if {noWaterMark} is set to {true}
     hdVideo: false,
+
+    // verifyFp is used to verify the request and avoid captcha
+    // When you are using proxy then there are high chances that the request will be 
+    // blocked with captcha
+    // You can set your own verifyFp value or default(hardcoded) will be used
+    verifyFp: ''
 };
 ```
 
@@ -612,27 +618,54 @@ Example output for the methods: **user, hashtag, trend, music, userEvent, hashta
 
 ```javascript
 {
-    musicId: '6801885499343571718',
-    musicName: 'original sound',
-    uniqueId: 'tiktok',
-    secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
-    authorId: '107955',
-    authorName: 'tiktok',
-    playUrl: {
-        Uri: 'musically-maliva-obj/1660617654568981.mp3',
-        UrlList: ['https://p16-va-tiktok.ibyteimg.com/obj/musically-maliva-obj/1660617654568981.mp3'],
+    music: {
+        id: '6882925279036066566',
+        title: 'doja x calabria',
+        playUrl: 'dfdfdfdf',
+        coverThumb:
+            'dfdfdf',
+        coverMedium:
+            'dfdfdf',
+        coverLarge:
+            'fdfdf',
+        authorName: 'bryce',
+        original: true,
+        playToken:
+            'ffdfdf',
+        keyToken: 'dfdfdfd',
+        audioURLWithCookie: false,
+        private: false,
+        duration: 46,
+        album: '',
     },
-    covers: ['https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_100x100.jpeg'],
-    posts: 214,
-    original: true,
-    authorCovers: ['https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_720x720.jpeg'],
-    coversMedium: ['https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_720x720.jpeg'],
-    playToken:
-        'eyJHZXRQbGF5SW5mb1Rva2VuIjoiQWN0aW9uPUdldFBsYXlJbmZvXHUwMDI2VmVyc2lvbj0yMDE5LTAzLTE1XHUwMDI2WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTZcdTAwMjZYLUFtei1DcmVkZW50aWFsPUFLTFRNek0xTUdJMFlUZzVOMlkwTkRjNFptRXlPVFl4TXpJeFpqWmpNV05qTnpnJTJGMjAyMDA2MjglMkZjbi1ub3J0aC0xJTJGdm9kJTJGYXdzNF9yZXF1ZXN0XHUwMDI2WC1BbXotRGF0ZT0yMDIwMDYyOFQxNTE1MzBaXHUwMDI2WC1BbXotRXhwaXJlcz0zbTBzXHUwMDI2WC1BbXotTm90U2lnbkJvZHk9XHUwMDI2WC1BbXotU2lnbmF0dXJlPWUyOGM2M2JjZTVmZDc1NmM2Y2QxOWJjMmViZTI0Mjk4NTBmODc2NjliNDk3ZTg0NjYzOWFlNzNlZGRmMzZlNGNcdTAwMjZYLUFtei1TaWduZWRIZWFkZXJzPVx1MDAyNlgtQW16LVNpZ25lZFF1ZXJpZXM9QWN0aW9uJTNCVmVyc2lvbiUzQlgtQW16LUFsZ29yaXRobSUzQlgtQW16LUNyZWRlbnRpYWwlM0JYLUFtei1EYXRlJTNCWC1BbXotRXhwaXJlcyUzQlgtQW16LU5vdFNpZ25Cb2R5JTNCWC1BbXotU2lnbmVkSGVhZGVycyUzQlgtQW16LVNpZ25lZFF1ZXJpZXMlM0Jjb2RlY190eXBlJTNCZm9ybWF0X3R5cGUlM0J2aWRlb19pZFx1MDAyNmNvZGVjX3R5cGU9NVx1MDAyNmZvcm1hdF90eXBlPWhsc1x1MDAyNnZpZGVvX2lkPXYwOTk0Mjc3MDAwMGJwaWl2NTM5cTBiOWQ2ZHFwc3VnIiwiVmVyc2lvbiI6InYxIn0=',
-    keyToken: 'HMAC-SHA1%3A1.0%3A1593357510%3AAKLTMzM1MGI0YTg5N2Y0NDc4ZmEyOTYxMzIxZjZjMWNjNzg%3AGIpA60%2B9EDlcP1MXCTeI%2BEpzmGg%3D',
-    audioURLWithCookie: false,
-    private: false,
-}
+    author: {
+        id: '6835300004094166021',
+        uniqueId: 'mashupsbybryce',
+        nickname: 'bryce',
+        avatarThumb:
+            'dfdfd',
+        avatarMedium:
+            'dfdfdf',
+        avatarLarger:
+            'dfdfdf',
+        signature: 'hi ily :)\n70k sounds cool tbh\n👇follow my soundcloud & insta👇',
+        verified: false,
+        secUid: 'MS4wLjABAAAA1_5bjLAamayD4rv3q49qJGa_7dZ5jzExTO0ozOybqIwwhw5TAg_iM25lkO94DM3K',
+        secret: false,
+        ftc: false,
+        relation: 0,
+        openFavorite: false,
+        commentSetting: 0,
+        duetSetting: 0,
+        stitchSetting: 0,
+        privateAccount: false,
+    },
+    stats: { videoCount: 361700 },
+    shareMeta: {
+        title: 'bryceyouloser | ♬ doja x calabria | on TikTok',
+        desc: '361.0k videos - Watch awesome short ' + 'videos created with ♬ doja x calabria',
+    },
+};
 ```
 
 <a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>

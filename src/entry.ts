@@ -39,6 +39,7 @@ const INIT_OPTIONS = {
     timeout: 0,
     tac: '',
     signature: '',
+    verifyFp: CONST.verifyFp(),
     headers: {
         'User-Agent': CONST.userAgent(),
         Referer: 'https://www.tiktok.com/',
@@ -67,6 +68,7 @@ const promiseScraper = async (input: string, type: ScrapeType, options = {} as O
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
+
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }

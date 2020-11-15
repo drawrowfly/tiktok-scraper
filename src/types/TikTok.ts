@@ -45,6 +45,7 @@ export interface Options {
     webHookUrl?: string;
     method?: string;
     headers?: Headers;
+    verifyFp?: string;
 }
 export interface TikTokConstructor {
     download: boolean;
@@ -73,6 +74,7 @@ export interface TikTokConstructor {
     webHookUrl?: string;
     method?: string;
     headers: Headers;
+    verifyFp?: string;
 }
 
 export interface Hashtags {

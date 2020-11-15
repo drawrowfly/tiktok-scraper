@@ -19,6 +19,16 @@ export = {
         trend: 12,
     },
     /**
+     * verifyFp is used to bypass captcha
+     * Currently this method is with hardcoded values
+     * later I or someone else will implement proper way to generate valid value
+     */
+    verifyFp: () => {
+        const variants = ['verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX', 'verify_khi96drf_iGrjMBcF_nfPv_4PpW_9tmA_7IUl3SLD4ziM'];
+
+        return variants[Math.floor(Math.random() * variants.length)];
+    },
+    /**
      * Generate random user-agent with randon versions(fake)
      */
     userAgent: () => {
