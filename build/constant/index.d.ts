@@ -6,6 +6,7 @@ declare const _default: {
         music: number;
         trend: number;
     };
-    userAgentList: string[];
+    verifyFp: () => never;
+    userAgent: () => string;
 };
 export = _default;

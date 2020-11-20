@@ -27,13 +27,13 @@ const INIT_OPTIONS = {
     timeout: 0,
     tac: '',
     signature: '',
+    verifyFp: constant_1.default.verifyFp(),
     headers: {
-        'User-Agent': constant_1.default.userAgentList[Math.floor(Math.random() * constant_1.default.userAgentList.length)],
+        'User-Agent': constant_1.default.userAgent(),
         Referer: 'https://www.tiktok.com/',
         Cookie: `tt_webid_v2=68${helpers_1.makeid(16)}`,
     },
 };
-const randomUserAgent = () => constant_1.default.userAgentList[Math.floor(Math.random() * constant_1.default.userAgentList.length)];
 const proxyFromFile = async (file) => {
     try {
         const data = (await bluebird_1.fromCallback(cb => fs_1.readFile(file, { encoding: 'utf-8' }, cb)));
@@ -102,9 +102,6 @@ exports.getUserProfileInfo = async (input, options = {}) => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
-    if (options === null || options === void 0 ? void 0 : options.randomUa) {
-        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
-    }
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
@@ -129,9 +126,6 @@ exports.getVideoMeta = async (input, options = {}) => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
-    if (options === null || options === void 0 ? void 0 : options.randomUa) {
-        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
-    }
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
@@ -146,9 +140,6 @@ exports.getVideoMeta = async (input, options = {}) => {
 exports.video = async (input, options = {}) => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
-    }
-    if (options === null || options === void 0 ? void 0 : options.randomUa) {
-        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
     }
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
@@ -313,9 +304,6 @@ exports.fromfile = async (input, options = {}) => {
     });
     if (!batch.length) {
         throw `File is empty: ${input}`;
-    }
-    if (options === null || options === void 0 ? void 0 : options.randomUa) {
-        INIT_OPTIONS.headers['User-Agent'] = randomUserAgent();
     }
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);

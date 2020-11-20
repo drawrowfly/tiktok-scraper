@@ -16,9 +16,10 @@ const constant_1 = __importDefault(require("../constant"));
 const helpers_1 = require("../helpers");
 const core_1 = require("../core");
 class TikTokScraper extends events_1.EventEmitter {
-    constructor({ download, filepath, filetype, proxy, asyncDownload, cli = false, event = false, progress = false, input, number, type, by_user_id = false, store_history = false, historyPath = '', noWaterMark = false, fileName = '', timeout = 0, bulk = false, zip = false, test = false, hdVideo = false, signature = '', webHookUrl = '', method = 'POST', headers, }) {
+    constructor({ download, filepath, filetype, proxy, asyncDownload, cli = false, event = false, progress = false, input, number, type, by_user_id = false, store_history = false, historyPath = '', noWaterMark = false, fileName = '', timeout = 0, bulk = false, zip = false, test = false, hdVideo = false, signature = '', webHookUrl = '', method = 'POST', headers, verifyFp = '', }) {
         super();
         this.storeValue = '';
+        this.verifyFp = verifyFp;
         this.mainHost = 'https://m.tiktok.com/';
         this.headers = headers;
         this.download = download;
@@ -485,7 +486,7 @@ class TikTokScraper extends events_1.EventEmitter {
             count: this.number > 30 ? 50 : 30,
             minCursor: 0,
             maxCursor: 0,
-            verifyFp: '',
+            verifyFp: this.verifyFp,
         };
     }
     async getMusicFeedQuery() {
@@ -511,6 +512,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 count: 30,
                 cursor: 0,
                 aid: 1988,
+                verifyFp: this.verifyFp,
             };
         }
         const id = encodeURIComponent(this.input);
@@ -530,6 +532,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 count: 30,
                 cursor: 0,
                 aid: 1988,
+                verifyFp: this.verifyFp,
             };
         }
         catch (error) {
@@ -546,12 +549,12 @@ class TikTokScraper extends events_1.EventEmitter {
                 minCursor: 0,
                 maxCursor: 0,
                 lang: '',
-                verifyFp: '',
+                verifyFp: this.verifyFp,
             };
         }
         const id = encodeURIComponent(this.input);
         const query = {
-            uri: `${this.mainHost}node/share/user/@${id}?uniqueId=${id}`,
+            uri: `${this.mainHost}node/share/user/@${id}?uniqueId=${id}&verifyFp=${this.verifyFp}`,
             method: 'GET',
             json: true,
         };
@@ -569,7 +572,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 minCursor: 0,
                 maxCursor: 0,
                 lang: '',
-                verifyFp: '',
+                verifyFp: this.verifyFp,
             };
         }
         catch (error) {
@@ -581,7 +584,7 @@ class TikTokScraper extends events_1.EventEmitter {
             throw `Username is missing`;
         }
         const query = {
-            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${this.input}`,
+            uri: `${this.mainHost}node/share/user/@${this.input}?uniqueId=${this.input}&verifyFp=${this.verifyFp}`,
             method: 'GET',
             json: true,
         };
@@ -653,7 +656,7 @@ class TikTokScraper extends events_1.EventEmitter {
             throw `Url is missing`;
         }
         const options = {
-            uri: this.input,
+            uri: `${this.input}?verifyFp=${this.verifyFp}`,
             method: 'GET',
             json: true,
         };
