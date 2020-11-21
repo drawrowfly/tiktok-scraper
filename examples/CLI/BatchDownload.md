@@ -1,4 +1,4 @@
-[Go back to the Main Documenation](https://github.com/drawrowfly/tiktok-scraper/blob/master/README.md)
+[Go back to the Main Documentation](https://github.com/drawrowfly/tiktok-scraper/blob/master/README.md)
 
 ## Batch Scrape And Download Example
 
