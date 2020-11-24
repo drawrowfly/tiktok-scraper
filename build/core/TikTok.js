@@ -136,6 +136,9 @@ class TikTokScraper extends events_1.EventEmitter {
                 method }, (qs ? { qs } : {})), (body ? { body } : {})), (form ? { form } : {})), { headers: Object.assign(Object.assign({}, this.headers), headers) }), (json ? { json: true } : {})), (gzip ? { gzip: true } : {})), { resolveWithFullResponse: true }), (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {})), { timeout: 10000, rejectUnauthorized: false });
             try {
                 const response = await request_promise_1.default(options);
+                if (response.headers['x-luminati-ip'] && process.env.TIKTOK_DIRECT_PROXY_ADDRESS) {
+                    this.proxy = process.env.TIKTOK_DIRECT_PROXY_ADDRESS.replace('REPLACE_ME_WITH_IP', response.headers['x-luminati-ip']);
+                }
                 setTimeout(() => {
                     resolve(response.body);
                 }, this.timeout);

@@ -290,6 +290,11 @@ export class TikTokScraper extends EventEmitter {
 
             try {
                 const response = await rp(options);
+
+                if (response.headers['x-luminati-ip'] && process.env.TIKTOK_DIRECT_PROXY_ADDRESS) {
+                  this.proxy = process.env.TIKTOK_DIRECT_PROXY_ADDRESS.replace('REPLACE_ME_WITH_IP', response.headers['x-luminati-ip']);
+                }
+
                 setTimeout(() => {
                     resolve(response.body);
                 }, this.timeout);
