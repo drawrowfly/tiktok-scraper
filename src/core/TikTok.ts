@@ -270,7 +270,6 @@ export class TikTokScraper extends EventEmitter {
         return new Promise(async (resolve, reject) => {
             const proxy = this.getProxy;
 
-            // console.log(`URL: ${uri}; QS: ${JSON.stringify(qs)}`)
             const options = ({
                 uri,
                 method,
@@ -644,7 +643,7 @@ export class TikTokScraper extends EventEmitter {
                     break;
                 }
             }
-            console.error(`POSTS: ${JSON.stringify(posts)}`)
+
             if (this.noDuplicates.indexOf(posts[i].id) === -1) {
                 this.noDuplicates.push(posts[i].id);
 
