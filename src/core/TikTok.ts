@@ -269,6 +269,8 @@ export class TikTokScraper extends EventEmitter {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
             const proxy = this.getProxy;
+
+            // console.log(`URL: ${uri}; QS: ${JSON.stringify(qs)}`)
             const options = ({
                 uri,
                 method,
@@ -642,9 +644,10 @@ export class TikTokScraper extends EventEmitter {
                     break;
                 }
             }
-
+            console.error(`POSTS: ${JSON.stringify(posts)}`)
             if (this.noDuplicates.indexOf(posts[i].id) === -1) {
                 this.noDuplicates.push(posts[i].id);
+
                 const item: PostCollector = {
                     id: posts[i].id,
                     text: posts[i].desc,
@@ -685,6 +688,29 @@ export class TikTokScraper extends EventEmitter {
                         width: posts[i].video.width,
                         duration: posts[i].video.duration,
                     },
+                    textExtra: (posts[i].textExtra
+                        ? posts[i].textExtra.map(({
+                                awemeId,
+                                start,
+                                end,
+                                hashtagName,
+                                hashtagId,
+                                type,
+                                userId,
+                                isCommerce,
+                                userUniqueId
+                            }) => ({
+                                awemeId,
+                                start,
+                                end,
+                                hashtagName,
+                                hashtagId,
+                                type,
+                                userId,
+                                isCommerce,
+                                userUniqueId
+                          }))
+                        : []),
                     diggCount: posts[i].stats.diggCount,
                     shareCount: posts[i].stats.shareCount,
                     playCount: posts[i].stats.playCount,
