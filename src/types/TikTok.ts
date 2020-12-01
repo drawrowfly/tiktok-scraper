@@ -84,6 +84,18 @@ export interface Hashtags {
     cover: string[] | string;
 }
 
+export interface TextExtra {
+    awemeId: string;
+    start: number;
+    end: number;
+    hashtagName?: string;
+    hashtagId?: string;
+    type: number;
+    userId?: string;
+    userUniqueId?: string;
+    isCommerce: boolean;
+}
+
 export interface PostCollector {
     id: string;
     text: string;
@@ -128,6 +140,7 @@ export interface PostCollector {
         ratio?: number;
         duration: number;
     };
+    textExtra?: TextExtra[];
     diggCount: number;
     shareCount: number;
     playCount: number;

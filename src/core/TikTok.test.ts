@@ -69,10 +69,12 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
 
     it('result should emit "data" event with the result', done => {
         instance.on('data', data => {
+            // eslint-disable-next-line no-console
+            console.error(JSON.stringify(data));
             expect(data).toEqual({
-                id: '6833468102982798598',
-                text: 'To our community, a message from our CEO...',
-                createTime: 1591040777,
+                id: '6800111723257941253',
+                text: '@madisonbeer shows us her #ultrainstinct',
+                createTime: 1583274394,
                 authorMeta: {
                     id: '107955',
                     secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
@@ -83,35 +85,68 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
                     avatar: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg',
                 },
                 musicMeta: {
-                    musicId: '6833468087698803462',
-                    musicName: 'original sound',
-                    musicAuthor: 'tiktok',
+                    musicId: '6795008547961752326',
+                    musicName: 'Ultra Instinct',
+                    musicAuthor: 'adamdevito',
                     musicOriginal: true,
-                    playUrl: 'https://p16-va-tiktok.ibyteimg.com/obj/musically-maliva-obj/8933750c078b6b0702864cd3004f989f.mp3',
-                    coverThumb: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_100x100.jpeg',
-                    coverMedium: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_720x720.jpeg',
-                    coverLarge: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg',
+                    playUrl: 'https://p16-va-tiktok.ibyteimg.com/obj/musically-maliva-obj/1658946263458837.mp3',
+                    coverThumb: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1655766966982661~c5_100x100.jpeg',
+                    coverMedium: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1655766966982661~c5_720x720.jpeg',
+                    coverLarge: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1655766966982661~c5_1080x1080.jpeg',
                 },
                 covers: {
                     default:
-                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/57cf33573b3348b9a44b12287601574d_1591040780?x-expires=1591862400&x-signature=dF7jR2iPW2St4BWqBgxi78FvMP0%3D',
+                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/e48225bcc2ed4d49acccd224ee6bef4d_1583274508?x-expires=1591862400&x-signature=C0T7AAfVdmxTzXuQuDZX7C%2Bnz68%3D',
                     origin:
-                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/1fca8a4bd2cd49eabfc2290a5f3befab_1591040779?x-expires=1591862400&x-signature=ckP5WHRjaPHlD%2FhGJTm0s6%2BS6bo%3D',
+                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/6413b45c9e6f48ccaa458d3ee3499214_1583274398?x-expires=1591862400&x-signature=mabQXicsV3SopgpW0vgZl3vq%2Bx8%3D',
                     dynamic:
-                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/6f08a25103584cac821e15727c625f65_1591040779?x-expires=1591862400&x-signature=sP2%2BauyoM39NP%2BrUAgCZdh1KilI%3D',
+                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/4eeadcc7e81c475698838f01c3456483_1583274398?x-expires=1591862400&x-signature=46eVe2t9ugE5hBrZVY4HiB6VWKI%3D',
                 },
-                webVideoUrl: 'https://www.tiktok.com/@tiktok/video/6833468102982798598',
+                webVideoUrl: 'https://www.tiktok.com/@tiktok/video/6800111723257941253',
                 videoUrl:
-                    'https://v19.tiktokcdn.com/270ac5f1885ae68e7bcf5d2fedf02282/5edf9875/video/tos/useast2a/tos-useast2a-ve-0068c001/76cda2fd993649878b0099e4e0d064b3/?a=1233&br=572&bt=286&cr=0&cs=0&dr=0&ds=3&er=&l=2020060908104601018907106605015433&lr=tiktok_m&mime_type=video_mp4&qs=0&rc=anhneHdkeDRvdTMzZjczM0ApOjg5NWk8PGQ2N2Q5Njs2aGdjY2VxZGAwal5fLS00MTZzczJhYGMxMDMxNTBeNi8wYTA6Yw%3D%3D&vl=&vr=',
+                    'https://v19.tiktokcdn.com/4d67e959107f5b1b8e46ab682fc434e7/5edf986e/video/tos/useast2a/tos-useast2a-ve-0068c004/f3573a31d77646d58687bc024cac2989/?a=1233&br=3574&bt=1787&cr=0&cs=0&dr=0&ds=3&er=&l=2020060908104601018907106605015433&lr=tiktok_m&mime_type=video_mp4&qs=0&rc=MzlsZnlnPDhnczMzPDczM0ApNmhmZDo3MzxkN2dnaTdpZGdsYmtxNS5uZ2NfLS1fMTZzc142MmI0YDA2Xi9iNmMxLzA6Yw%3D%3D&vl=&vr=',
                 videoUrlNoWaterMark: '',
-                videoMeta: { height: 1024, width: 576, duration: 15 },
-                diggCount: 201200,
-                shareCount: 2537,
-                playCount: 1800000,
-                commentCount: 15700,
+                videoMeta: {
+                    height: 1280,
+                    width: 720,
+                    duration: 8,
+                },
+                textExtra: [
+                    {
+                        awemeId: '',
+                        start: 0,
+                        end: 12,
+                        hashtagName: '',
+                        hashtagId: '',
+                        type: 0,
+                        userId: '20921174',
+                        isCommerce: false,
+                    },
+                    {
+                        awemeId: '',
+                        start: 26,
+                        end: 40,
+                        hashtagName: 'ultrainstinct',
+                        hashtagId: '',
+                        type: 1,
+                        userId: '',
+                        isCommerce: false,
+                    },
+                ],
+                diggCount: 964700,
+                shareCount: 3349,
+                playCount: 10500000,
+                commentCount: 9311,
                 downloaded: false,
-                mentions: [],
-                hashtags: [],
+                mentions: ['@madisonbeer'],
+                hashtags: [
+                    {
+                        id: '80332770',
+                        name: 'ultrainstinct',
+                        title: "Whether you're a momentary expert or struggle with the big moments, show us your #UltraInstinct.",
+                        cover: 'https://p16-va-default.akamaized.net/obj/musically-maliva-obj/43d03229b2f2731b71db88ce67a54d47',
+                    },
+                ],
             });
             done();
         });

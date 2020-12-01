@@ -685,6 +685,19 @@ export class TikTokScraper extends EventEmitter {
                         width: posts[i].video.width,
                         duration: posts[i].video.duration,
                     },
+                    textExtra: posts[i].textExtra
+                        ? posts[i].textExtra.map(({ awemeId, start, end, hashtagName, hashtagId, type, userId, isCommerce, userUniqueId }) => ({
+                              awemeId,
+                              start,
+                              end,
+                              hashtagName,
+                              hashtagId,
+                              type,
+                              userId,
+                              isCommerce,
+                              userUniqueId,
+                          }))
+                        : undefined,
                     diggCount: posts[i].stats.diggCount,
                     shareCount: posts[i].stats.shareCount,
                     playCount: posts[i].stats.playCount,

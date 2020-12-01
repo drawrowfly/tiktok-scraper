@@ -184,6 +184,7 @@ export interface FeedItems {
         type: number;
         userId: string;
         isCommerce: boolean;
+        userUniqueId: string;
     }[];
     secret: boolean;
     forFriend: boolean;
