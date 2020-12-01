@@ -85,15 +85,15 @@ export interface Hashtags {
 }
 
 export interface TextExtra {
-    awemeId?: string;
-    start?: number;
-    end?: number;
+    awemeId: string;
+    start: number;
+    end: number;
     hashtagName?: string;
     hashtagId?: string;
-    type?: number;
+    type: number;
     userId?: string;
-    isCommerce?: boolean;
     userUniqueId?: string;
+    isCommerce: boolean;
 }
 
 export interface PostCollector {
