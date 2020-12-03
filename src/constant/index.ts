@@ -24,7 +24,7 @@ export = {
      * later I or someone else will implement proper way to generate valid value
      */
     verifyFp: () => {
-        const variants = ['verify_khpndkhf_ERut2lgl_kAb1_4TM1_9Zp3_4bG4cYoT86xY'];
+        const variants = [];
 
         return variants[Math.floor(Math.random() * variants.length)];
     },
