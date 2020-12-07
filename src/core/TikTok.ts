@@ -1009,6 +1009,7 @@ export class TikTokScraper extends EventEmitter {
 
                 const videoData = short ? videoProps[shortKey].videoData : videoProps.props.pageProps.itemInfo.itemStruct;
 
+
                 const videoItem = {
                     id: videoData.id,
                     text: videoData.desc,
@@ -1045,6 +1046,9 @@ export class TikTokScraper extends EventEmitter {
                         height: videoData.video.height,
                         ratio: videoData.video.ratio,
                         duration: videoData.video.duration,
+                        duetEnabled: videoData.duetEnabled,
+                        stitchEnabled: videoData.stitchEnabled,
+                        duetInfo: videoData.duetInfo
                     },
                     covers: {
                         default: videoData.video.cover,

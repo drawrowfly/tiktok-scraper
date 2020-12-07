@@ -84,6 +84,10 @@ export interface Hashtags {
     cover: string[] | string;
 }
 
+export interface DuetInfo {
+    duetWithId: string;
+}
+
 export interface PostCollector {
     id: string;
     text: string;
@@ -127,6 +131,9 @@ export interface PostCollector {
         height: number;
         ratio?: number;
         duration: number;
+        duetEnabled?: boolean;
+        stitchEnabled?: boolean;
+        duetInfo?: DuetInfo;
     };
     diggCount: number;
     shareCount: number;
