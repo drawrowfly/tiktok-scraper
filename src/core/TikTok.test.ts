@@ -533,7 +533,15 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             videoUrl:
                 'https://v16-web-newkey.tiktokcdn.com/2ea83f8b07e61eb2844a644d0b1ff238/5f939968/video/tos/useast2a/tos-useast2a-pve-0068/2141262fa24c4f7687f2d6b0df121616/?a=1988&br=3316&bt=1658&cr=0&cs=0&cv=1&dr=0&ds=3&er=&l=202010232102490101902192101109C365&lr=tiktok_m&mime_type=video_mp4&qs=0&rc=anFwZTh4N2R3dzMzZzczM0ApNWY0O2QzaDszNzxlOTRlN2dkbzVlbGRkM3NfLS0xMTZzc2EwNC4vLWEuYS5hMmFiMy06Yw%3D%3D&vl=&vr=',
             videoUrlNoWaterMark: null,
-            videoMeta: { width: 576, height: 1024, ratio: '720p', duration: 15 },
+            videoMeta: {
+                width: 576,
+                height: 1024,
+                ratio: '720p',
+                duration: 15,
+                duetInfo: { duetFromId: '0' },
+                duetEnabled: true,
+                stitchEnabled: true,
+            },
             covers: {
                 default:
                     'https://p16-sign-sg.tiktokcdn.com/obj/tos-maliva-p-0068/5f1e128e900c4008bd6d612964ef7d1b?x-expires=1603508400&x-signature=lXSV%2BKG4%2B8G%2BGJREfeNEys6m3eg%3D',

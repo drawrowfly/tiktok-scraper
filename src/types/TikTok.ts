@@ -85,7 +85,7 @@ export interface Hashtags {
 }
 
 export interface DuetInfo {
-    duetWithId: string;
+    duetFromId: string;
 }
 
 export interface PostCollector {
