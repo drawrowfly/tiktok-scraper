@@ -30,7 +30,7 @@ const getInitOptions = () => {
         asyncDownload: 5,
         asyncScraping: 3,
         proxy: [],
-        filepath: process.cwd(),
+        filepath: '',
         filetype: 'na',
         progress: false,
         event: false,
@@ -45,8 +45,8 @@ const getInitOptions = () => {
             'User-Agent': CONST.userAgent(),
             Referer: 'https://www.tiktok.com/',
             Cookie: `tt_webid_v2=68${makeid(16)}`,
-        }
-    }
+        },
+    };
 };
 
 /**
