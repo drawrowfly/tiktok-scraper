@@ -51,7 +51,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   Save post metadata to the JSON/CSV files
 -   Download media **with and without the watermark** and save to the ZIP file
 -   Download single video without the watermark from the CLI
--   Sign URL to make custom request to the TIkTok API
+-   Sign URL to make custom request to the TikTok API
 -   Extract metadata from the User, Hashtag and Single Video pages
 -   **Save previous progress and download only new videos that weren't downloaded before**. This feature only works from the CLI and only if **download** flag is on.
 -   **View and manage previously downloaded posts history in the CLI**
@@ -66,8 +66,8 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] Download video without the watermark
 -   [x] Indicate in the output file(csv/json) if the video was downloaded or not
 -   [x] Build and run from Docker
--   [x] CLI: Scrape and download in batchu
--   [x] CLi: Load proxies from a file
+-   [x] CLI: Scrape and download in batch
+-   [x] CLI: Load proxies from a file
 -   [x] CLI: Optional ZIP
 -   [x] Renew API
 -   [x] Set WebHook URL (CLI)
