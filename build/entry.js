@@ -10,29 +10,31 @@ const async_1 = require("async");
 const core_1 = require("./core");
 const constant_1 = __importDefault(require("./constant"));
 const helpers_1 = require("./helpers");
-const INIT_OPTIONS = {
-    number: 30,
-    download: false,
-    zip: false,
-    asyncDownload: 5,
-    asyncScraping: 3,
-    proxy: [],
-    filepath: process.cwd(),
-    filetype: 'na',
-    progress: false,
-    event: false,
-    by_user_id: false,
-    noWaterMark: false,
-    hdVideo: false,
-    timeout: 0,
-    tac: '',
-    signature: '',
-    verifyFp: constant_1.default.verifyFp(),
-    headers: {
-        'User-Agent': constant_1.default.userAgent(),
-        Referer: 'https://www.tiktok.com/',
-        Cookie: `tt_webid_v2=68${helpers_1.makeid(16)}`,
-    },
+const getInitOptions = () => {
+    return {
+        number: 30,
+        download: false,
+        zip: false,
+        asyncDownload: 5,
+        asyncScraping: 3,
+        proxy: [],
+        filepath: '',
+        filetype: 'na',
+        progress: false,
+        event: false,
+        by_user_id: false,
+        noWaterMark: false,
+        hdVideo: false,
+        timeout: 0,
+        tac: '',
+        signature: '',
+        verifyFp: constant_1.default.verifyFp(),
+        headers: {
+            'User-Agent': constant_1.default.userAgent(),
+            Referer: 'https://www.tiktok.com/',
+            Cookie: `tt_webid_v2=68${helpers_1.makeid(16)}`,
+        },
+    };
 };
 const proxyFromFile = async (file) => {
     try {
@@ -54,7 +56,7 @@ const promiseScraper = async (input, type, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    const constructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type, input });
+    const constructor = Object.assign(Object.assign(Object.assign({}, getInitOptions()), options), { type, input });
     const scraper = new core_1.TikTokScraper(constructor);
     const result = await scraper.scrape();
     return result;
@@ -63,7 +65,7 @@ const eventScraper = (input, type, options = {}) => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }
-    const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type, input, event: true });
+    const contructor = Object.assign(Object.assign(Object.assign({}, getInitOptions()), options), { type, input, event: true });
     return new core_1.TikTokScraper(contructor);
 };
 exports.hashtag = async (input, options) => promiseScraper(input, 'hashtag', options);
@@ -81,7 +83,7 @@ exports.getHashtagInfo = async (input, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'signle_hashtag', input });
+    const contructor = Object.assign(Object.assign(Object.assign({}, getInitOptions()), options), { type: 'signle_hashtag', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.getHashtagInfo();
     return result;
@@ -93,7 +95,7 @@ exports.getMusicInfo = async (input, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'single_music', input });
+    const contructor = Object.assign(Object.assign(Object.assign({}, getInitOptions()), options), { type: 'single_music', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.getMusicInfo();
     return result;
@@ -105,7 +107,7 @@ exports.getUserProfileInfo = async (input, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'sinsgle_user', input });
+    const contructor = Object.assign(Object.assign(Object.assign({}, getInitOptions()), options), { type: 'sinsgle_user', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.getUserProfileInfo();
     return result;
@@ -117,7 +119,7 @@ exports.signUrl = async (input, options = {}) => {
     if (options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'signature', input });
+    const contructor = Object.assign(Object.assign(Object.assign({}, getInitOptions()), options), { type: 'signature', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.signUrl();
     return result;
@@ -129,7 +131,7 @@ exports.getVideoMeta = async (input, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'video_meta', input });
+    const contructor = Object.assign(Object.assign(Object.assign({}, getInitOptions()), options), { type: 'video_meta', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.getVideoMeta();
     return {
@@ -144,7 +146,7 @@ exports.video = async (input, options = {}) => {
     if (options === null || options === void 0 ? void 0 : options.proxyFile) {
         options.proxy = await proxyFromFile(options === null || options === void 0 ? void 0 : options.proxyFile);
     }
-    const contructor = Object.assign(Object.assign(Object.assign({}, INIT_OPTIONS), options), { type: 'video', input });
+    const contructor = Object.assign(Object.assign(Object.assign({}, getInitOptions()), options), { type: 'video', input });
     const scraper = new core_1.TikTokScraper(contructor);
     const result = await scraper.getVideoMeta();
     const path = (options === null || options === void 0 ? void 0 : options.filepath) ? `${options === null || options === void 0 ? void 0 : options.filepath}/${result.id}` : result.id;

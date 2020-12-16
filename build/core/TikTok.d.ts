@@ -25,6 +25,7 @@ export declare class TikTokScraper extends EventEmitter {
     Downloader: Downloader;
     private storeValue;
     private maxCursor;
+    private minCursor;
     private noWaterMark;
     private noDuplicates;
     private timeout;
@@ -42,6 +43,7 @@ export declare class TikTokScraper extends EventEmitter {
     constructor({ download, filepath, filetype, proxy, asyncDownload, cli, event, progress, input, number, type, by_user_id, store_history, historyPath, noWaterMark, fileName, timeout, bulk, zip, test, hdVideo, signature, webHookUrl, method, headers, verifyFp, }: TikTokConstructor);
     private get fileDestination();
     private get folderDestination();
+    private get getApiEndpoint();
     private get getProxy();
     private request;
     private returnInitError;
