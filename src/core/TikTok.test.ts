@@ -38,7 +38,17 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
 
     it('getUserId should return a valid Object', async () => {
         const userId: RequestQuery = await instance.getUserId();
-        expect(userId).toEqual({ count: 30, id: '107955', lang: '', maxCursor: 0, minCursor: 0, secUid: '', sourceType: 8, verifyFp: '' });
+        expect(userId).toEqual({
+            count: 30,
+            id: '107955',
+            lang: '',
+            maxCursor: 0,
+            minCursor: 0,
+            secUid: '',
+            sourceType: 8,
+            user_agent: 'Custom User-Agent',
+            verifyFp: '',
+        });
     });
 
     it('result should contain array value with the length 5', async () => {
@@ -277,7 +287,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
 
     it('getHashTagId should return a valid Object', async () => {
         const hashtag: RequestQuery = await instance.getHashTagId();
-        expect(hashtag).toEqual({ aid: 1988, challengeID: '99770', count: 30, cursor: 0, verifyFp: '' });
+        expect(hashtag).toEqual({ aid: 1988, challengeID: '99770', count: 30, cursor: 0, user_agent: 'okhttp', verifyFp: '' });
     });
 
     // it('result should contain array value with the length 5', async () => {
