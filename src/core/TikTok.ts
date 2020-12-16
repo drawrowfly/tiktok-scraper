@@ -819,6 +819,9 @@ export class TikTokScraper extends EventEmitter {
         const id = encodeURIComponent(this.input);
         const query = {
             uri: `${this.mainHost}node/share/tag/${id}?uniqueId=${id}`,
+            qs: {
+                user_agent: this.headers['User-Agent'],
+            },
             method: 'GET',
             json: true,
         };
