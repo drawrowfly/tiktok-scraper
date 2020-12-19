@@ -35,6 +35,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 	    - [Options](#options)
 	    - [Use with Promises](#promise)
 	    - [Use with Events](#event)
+	    - [How to get/set session value](#get-set-session)
 	    - [How to access/download video](#download-video)
 	    - [Output Example](#json-output-example)
 	        - [Video Feed Methods](#video-feed)
@@ -71,7 +72,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 -   [x] CLI: Optional ZIP
 -   [x] Renew API
 -   [x] Set WebHook URL (CLI)
--   [ ] Add new method to collect music metadata
+-   [x] Add new method to collect music metadata
 -   [ ] Add Manual Pagination
 -   [ ] Improve documentation
 -   [ ] Download audio files
@@ -124,60 +125,60 @@ Commands:
                                 in a file. 1 value per 1 line
 
 Options:
-  --version               Show version number                          [boolean]
-  --timeout               Set timeout between requests. Timeout is in
-                          Milliseconds: 1000 mls = 1 s              [default: 0]
-  --number, -n            Number of posts to scrape. If you will set 0 then all
-                          posts will be scraped                     [default: 0]
-  --proxy, -p             Set single proxy                         [default: ""]
-  --proxy-file            Use proxies from a file. Scraper will use random
-                          proxies from the file per each request. 1 line 1
-                          proxy.                                   [default: ""]
-  --download, -d          Download video posts to the folder with the name input
-                          [id]                        [boolean] [default: false]
-  --asyncDownload, -a     Number of concurrent downloads            [default: 5]
-  --hd                    Download video in HD. Video size will be x5-x10 times
-                          larger and this will affect scraper execution speed.
-                          This option only works in combination with -w flag
-                                                      [boolean] [default: false]
-  --zip, -z               ZIP all downloaded video posts
-                                                      [boolean] [default: false]
-  --filepath              File path to save all output files.
-      [default: "/Users/blah/blah"]
-  --filetype, --type, -t  Type of the output file where post information will
-                          be saved. 'all' - save information about all posts to
-                          the` 'json' and 'csv'
-                               [choices: "csv", "json", "all", ""] [default: ""]
-  --filename, -f          Set custom filename for the output files [default: ""]
-  --noWaterMark, -w       Download video without the watermark. This option will
-                          affect the execution speed  [boolean] [default: false]
-  --store, -s             Scraper will save the progress in the OS TMP or Custom
-                          folder and in the future usage will only download new
-                          videos avoiding duplicates  [boolean] [default: false]
-  --historypath           Set custom path where history file/files will be
-                          stored
-                   [default: "/var/folders/d5/fyh1_f2926q7c65g7skc0qh80000gn/T"]
-  --remove, -r            Delete the history record by entering "TYPE:INPUT" or
-                          "all" to clean all the history. For example: user:bob
+  --version            Show version number                             [boolean]
+  --session            Set session cookie value. Session is required to scrape
+                       user/trending/hashtag/music feed
+  --timeout            Set timeout between requests. Timeout is in Milliseconds:
+                       1000 mls = 1 s                               [default: 0]
+  --number, -n         Number of posts to scrape. If you will set 0 then all
+                       posts will be scraped                        [default: 0]
+  --proxy, -p          Set single proxy                            [default: ""]
+  --proxy-file         Use proxies from a file. Scraper will use random proxies
+                       from the file per each request. 1 line 1 proxy.
                                                                    [default: ""]
-  --webHookUrl       Set webhook url to receive scraper result as HTTP requests.
-                     For example to your own API                   [default: ""]
-  --method           Receive data to your webhook url as POST or GET request
+  --download, -d       Download video posts to the folder with the name input
+                       [id]                           [boolean] [default: false]
+  --asyncDownload, -a  Number of concurrent downloads               [default: 5]
+  --hd                 Download video in HD. Video size will be x5-x10 times
+                       larger and this will affect scraper execution speed. This
+                       option only works in combination with -w flag
+                                                      [boolean] [default: false]
+  --zip, -z            ZIP all downloaded video posts [boolean] [default: false]
+  --filepath           File path to save all output files.
+      [default: "/Users/karl.wint/Documents/projects/javascript/tiktok-scraper"]
+  --filetype, -t       Type of the output file where post information will be
+                       saved. 'all' - save information about all posts to the`
+                       'json' and 'csv'
+                               [choices: "csv", "json", "all", ""] [default: ""]
+  --filename, -f       Set custom filename for the output files    [default: ""]
+  --noWaterMark, -w    Download video without the watermark. NOTE: With the
+                       recent update you only need to use this option if you are
+                       scraping Hashtag Feed. User/Trend/Music feeds will have
+                       this url by default            [boolean] [default: false]
+  --store, -s          Scraper will save the progress in the OS TMP or Custom
+                       folder and in the future usage will only download new
+                       videos avoiding duplicates     [boolean] [default: false]
+  --historypath        Set custom path where history file/files will be stored
+                   [default: "/var/folders/d5/fyh1_f2926q7c65g7skc0qh80000gn/T"]
+  --remove, -r         Delete the history record by entering "TYPE:INPUT" or
+                       "all" to clean all the history. For example: user:bob
+                                                                   [default: ""]
+  --webHookUrl         Set webhook url to receive scraper result as HTTP
+                       requests. For example to your own API       [default: ""]
+  --method             Receive data to your webhook url as POST or GET request
                                       [choices: "GET", "POST"] [default: "POST"]
-  --help             Show help                                         [boolean]
+  --help               Show help                                       [boolean]
 
 Examples:
-  tiktok-scraper user USERNAME -d -n 100
-  tiktok-scraper user USERNAME -d -n 100 -f customFileName
-  tiktok-scraper hashtag HASHTAG_NAME -d -n 100
-  tiktok-scraper trend -d -n 100
-  tiktok-scraper music MUSICID -n 100
-  tiktok-scraper music MUSIC_ID -d -n 50
-  tiktok-scraper video https://www.tiktok.com/@tiktok/video/6807491984882765062
+  tiktok-scraper user USERNAME -d -n 100 --session sid_tt=dae32131231
+  tiktok-scraper trend -d -n 100 --session sid_tt=dae32131231
+  tiktok-scraper hashtag HASHTAG_NAME -d -n 100 --session sid_tt=dae32131231
+  tiktok-scraper music MUSIC_ID -d -n 50 --session sid_tt=dae32131231
+  tiktok-scraper video https://www.tiktok.com/@tiktok/video/6807491984882765062 -d
   tiktok-scraper history
   tiktok-scraper history -r user:bob
   tiktok-scraper history -r all
-  tiktok-scraper from-file BATCH_FILE ASYNC_TASKS -d -n 25
+  tiktok-scraper from-file BATCH_FILE ASYNC_TASKS -d
 ```
 - [Terminal Examples](https://github.com/drawrowfly/tiktok-scraper/tree/master/examples/CLI/Examples.md)
 - [Manage Download History](https://github.com/drawrowfly/tiktok-scraper/tree/master/examples/CLI/DownloadHistory.md)
@@ -218,10 +219,10 @@ docker run -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d 
 ### Methods
 
 ```javascript
-.user(id, options) //Scrape posts from a specific user (Promise)
-.hashtag(id, options) //Scrape posts from hashtag section (Promise)
-.trend('', options) // Scrape posts from a trends section (Promise)
-.music(id, options) // Scrape posts by music id (Promise)
+.user(id, options) //Scrape posts from a specific user (Promise) <--- REQUIRES SESSION
+.hashtag(id, options) //Scrape posts from hashtag section (Promise) <--- REQUIRES SESSION
+.trend('', options) // Scrape posts from a trends section (Promise) <--- REQUIRES SESSION
+.music(id, options) // Scrape posts by music id (Promise) <--- REQUIRES SESSION
 
 .userEvent(id, options) //Scrape posts from a specific user (Event)
 .hashtagEvent(id, options) //Scrape posts from hashtag section (Event)
@@ -241,6 +242,11 @@ docker run -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d 
 const options = {
     // Number of posts to scrape: {int default: 20}
     number: 50,
+    
+    // Set session: {string[] default: ['']}
+    // Authenticated session cookie value is required to scrape user/trending/music/hashtag feed
+    // You can put here any number of sessions, each request will select random session from the list
+    sessionList: ['sid_tt=21312213'],
 
     // Set proxy {string[] | string default: ''}
     // http proxy: 127.0.0.1:8080
@@ -277,9 +283,9 @@ const options = {
     // NOTE: When you parse video feed or single video metadata then in return you will receive {headers} object
     // that was used to extract the information and in order to access and download video through received {videoUrl} value you need to use same headers
     headers: {
-        'User-Agent': "BLAH",
-        Referer: 'https://www.tiktok.com/',
-        Cookie: `tt_webid_v2=68dssds`,
+        'user-agent': "BLAH",
+        referer: 'https://www.tiktok.com/',
+        cookie: `tt_webid_v2=68dssds`,
     },
     
     // Download video without the watermark: {boolean default: false}
@@ -309,7 +315,10 @@ const TikTokScraper = require('tiktok-scraper');
 // User feed by username
 (async () => {
     try {
-        const posts = await TikTokScraper.user('USERNAME', { number: 100 });
+        const posts = await TikTokScraper.user('USERNAME', { 
+            number: 100, 
+            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;'] 
+        });
         console.log(posts);
     } catch (error) {
         console.log(error);
@@ -320,7 +329,11 @@ const TikTokScraper = require('tiktok-scraper');
 // Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
 (async () => {
     try {
-        const posts = await TikTokScraper.user(`USER_ID`, { number: 100, by_user_id: true });
+        const posts = await TikTokScraper.user(`USER_ID`, { 
+            number: 100, 
+            by_user_id: true,
+            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;'] 
+        });
         console.log(posts);
     } catch (error) {
         console.log(error);
@@ -330,7 +343,10 @@ const TikTokScraper = require('tiktok-scraper');
 // Trending feed
 (async () => {
     try {
-        const posts = await TikTokScraper.trend('', { number: 100 });
+        const posts = await TikTokScraper.trend('', { 
+            number: 100,
+            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;'] 
+        });
         console.log(posts);
     } catch (error) {
         console.log(error);
@@ -340,7 +356,10 @@ const TikTokScraper = require('tiktok-scraper');
 // Hashtag feed
 (async () => {
     try {
-        const posts = await TikTokScraper.hashtag('HASHTAG', { number: 100 });
+        const posts = await TikTokScraper.hashtag('HASHTAG', { 
+            number: 100,
+            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;'] 
+        });
         console.log(posts);
     } catch (error) {
         console.log(error);
@@ -371,31 +390,6 @@ const TikTokScraper = require('tiktok-scraper');
     }
 })();
 
-// Sign tiktok Web Api URL
-// url - full url
-// options - you can set the User-Agent and other options
-const rp = require('request-promise');
-
-(async () => {
-    try {
-        const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
-        const url = 'https://m.tiktok.com/share/item/list?secUid=&id=355503&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&lang=';
-
-        const signature = await TikTokScraper.signUrl(url, { headers:{
-            'User-Agent': userAgent,
-        } });
-
-        const result = await rp({
-            uri: `${url}&_signature=${signature}`,
-            headers: {
-                'user-agent': userAgent,
-            },
-        });
-        console.log(result);
-    } catch (error) {
-        console.log(error);
-    }
-})();
 
 // Get single video metadata
 // input - WEB_VIDEO_URL
@@ -440,6 +434,15 @@ hashtag.on('error', error => {
 });
 hashtag.scrape();
 ```
+### Get Set Session
+In order to scrape user/hashtag/music/trending feed you need to set authenticated session cookie value!
+How:
+- Open https://www.tiktok.com/ in any browser
+- Login in to your account
+- Right click -> inspector -> networking
+- Refresh page -> select any request that was made to the tiktok -> go to the Request Header sections -> Cookies
+- Find in cookies **sid_tt** value. It usually looks like that: **sid_tt=521kkadkasdaskdj4j213j12j312;**
+- **sid_tt=521kkadkasdaskdj4j213j12j312;** - this will be your authenticated session cookie value that should be used to scrape user/hashtag/music/trending feed
 ### Download Video
 **This part is related to the MODULE usage (NOT THE CLI)**
 
@@ -451,9 +454,9 @@ When you extract videos from the user, hashtag, music, trending feed or single v
 
 ```json
     headers: {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36",
-        "Referer": "https://www.tiktok.com/",
-        "Cookie": "tt_webid_v2=689854141086886123"
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36",
+        "referer": "https://www.tiktok.com/",
+        "cookie": "tt_webid_v2=689854141086886123"
     },
 ```
 #### Method 2: custom headers
@@ -462,9 +465,9 @@ You can pass your own headers with the **{options}**.
 
 ```javascript
 const headers = {
-    "User-Agent": "BOB",
-    "Referer": "https://www.tiktok.com/",
-    "Cookie": "tt_webid_v2=BOB"
+    "user-agent": "BOB",
+    "referer": "https://www.tiktok.com/",
+    "cookie": "tt_webid_v2=BOB"
 }
 getVideoMeta('WEB_VIDEO_URL', {headers})
 user('WEB_VIDEO_URL', {headers})
@@ -482,9 +485,9 @@ Example output for the methods: **user, hashtag, trend, music, userEvent, hashta
 ```javascript
 {
     headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
-        Referer: 'https://www.tiktok.com/',
-        Cookie: 'tt_webid_v2=689854141086886123'
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
+        referer: 'https://www.tiktok.com/',
+        cookie: 'tt_webid_v2=689854141086886123'
     },
     collector:[{
         id: 'VIDEO_ID',
@@ -582,9 +585,9 @@ Example output for the methods: **user, hashtag, trend, music, userEvent, hashta
 ```javascript
 {
     headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
-        Referer: 'https://www.tiktok.com/',
-        Cookie: 'tt_webid_v2=689854141086886123'
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
+        referer: 'https://www.tiktok.com/',
+        cookie: 'tt_webid_v2=689854141086886123'
     },
     collector:[{
         id: '6807491984882765062',
@@ -633,7 +636,7 @@ Example output for the methods: **user, hashtag, trend, music, userEvent, hashta
         playToken:
             'ffdfdf',
         keyToken: 'dfdfdfd',
-        audioURLWithCookie: false,
+        audioURLWithcookie: false,
         private: false,
         duration: 46,
         album: '',

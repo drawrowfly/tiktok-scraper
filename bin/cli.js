@@ -20,6 +20,10 @@ const startScraper = async argv => {
             argv.fileName = argv.filename;
         }
 
+        if (argv.session) {
+            argv.sessionList = [argv.session];
+        }
+
         if (argv.historypath) {
             argv.historyPath = argv.historypath;
         }
@@ -71,10 +75,10 @@ const startScraper = async argv => {
 
 yargs
     .usage('Usage: $0 <command> [options]')
-    .example(`$0 user USERNAME -d -n 100`)
-    .example(`$0 trend -d -n 100`)
-    .example(`$0 hashtag HASHTAG_NAME -d -n 100`)
-    .example(`$0 music MUSIC_ID -d -n 50`)
+    .example(`$0 user USERNAME -d -n 100 --session sid_tt=dae32131231`)
+    .example(`$0 trend -d -n 100 --session sid_tt=dae32131231`)
+    .example(`$0 hashtag HASHTAG_NAME -d -n 100 --session sid_tt=dae32131231`)
+    .example(`$0 music MUSIC_ID -d -n 50 --session sid_tt=dae32131231`)
     .example(`$0 video https://www.tiktok.com/@tiktok/video/6807491984882765062 -d`)
     .example(`$0 history`)
     .example(`$0 history -r user:bob`)
@@ -108,6 +112,9 @@ yargs
         help: {
             alias: 'h',
             describe: 'help',
+        },
+        session: {
+            describe: 'Set session cookie value. Session is required to scrape user/trending/hashtag/music feed',
         },
         timeout: {
             default: 0,
@@ -257,6 +264,14 @@ yargs
 
         if (argv._[0] === 'userprofile') {
             argv._[0] = 'getUserProfileInfo';
+        }
+
+        if (CONST.requiredSession.indexOf(argv._[0]) > -1) {
+            if (!argv.session) {
+                throw new Error(
+                    'In order to scrape user/trending/music/hashtag feed you need to set authenticated session cookie value --session .Please read the github readme',
+                );
+            }
         }
 
         return true;

@@ -42,9 +42,9 @@ const getInitOptions = () => {
         signature: '',
         verifyFp: CONST.verifyFp(),
         headers: {
-            'User-Agent': CONST.userAgent(),
-            Referer: 'https://www.tiktok.com/',
-            Cookie: `tt_webid_v2=68${makeid(16)}`,
+            'user-agent': CONST.userAgent(),
+            referer: 'https://www.tiktok.com/',
+            cookie: `tt_webid_v2=68${makeid(16)}`,
         },
     };
 };

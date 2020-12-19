@@ -2,7 +2,7 @@ import { hashtag } from '../src';
 
 (async () => {
     try {
-        const posts = await hashtag('summer', { number: 1, noWaterMark: true });
+        const posts = await hashtag('summer', { number: 1, sessionList: ['sid_tt=asdasd13123123123adasda;'] });
         console.log(posts.collector);
     } catch (error) {
         console.log(error);
