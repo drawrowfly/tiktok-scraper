@@ -943,11 +943,13 @@ export class TikTokScraper extends EventEmitter {
             const response = await this.request<TikTokMetadata>(options);
 
             if (!response) {
+                throw new Error(`An unknown error occurred: ${this.input}`);
+            }
+
+            if (response.statusCode === 10202) {
                 throw new Error(`Can't find user: ${this.input}`);
             }
-            if (response.statusCode !== 0) {
-                throw new Error(`Can't find user: ${this.input}`);
-            }
+
             return response.userInfo;
         } catch (error) {
             throw error.message;
