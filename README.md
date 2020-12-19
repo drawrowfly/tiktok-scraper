@@ -436,13 +436,19 @@ hashtag.scrape();
 ```
 ### Get Set Session
 In order to scrape user/hashtag/music/trending feed you need to set authenticated session cookie value!
-How:
+
+Get the session:
 - Open https://www.tiktok.com/ in any browser
 - Login in to your account
 - Right click -> inspector -> networking
 - Refresh page -> select any request that was made to the tiktok -> go to the Request Header sections -> Cookies
 - Find in cookies **sid_tt** value. It usually looks like that: **sid_tt=521kkadkasdaskdj4j213j12j312;**
 - **sid_tt=521kkadkasdaskdj4j213j12j312;** - this will be your authenticated session cookie value that should be used to scrape user/hashtag/music/trending feed
+
+Set the session:
+- In the **CLI** you can set session by using the option --session. For example **--session sid_tt=521kkadkasdaskdj4j213j12j312;**
+- In the **MODULE** you can set session by setting the option value sessionList . For example **sessionList:["sid_tt=521kkadkasdaskdj4j213j12j312;", "sid_tt=12312312312312;"]**
+
 ### Download Video
 **This part is related to the MODULE usage (NOT THE CLI)**
 
