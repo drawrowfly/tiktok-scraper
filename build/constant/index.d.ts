@@ -1,6 +1,7 @@
 declare const _default: {
     scrape: string[];
     history: string[];
+    requiredSession: string[];
     sourceType: {
         user: number;
         music: number;

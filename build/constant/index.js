@@ -14,6 +14,7 @@ module.exports = {
         'userprofile',
     ],
     history: ['user', 'hashtag', 'trend', 'music'],
+    requiredSession: ['user', 'hashtag', 'trend', 'music'],
     sourceType: {
         user: 8,
         music: 11,
