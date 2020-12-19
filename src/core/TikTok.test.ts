@@ -19,7 +19,7 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
             noWaterMark: false,
             type: 'user',
             headers: {
-                'User-Agent': 'Custom User-Agent',
+                'user-agent': 'Custom user-agent',
             },
             proxy: '',
             number: 5,
@@ -33,7 +33,7 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
 
     it('set custom user-agent', async () => {
         expect(instance).toBeInstanceOf(TikTokScraper);
-        expect(instance.headers['User-Agent']).toContain('Custom User-Agent');
+        expect(instance.headers['user-agent']).toContain('Custom user-agent');
     });
 
     it('getUserId should return a valid Object', async () => {
@@ -46,7 +46,6 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
             minCursor: 0,
             secUid: '',
             sourceType: 8,
-            user_agent: 'Custom User-Agent',
             verifyFp: '',
         });
     });
@@ -69,7 +68,7 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
             input: 'tiktok',
             type: 'user',
             headers: {
-                'User-Agent': 'Custom User-Agent',
+                'user-agent': 'Custom user-agent',
             },
             proxy: '',
             number: 1,
@@ -148,7 +147,7 @@ describe('TikTok Scraper MODULE(promise): user(invalid input data)', () => {
             input: '',
             type: 'user',
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -166,7 +165,7 @@ describe('TikTok Scraper MODULE(promise): user(invalid input data)', () => {
             input: '',
             type: 'fake' as ScrapeType,
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -186,7 +185,7 @@ describe('TikTok Scraper MODULE(event): user(invalid input data)', () => {
             input: '',
             type: 'user',
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 1,
@@ -209,7 +208,7 @@ describe('TikTok Scraper MODULE(event): user(invalid input data)', () => {
             input: '',
             type: 'fake' as ScrapeType,
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -238,7 +237,7 @@ describe('TikTok Scraper MODULE(promise): user(save to a file)', () => {
             input: 'tiktok',
             type: 'user',
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -273,7 +272,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
             input: 'summer',
             type: 'hashtag',
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -308,7 +307,7 @@ describe('TikTok Scraper MODULE(promise): signUrl', () => {
             input: 'https://m.tiktok.com/share/item/list?secUid=&id=355503&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&lang=',
             type: 'signature',
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -338,7 +337,7 @@ describe('TikTok Scraper MODULE(promise): getHashtagInfo', () => {
             input: hasthagName,
             type: 'single_hashtag',
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -389,7 +388,7 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
             input: userName,
             type: 'single_user',
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -459,7 +458,7 @@ describe('TikTok Scraper CLI: user(save progress)', () => {
             input: 'tiktok',
             type: 'user',
             headers: {
-                'User-Agent': 'okhttp',
+                'user-agent': 'okhttp',
             },
             proxy: '',
             number: 5,
@@ -497,7 +496,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             input: 'https://www.tiktok.com/@tiktok/video/6807491984882765062',
             type: 'video_meta',
             headers: {
-                'User-Agent': CONST.userAgent(),
+                'user-agent': CONST.userAgent(),
             },
             proxy: '',
             number: 5,

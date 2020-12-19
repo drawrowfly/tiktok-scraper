@@ -2,7 +2,7 @@ import { music } from '../src';
 
 (async () => {
     try {
-        const posts = await music('6548327243720952577', { number: 1, noWaterMark: true });
+        const posts = await music('6548327243720952577', { number: 1, sessionList: ['sid_tt=asdasd13123123123adasda;'] });
         console.log(posts.collector);
     } catch (error) {
         console.log(error);

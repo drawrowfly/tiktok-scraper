@@ -2,7 +2,7 @@ import { user } from '../src';
 
 (async () => {
     try {
-        const posts = await user('tiktok', { number: 1, noWaterMark: true });
+        const posts = await user('tiktok', { number: 1, sessionList: ['sid_tt=asdasd13123123123adasda;'] });
         console.log(posts.collector);
     } catch (error) {
         console.log(error);
