@@ -318,3 +318,11 @@ export interface HashtagMetadata {
     };
     stats: { videoCount: number; viewCount: number };
 }
+
+export interface WebHtmlUserMetadata {
+    props: {
+        pageProps: {
+            userInfo: UserMetadata;
+        };
+    };
+}
