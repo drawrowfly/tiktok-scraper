@@ -126,8 +126,10 @@ Commands:
 
 Options:
   --version            Show version number                             [boolean]
-  --session            Set session cookie value. Session is required to scrape
-                       user/trending/hashtag/music feed
+  --session            Set session cookie value. Sometimes session can be
+                       helpful when scraping data from any method  [default: ""]
+  --session-file       Set path to the file with list of active sessions. One
+                       session per line!                           [default: ""]
   --timeout            Set timeout between requests. Timeout is in Milliseconds:
                        1000 mls = 1 s                               [default: 0]
   --number, -n         Number of posts to scrape. If you will set 0 then all
@@ -219,10 +221,10 @@ docker run -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d 
 ### Methods
 
 ```javascript
-.user(id, options) //Scrape posts from a specific user (Promise) <--- REQUIRES SESSION
-.hashtag(id, options) //Scrape posts from hashtag section (Promise) <--- REQUIRES SESSION
-.trend('', options) // Scrape posts from a trends section (Promise) <--- REQUIRES SESSION
-.music(id, options) // Scrape posts by music id (Promise) <--- REQUIRES SESSION
+.user(id, options) //Scrape posts from a specific user (Promise)
+.hashtag(id, options) //Scrape posts from hashtag section (Promise)
+.trend('', options) // Scrape posts from a trends section (Promise)
+.music(id, options) // Scrape posts by music id (Promise)
 
 .userEvent(id, options) //Scrape posts from a specific user (Event)
 .hashtagEvent(id, options) //Scrape posts from hashtag section (Event)
@@ -435,7 +437,9 @@ hashtag.on('error', error => {
 hashtag.scrape();
 ```
 ### Get Set Session
-In order to scrape user/hashtag/music/trending feed you need to set authenticated session cookie value!
+**NOT REQUIRED**
+
+**Very common problem is when tiktok is blacklisting your IP/PROXY and in such case you can try to set session and there will be higher chances for success**
 
 Get the session:
 - Open https://www.tiktok.com/ in any browser
@@ -446,7 +450,17 @@ Get the session:
 - **sid_tt=521kkadkasdaskdj4j213j12j312;** - this will be your authenticated session cookie value that should be used to scrape user/hashtag/music/trending feed
 
 Set the session:
-- In the **CLI** you can set session by using the option --session. For example **--session sid_tt=521kkadkasdaskdj4j213j12j312;**
+- **CLI**:
+    -  Set single session by using option **--session**. For example **--session sid_tt=521kkadkasdaskdj4j213j12j312;**
+    -  Set path to the file with the list of sessions by using option **--session-file**. For example **--session-file /var/bob/sessionList.txt**
+        - Example content /var/bob/sessionList.txt:
+        ```
+        sid_tt=521kkadkasdaskdj4j213j12j312;
+        sid_tt=521kkadkasdaskdj4j213j12j312;
+        sid_tt=521kkadkasdaskdj4j213j12j312;
+        sid_tt=521kkadkasdaskdj4j213j12j312;
+        ```
+         
 - In the **MODULE** you can set session by setting the option value sessionList . For example **sessionList:["sid_tt=521kkadkasdaskdj4j213j12j312;", "sid_tt=12312312312312;"]**
 
 ### Download Video

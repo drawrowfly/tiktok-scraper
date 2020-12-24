@@ -66,6 +66,23 @@ const proxyFromFile = async (file: string) => {
     }
 };
 
+/**
+ * Load session list from a file
+ * @param file
+ */
+const sessionFromFile = async (file: string) => {
+    try {
+        const data = (await fromCallback(cb => readFile(file, { encoding: 'utf-8' }, cb))) as string;
+        const proxyList = data.split('\n');
+        if (!proxyList.length || proxyList[0] === '') {
+            throw new Error('Session file is empty');
+        }
+        return proxyList;
+    } catch (error) {
+        throw error.message;
+    }
+};
+
 const promiseScraper = async (input: string, type: ScrapeType, options = {} as Options): Promise<Result> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
@@ -73,6 +90,10 @@ const promiseScraper = async (input: string, type: ScrapeType, options = {} as O
 
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
+    }
+
+    if (options?.sessionFile) {
+        options.sessionList = await sessionFromFile(options?.sessionFile);
     }
 
     const constructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type, input } };
@@ -109,7 +130,9 @@ export const getHashtagInfo = async (input: string, options = {} as Options): Pr
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
-
+    if (options?.sessionFile) {
+        options.sessionList = await sessionFromFile(options?.sessionFile);
+    }
     const contructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type: 'signle_hashtag' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
 
@@ -124,7 +147,9 @@ export const getMusicInfo = async (input: string, options = {} as Options): Prom
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
-
+    if (options?.sessionFile) {
+        options.sessionList = await sessionFromFile(options?.sessionFile);
+    }
     const contructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type: 'single_music' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
 
@@ -140,6 +165,9 @@ export const getUserProfileInfo = async (input: string, options = {} as Options)
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
+    if (options?.sessionFile) {
+        options.sessionList = await sessionFromFile(options?.sessionFile);
+    }
     const contructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type: 'sinsgle_user' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
 
@@ -154,7 +182,9 @@ export const signUrl = async (input: string, options = {} as Options): Promise<s
     if (options.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
     }
-
+    if (options?.sessionFile) {
+        options.sessionList = await sessionFromFile(options?.sessionFile);
+    }
     const contructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type: 'signature' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
 
@@ -169,6 +199,9 @@ export const getVideoMeta = async (input: string, options = {} as Options): Prom
 
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
+    }
+    if (options?.sessionFile) {
+        options.sessionList = await sessionFromFile(options?.sessionFile);
     }
     const contructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type: 'video_meta' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
@@ -187,6 +220,9 @@ export const video = async (input: string, options = {} as Options): Promise<any
 
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
+    }
+    if (options?.sessionFile) {
+        options.sessionList = await sessionFromFile(options?.sessionFile);
     }
     const contructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type: 'video' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
@@ -372,6 +408,9 @@ export const fromfile = async (input: string, options = {} as Options) => {
                     by_user_id: true,
                 };
             }
+            if (item.indexOf('@') > -1) {
+                item = item.replace(/@/g, '');
+            }
             return {
                 type: 'user',
                 input: item,
@@ -383,6 +422,9 @@ export const fromfile = async (input: string, options = {} as Options) => {
 
     if (options?.proxyFile) {
         options.proxy = await proxyFromFile(options?.proxyFile);
+    }
+    if (options?.sessionFile) {
+        options.sessionList = await sessionFromFile(options?.sessionFile);
     }
     const result = await batchProcessor(batch, options);
 

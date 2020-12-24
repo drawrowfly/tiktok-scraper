@@ -66,7 +66,7 @@ const startScraper = async argv => {
                 console.log(scraper);
             }
         } catch (error) {
-            console.error(error.message);
+            console.error(error.message ? error.message : error);
         }
     } catch (error) {
         console.log(error);
@@ -114,7 +114,12 @@ yargs
             describe: 'help',
         },
         session: {
-            describe: 'Set session cookie value. Session is required to scrape user/trending/hashtag/music feed',
+            default: '',
+            describe: 'Set session cookie value. Sometimes session can be helpful when scraping data from any method',
+        },
+        'session-file': {
+            default: '',
+            describe: 'Set path to the file with list of active sessions. One session per line!',
         },
         timeout: {
             default: 0,
@@ -264,14 +269,6 @@ yargs
 
         if (argv._[0] === 'userprofile') {
             argv._[0] = 'getUserProfileInfo';
-        }
-
-        if (CONST.requiredSession.indexOf(argv._[0]) > -1) {
-            if (!argv.session) {
-                throw new Error(
-                    'In order to scrape user/trending/music/hashtag feed you need to set authenticated session cookie value --session .Please read the github readme',
-                );
-            }
         }
 
         return true;

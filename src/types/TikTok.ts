@@ -24,6 +24,7 @@ export interface Options {
     proxy?: string[] | string;
     sessionList?: string[];
     proxyFile?: string;
+    sessionFile?: string;
     event?: boolean;
     by_user_id?: boolean;
     download?: boolean;
