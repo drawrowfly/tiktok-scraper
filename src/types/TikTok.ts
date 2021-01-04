@@ -89,6 +89,7 @@ export interface Hashtags {
 
 export interface PostCollector {
     id: string;
+    secretID: string;
     text: string;
     createTime: number;
     authorMeta: {
