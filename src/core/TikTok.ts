@@ -1106,6 +1106,9 @@ export class TikTokScraper extends EventEmitter {
                         height: videoData.video.height,
                         ratio: videoData.video.ratio,
                         duration: videoData.video.duration,
+                        duetEnabled: videoData.duetEnabled,
+                        stitchEnabled: videoData.stitchEnabled,
+                        duetInfo: videoData.duetInfo,
                     },
                     covers: {
                         default: videoData.video.cover,
