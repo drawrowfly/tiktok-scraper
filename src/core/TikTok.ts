@@ -940,10 +940,10 @@ export class TikTokScraper extends EventEmitter {
                 const userMetadata: WebHtmlUserMetadata = JSON.parse(breakResponse);
                 return userMetadata.props.pageProps.userInfo;
             }
-            throw new Error(`Can't extract user metadata from the html page`);
-        } catch (error) {
-            throw error.message;
+        } catch {
+            // continue regardless of error
         }
+        throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }
 
     /**
