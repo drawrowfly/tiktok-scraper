@@ -233,7 +233,7 @@ export class TikTokScraper extends EventEmitter {
             case 'hashtag':
                 return this.filepath ? `${this.filepath}/#${this.input}` : `#${this.input}`;
             case 'music':
-                return this.filepath ? `${this.filepath}/music:${this.input}` : `music:${this.input}`;
+                return this.filepath ? `${this.filepath}/music_${this.input}` : `music_${this.input}`;
             case 'trend':
                 return this.filepath ? `${this.filepath}/trend` : `trend`;
             case 'video':
