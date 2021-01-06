@@ -233,7 +233,7 @@ export class TikTokScraper extends EventEmitter {
             case 'hashtag':
                 return this.filepath ? `${this.filepath}/#${this.input}` : `#${this.input}`;
             case 'music':
-                return this.filepath ? `${this.filepath}/music:${this.input}` : `music:${this.input}`;
+                return this.filepath ? `${this.filepath}/music_${this.input}` : `music_${this.input}`;
             case 'trend':
                 return this.filepath ? `${this.filepath}/trend` : `trend`;
             case 'video':
@@ -418,29 +418,10 @@ export class TikTokScraper extends EventEmitter {
      */
     // eslint-disable-next-line class-methods-use-this
     private async extractVideoId(item: PostCollector): Promise<string | null> {
-        // All videos after July 27 2020 do not store unique video id
-        // it means that we can't extract url to the video without the watermark
-        if (item.createTime > 1595808000) {
-            return null;
-        }
-        try {
-            const result = await rp({
-                uri: item.videoUrl,
-            });
-            const position = Buffer.from(result).indexOf('vid:');
-            if (position !== -1) {
-                const id = Buffer.from(result)
-                    .slice(position + 4, position + 36)
-                    .toString();
+        return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${item.secretID}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${
+            this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
+        }`;
 
-                return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${
-                    this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
-                }`;
-            }
-        } catch {
-            // continue regardless of error
-        }
-        return null;
     }
 
     /**
@@ -672,6 +653,7 @@ export class TikTokScraper extends EventEmitter {
                 this.noDuplicates.push(posts[i].id);
                 const item: PostCollector = {
                     id: posts[i].id,
+                    secretID: posts[i].video.id,
                     text: posts[i].desc,
                     createTime: posts[i].createTime,
                     authorMeta: {
@@ -1072,6 +1054,7 @@ export class TikTokScraper extends EventEmitter {
 
                 const videoItem = {
                     id: videoData.id,
+                    secretID: videoData.video.id,
                     text: videoData.desc,
                     createTime: videoData.createTime,
                     authorMeta: {
@@ -1106,6 +1089,9 @@ export class TikTokScraper extends EventEmitter {
                         height: videoData.video.height,
                         ratio: videoData.video.ratio,
                         duration: videoData.video.duration,
+                        duetEnabled: videoData.duetEnabled,
+                        stitchEnabled: videoData.stitchEnabled,
+                        duetInfo: videoData.duetInfo,
                     },
                     covers: {
                         default: videoData.video.cover,
