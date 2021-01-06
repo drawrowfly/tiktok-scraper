@@ -1,3 +1,5 @@
+import { DuetInfo } from '.';
+
 export interface ItemInfos {
     id: string;
     text: string;
@@ -137,6 +139,11 @@ export interface ItemListData {
     cursor: string;
 }
 
+export interface VideoMetadata {
+    statusCode: number;
+    itemInfo: { itemStruct: FeedItems };
+}
+
 export interface FeedItems {
     id: string;
     desc: string;
@@ -166,6 +173,7 @@ export interface FeedItems {
         secUid: string;
         relation: number;
         openFavorite: boolean;
+        secret: boolean;
     };
     music: {
         id: string;
@@ -176,6 +184,8 @@ export interface FeedItems {
         coverLarge: string;
         authorName: string;
         original: boolean;
+        duration: number;
+        album: string;
     };
     challenges: {
         id: string;
@@ -212,6 +222,16 @@ export interface FeedItems {
     itemCommentStatus: number;
     showNotPass: boolean;
     vl1: boolean;
+    authorStats: {
+        followingCount: number;
+        followerCount: number;
+        heartCount: number;
+        videoCount: number;
+        diggCount: number;
+    };
+    duetEnabled: boolean;
+    stitchEnabled: boolean;
+    duetInfo: DuetInfo;
 }
 
 /**

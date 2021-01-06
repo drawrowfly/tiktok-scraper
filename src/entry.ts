@@ -206,7 +206,8 @@ export const getVideoMeta = async (input: string, options = {} as Options): Prom
     const contructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type: 'video_meta' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
 
-    const result = await scraper.getVideoMeta();
+    const fullUrl = /^https:\/\/www\.tiktok\.com\/@[\w.-]+\/video\/\d+/.test(input);
+    const result = await scraper.getVideoMeta(!fullUrl);
     return {
         headers: contructor.headers,
         collector: [result],

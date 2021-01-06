@@ -5,6 +5,8 @@ const request = options => {
     switch (true) {
         case /^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(.\w.+)\/video\/(\d+))\?verifyFp=$/.test(uri):
             return { body: response.videoMeta };
+        case /^https:\/\/www\.tiktok\.com\/@[\w.-]+/.test(uri):
+            return { body: response.userMeta };
         case /^https:\/\/m.tiktok.com\/node\/share\/user\/@\w+\?uniqueId=(\w+)&verifyFp=$/.test(uri): {
             const user = /^https:\/\/m.tiktok.com\/node\/share\/user\/@\w+\?uniqueId=(\w+)&verifyFp=$/.exec(uri);
             if (user) {

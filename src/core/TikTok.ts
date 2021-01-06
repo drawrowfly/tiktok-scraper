@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
 /* eslint-disable no-throw-literal */
 /* eslint-disable no-await-in-loop */
@@ -30,6 +31,7 @@ import {
     HashtagMetadata,
     Headers,
     WebHtmlUserMetadata,
+    VideoMetadata,
 } from '../types';
 
 import { Downloader } from '../core';
@@ -287,7 +289,10 @@ export class TikTokScraper extends EventEmitter {
      * Main request method
      * @param {} OptionsWithUri
      */
-    private request<T>({ uri, method, qs, body, form, headers, json, gzip }: OptionsWithUri): Promise<T> {
+    private request<T>(
+        { uri, method, qs, body, form, headers, json, gzip, followAllRedirects, simple = true }: OptionsWithUri,
+        bodyOnly = true,
+    ): Promise<T> {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
             const proxy = this.getProxy;
@@ -304,6 +309,8 @@ export class TikTokScraper extends EventEmitter {
                 ...(json ? { json: true } : {}),
                 ...(gzip ? { gzip: true } : {}),
                 resolveWithFullResponse: true,
+                followAllRedirects: followAllRedirects || false,
+                simple,
                 ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
                 ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
                 timeout: 10000,
@@ -312,7 +319,7 @@ export class TikTokScraper extends EventEmitter {
             try {
                 const response = await rp(options);
                 setTimeout(() => {
-                    resolve(response.body);
+                    resolve(bodyOnly ? response.body : response);
                 }, this.timeout);
             } catch (error) {
                 reject(error);
@@ -394,34 +401,65 @@ export class TikTokScraper extends EventEmitter {
             forEachLimit(
                 this.collector,
                 5,
-                (item: PostCollector, cb) => {
-                    this.extractVideoId(item)
-                        .then(video => {
-                            if (video) {
-                                // eslint-disable-next-line no-param-reassign
-                                item.videoUrlNoWaterMark = video;
-                            }
-                            cb(null);
-                        })
-                        .catch(() => cb(null));
+                async (item: PostCollector) => {
+                    try {
+                        const videoData = await this.getVideoMetadata(item.webVideoUrl);
+                        item.secretID = videoData.video.id;
+                        item.videoApiUrlNoWaterMark = this.getApiUrlWithoutWatermark(item);
+                        item.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(item.videoApiUrlNoWaterMark!);
+                    } catch {
+                        throw new Error(`Can't extract unique video id`);
+                    }
                 },
                 () => {
-                    resolve();
+                    resolve(null);
                 },
             );
         });
     }
 
     /**
-     * Extract uniq video id
+     * Get temporary url to the video without the watermark
+     * The url has expiration time (between 5-20 minutes+-)
+     * @param uri
+     */
+    private async getUrlWithoutTheWatermark(uri: string): Promise<string> {
+        if (!uri) {
+            return '';
+        }
+        const options = {
+            uri,
+            method: 'GET',
+            headers: {
+                'user-agent':
+                    'com.zhiliaoapp.musically/2021600040 (Linux; U; Android 5.0; en_US; SM-N900T; Build/LRX21V; Cronet/TTNetVersion:6c7b701a 2020-04-23 QuicVersion:0144d358 2020-03-24)',
+                'sec-fetch-mode': 'navigate',
+            },
+            followAllRedirects: true,
+            simple: false,
+        };
+
+        try {
+            const response: {
+                request: { uri: { href: string } };
+            } = await this.request(options, false);
+            return response.request.uri.href;
+        } catch (err) {
+            throw new Error(`Can't extract video url without the watermark`);
+        }
+    }
+
+    /**
+     * Get url that can be used to extract video url without the watermark
      * @param uri
      */
     // eslint-disable-next-line class-methods-use-this
-    private async extractVideoId(item: PostCollector): Promise<string | null> {
-        return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${item.secretID}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${
-            this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
-        }`;
-
+    private getApiUrlWithoutWatermark(item: PostCollector) {
+        return item.secretID
+            ? `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${
+                  item.secretID
+              }&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''}`
+            : '';
     }
 
     /**
@@ -464,7 +502,7 @@ export class TikTokScraper extends EventEmitter {
                     }
                 },
                 () => {
-                    resolve();
+                    resolve(null);
                 },
             );
         });
@@ -625,13 +663,13 @@ export class TikTokScraper extends EventEmitter {
 
             try {
                 await fromCallback(cb => writeFile(`${this.historyPath}/${this.storeValue}.json`, JSON.stringify(store), cb));
-            } catch (error) {
+            } catch {
                 // continue regardless of error
             }
 
             try {
                 await fromCallback(cb => writeFile(`${this.historyPath}/tiktok_history.json`, JSON.stringify(history), cb));
-            } catch (error) {
+            } catch {
                 // continue regardless of error
             }
         }
@@ -664,6 +702,11 @@ export class TikTokScraper extends EventEmitter {
                         verified: posts[i].author.verified,
                         signature: posts[i].author.signature,
                         avatar: posts[i].author.avatarLarger,
+                        following: posts[i].authorStats.followingCount,
+                        fans: posts[i].authorStats.followerCount,
+                        heart: posts[i].authorStats.heartCount,
+                        video: posts[i].authorStats.videoCount,
+                        digg: posts[i].authorStats.diggCount,
                     },
                     ...(posts[i].music
                         ? {
@@ -672,10 +715,12 @@ export class TikTokScraper extends EventEmitter {
                                   musicName: posts[i].music.title,
                                   musicAuthor: posts[i].music.authorName,
                                   musicOriginal: posts[i].music.original,
+                                  musicAlbum: posts[i].music.album,
                                   playUrl: posts[i].music.playUrl,
                                   coverThumb: posts[i].music.coverThumb,
                                   coverMedium: posts[i].music.coverMedium,
                                   coverLarge: posts[i].music.coverLarge,
+                                  duration: posts[i].music.duration,
                               },
                           }
                         : {}),
@@ -687,6 +732,7 @@ export class TikTokScraper extends EventEmitter {
                     webVideoUrl: `https://www.tiktok.com/@${posts[i].author.uniqueId}/video/${posts[i].id}`,
                     videoUrl: posts[i].video.downloadAddr,
                     videoUrlNoWaterMark: '',
+                    videoApiUrlNoWaterMark: '',
                     videoMeta: {
                         height: posts[i].video.height,
                         width: posts[i].video.width,
@@ -997,20 +1043,16 @@ export class TikTokScraper extends EventEmitter {
     }
 
     /**
-     * Get video url without the watermark
-     * @param {}
+     * Get video metadata from the HTML
+     * This method can be used if you aren't able to retrieve video metadata from a simple API call
+     * Can be slow
      */
-
-    public async getVideoMeta(): Promise<PostCollector> {
-        if (!this.input) {
-            throw `Url is missing`;
-        }
+    private async getVideoMetadataFromHtml(): Promise<FeedItems> {
         const options = {
             uri: `${this.input}?verifyFp=${this.verifyFp}`,
             method: 'GET',
             json: true,
         };
-
         try {
             let short = false;
             let regex: RegExpExecArray | null;
@@ -1051,82 +1093,133 @@ export class TikTokScraper extends EventEmitter {
                 }
 
                 const videoData = short ? videoProps[shortKey].videoData : videoProps.props.pageProps.itemInfo.itemStruct;
-
-                const videoItem = {
-                    id: videoData.id,
-                    secretID: videoData.video.id,
-                    text: videoData.desc,
-                    createTime: videoData.createTime,
-                    authorMeta: {
-                        id: videoData.author.id,
-                        secUid: videoData.author.secUid,
-                        name: videoData.author.uniqueId,
-                        nickName: videoData.author.nickname,
-                        following: videoData.authorStats.followingCount,
-                        fans: videoData.authorStats.followerCount,
-                        heart: videoData.authorStats.heart,
-                        video: videoData.authorStats.videoCount,
-                        digg: videoData.authorStats.diggCount,
-                        verified: videoData.author.verified,
-                        private: videoData.author.secret,
-                        signature: videoData.author.signature,
-                        avatar: videoData.author.avatarLarger,
-                    },
-                    musicMeta: {
-                        musicId: videoData.music.id,
-                        musicName: videoData.music.title,
-                        musicAuthor: videoData.music.authorName,
-                        musicOriginal: videoData.music.original,
-                        coverThumb: videoData.music.coverThumb,
-                        coverMedium: videoData.music.coverMedium,
-                        coverLarge: videoData.music.coverLarge,
-                    },
-                    imageUrl: videoData.video.cover,
-                    videoUrl: videoData.video.playAddr,
-                    videoUrlNoWaterMark: null,
-                    videoMeta: {
-                        width: videoData.video.width,
-                        height: videoData.video.height,
-                        ratio: videoData.video.ratio,
-                        duration: videoData.video.duration,
-                        duetEnabled: videoData.duetEnabled,
-                        stitchEnabled: videoData.stitchEnabled,
-                        duetInfo: videoData.duetInfo,
-                    },
-                    covers: {
-                        default: videoData.video.cover,
-                        origin: videoData.video.originCover,
-                    },
-                    diggCount: videoData.stats.diggCount,
-                    shareCount: videoData.stats.shareCount,
-                    playCount: videoData.stats.playCount,
-                    commentCount: videoData.stats.commentCount,
-                    downloaded: false,
-                    mentions: videoData.desc.match(/(@\w+)/g) || [],
-                    hashtags: videoData.challenges
-                        ? videoData.challenges.map(({ id, title, desc, profileLarger }) => ({
-                              id,
-                              name: title,
-                              title: desc,
-                              cover: profileLarger,
-                          }))
-                        : [],
-                } as PostCollector;
-
-                try {
-                    const video = await this.extractVideoId(videoItem);
-                    videoItem.videoUrlNoWaterMark = video;
-                } catch (error) {
-                    // continue regardless of error
-                }
-                this.collector.push(videoItem);
-
-                return videoItem;
+                return videoData as FeedItems;
             }
-            throw new Error();
         } catch (error) {
-            throw `Can't extract metadata from the video: ${this.input}`;
+            throw `Can't extract video metadata: ${this.input}`;
         }
+
+        throw new Error();
+    }
+
+    /**
+     * Get video metadata from the regular API endpoint
+     */
+    private async getVideoMetadata(url = ''): Promise<FeedItems> {
+        const videoData = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/.exec(url || this.input);
+        if (videoData) {
+            const videoUsername = videoData[1];
+            const videoId = videoData[2];
+
+            const options = {
+                method: 'GET',
+                uri: `https://www.tiktok.com/node/share/video/${videoUsername}/${videoId}`,
+                json: true,
+            };
+
+            try {
+                const response = await this.request<VideoMetadata>(options);
+                if (response.statusCode === 0) {
+                    return response.itemInfo.itemStruct;
+                }
+            } catch {
+                // continue regardless of error
+            }
+        }
+        throw new Error(`Can't extract video metadata: ${this.input}`);
+    }
+
+    /**
+     * Get video url without the watermark
+     * @param {}
+     */
+
+    public async getVideoMeta(html = true): Promise<PostCollector> {
+        if (!this.input) {
+            throw `Url is missing`;
+        }
+
+        let videoData = {} as FeedItems;
+        if (html) {
+            videoData = await this.getVideoMetadataFromHtml();
+        } else {
+            videoData = await this.getVideoMetadata();
+        }
+
+        const videoItem = {
+            id: videoData.id,
+            secretID: videoData.video.id,
+            text: videoData.desc,
+            createTime: videoData.createTime,
+            authorMeta: {
+                id: videoData.author.id,
+                secUid: videoData.author.secUid,
+                name: videoData.author.uniqueId,
+                nickName: videoData.author.nickname,
+                following: videoData.authorStats.followingCount,
+                fans: videoData.authorStats.followerCount,
+                heart: videoData.authorStats.heartCount,
+                video: videoData.authorStats.videoCount,
+                digg: videoData.authorStats.diggCount,
+                verified: videoData.author.verified,
+                private: videoData.author.secret,
+                signature: videoData.author.signature,
+                avatar: videoData.author.avatarLarger,
+            },
+            musicMeta: {
+                musicId: videoData.music.id,
+                musicName: videoData.music.title,
+                musicAuthor: videoData.music.authorName,
+                musicOriginal: videoData.music.original,
+                coverThumb: videoData.music.coverThumb,
+                coverMedium: videoData.music.coverMedium,
+                coverLarge: videoData.music.coverLarge,
+                duration: videoData.music.duration,
+            },
+            imageUrl: videoData.video.cover,
+            videoUrl: videoData.video.playAddr,
+            videoUrlNoWaterMark: '',
+            videoApiUrlNoWaterMark: '',
+            videoMeta: {
+                width: videoData.video.width,
+                height: videoData.video.height,
+                ratio: videoData.video.ratio,
+                duration: videoData.video.duration,
+                duetEnabled: videoData.duetEnabled,
+                stitchEnabled: videoData.stitchEnabled,
+                duetInfo: videoData.duetInfo,
+            },
+            covers: {
+                default: videoData.video.cover,
+                origin: videoData.video.originCover,
+            },
+            diggCount: videoData.stats.diggCount,
+            shareCount: videoData.stats.shareCount,
+            playCount: videoData.stats.playCount,
+            commentCount: videoData.stats.commentCount,
+            downloaded: false,
+            mentions: videoData.desc.match(/(@\w+)/g) || [],
+            hashtags: videoData.challenges
+                ? videoData.challenges.map(({ id, title, desc, profileLarger }) => ({
+                      id,
+                      name: title,
+                      title: desc,
+                      cover: profileLarger,
+                  }))
+                : [],
+        } as PostCollector;
+
+        try {
+            if (this.noWaterMark) {
+                videoItem.videoApiUrlNoWaterMark = this.getApiUrlWithoutWatermark(videoItem);
+                videoItem.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(videoItem.videoApiUrlNoWaterMark);
+            }
+        } catch {
+            // continue regardless of error
+        }
+        this.collector.push(videoItem);
+
+        return videoItem;
     }
 
     /**
@@ -1157,7 +1250,7 @@ export class TikTokScraper extends EventEmitter {
                         .finally(() => cb(null));
                 },
                 () => {
-                    resolve();
+                    resolve(null);
                 },
             );
         });

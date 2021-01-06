@@ -116,10 +116,12 @@ export interface PostCollector {
         musicName: string;
         musicAuthor: string;
         musicOriginal: boolean;
+        musicAlbum: string;
         playUrl: string;
         coverThumb?: string;
         coverMedium?: string;
         coverLarge?: string;
+        duration?: number;
     };
     covers: {
         default: string;
@@ -129,11 +131,12 @@ export interface PostCollector {
     imageUrl?: string;
     webVideoUrl?: string;
     videoUrl: string;
-    videoUrlNoWaterMark: string | null;
+    videoUrlNoWaterMark?: string;
+    videoApiUrlNoWaterMark?: string;
     videoMeta: {
         width: number;
         height: number;
-        ratio?: number;
+        ratio?: string;
         duration: number;
         duetEnabled?: boolean;
         stitchEnabled?: boolean;

@@ -76,57 +76,6 @@ describe('TikTok Scraper MODULE(event): user(valid input data)', () => {
         });
     });
 
-    it('result should emit "data" event with the result', done => {
-        instance.on('data', data => {
-            expect(data).toEqual({
-                id: '6833468102982798598',
-                text: 'To our community, a message from our CEO...',
-                createTime: 1591040777,
-                authorMeta: {
-                    id: '107955',
-                    secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
-                    name: 'tiktok',
-                    nickName: 'TikTok',
-                    verified: true,
-                    signature: 'Make Your Day',
-                    avatar: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg',
-                },
-                musicMeta: {
-                    musicId: '6833468087698803462',
-                    musicName: 'original sound',
-                    musicAuthor: 'tiktok',
-                    musicOriginal: true,
-                    playUrl: 'https://p16-va-tiktok.ibyteimg.com/obj/musically-maliva-obj/8933750c078b6b0702864cd3004f989f.mp3',
-                    coverThumb: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_100x100.jpeg',
-                    coverMedium: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_720x720.jpeg',
-                    coverLarge: 'https://p16-va-tiktok.ibyteimg.com/img/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg',
-                },
-                covers: {
-                    default:
-                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/57cf33573b3348b9a44b12287601574d_1591040780?x-expires=1591862400&x-signature=dF7jR2iPW2St4BWqBgxi78FvMP0%3D',
-                    origin:
-                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/1fca8a4bd2cd49eabfc2290a5f3befab_1591040779?x-expires=1591862400&x-signature=ckP5WHRjaPHlD%2FhGJTm0s6%2BS6bo%3D',
-                    dynamic:
-                        'https://p16-tiktok-va.ibyteimg.com/obj/tos-maliva-p-0068/6f08a25103584cac821e15727c625f65_1591040779?x-expires=1591862400&x-signature=sP2%2BauyoM39NP%2BrUAgCZdh1KilI%3D',
-                },
-                webVideoUrl: 'https://www.tiktok.com/@tiktok/video/6833468102982798598',
-                videoUrl:
-                    'https://v19.tiktokcdn.com/270ac5f1885ae68e7bcf5d2fedf02282/5edf9875/video/tos/useast2a/tos-useast2a-ve-0068c001/76cda2fd993649878b0099e4e0d064b3/?a=1233&br=572&bt=286&cr=0&cs=0&dr=0&ds=3&er=&l=2020060908104601018907106605015433&lr=tiktok_m&mime_type=video_mp4&qs=0&rc=anhneHdkeDRvdTMzZjczM0ApOjg5NWk8PGQ2N2Q5Njs2aGdjY2VxZGAwal5fLS00MTZzczJhYGMxMDMxNTBeNi8wYTA6Yw%3D%3D&vl=&vr=',
-                videoUrlNoWaterMark: '',
-                videoMeta: { height: 1024, width: 576, duration: 15 },
-                diggCount: 201200,
-                shareCount: 2537,
-                playCount: 1800000,
-                commentCount: 15700,
-                downloaded: false,
-                mentions: [],
-                hashtags: [],
-            });
-            done();
-        });
-        instance.scrape();
-    });
-
     it('result should emit "done" event if task was completed', done => {
         instance.on('done', data => {
             expect(data).toEqual('completed');
@@ -402,13 +351,13 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
                 uniqueId: 'tiktok',
                 nickname: 'TikTok',
                 avatarThumb:
-                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_100x100.jpeg?x-expires=1603573200&x-signature=XGaOhkftgl2fNr%2BT1OpxPVWUWY4%3D',
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_100x100.jpeg?x-expires=1610028000&x-signature=kEnsi2vZJE9DYy5q3UH%2FKAIH8pI%3D',
                 avatarMedium:
-                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_720x720.jpeg?x-expires=1603573200&x-signature=bl%2BxXbD9ME6Tt4VNcWtPDAX4PZI%3D',
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_720x720.jpeg?x-expires=1610028000&x-signature=ZcG9nv927kBXHRsEh9ZeFAGjqzM%3D',
                 avatarLarger:
-                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg?x-expires=1603573200&x-signature=4%2FrCxmt8FiH7M9RY%2Bx%2F7WVzd0Og%3D',
-                signature: 'Make Your Day',
+                    'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg?x-expires=1610028000&x-signature=44JuBpJgUlN4dau%2B3eFemKgTrJI%3D',
                 verified: true,
+                createTime: 1425144149,
                 secUid: 'MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM',
                 secret: false,
                 ftc: false,
@@ -418,23 +367,17 @@ describe('TikTok Scraper MODULE(promise): getUserProfileInfo', () => {
                 duetSetting: 0,
                 stitchSetting: 0,
                 privateAccount: false,
+                shortId: '0',
+                signature: 'It Starts On TikTok',
             },
-            stats: { followingCount: 491, followerCount: 48300000, heartCount: 241100000, videoCount: 112, diggCount: 35, heart: 241100000 },
-            shareMeta: {
-                title: 'TikTok on TikTok',
-                desc: '@tiktok 48.0m Followers, 491 Following, 241.0m Likes - Watch awesome short videos created by TikTok',
-            },
+            stats: { followingCount: 496, followerCount: 50100000, heartCount: 246000000, videoCount: 118, diggCount: 53, heart: 246000000 },
+            itemList: [],
         });
     });
 
     it('Throw error if input username is empty', async () => {
         instance.input = '';
         await expect(instance.getUserProfileInfo()).rejects.toBe(`Username is missing`);
-    });
-
-    it(`Throw error if username doesn't exist`, async () => {
-        instance.input = 'na';
-        await expect(instance.getUserProfileInfo()).rejects.toBe(`Can't find user: na`);
     });
 });
 
@@ -536,12 +479,14 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
                     'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_720x720.jpeg?x-expires=1603573200&x-signature=bl%2BxXbD9ME6Tt4VNcWtPDAX4PZI%3D',
                 coverLarge:
                     'https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/1645136815763462~c5_1080x1080.jpeg?x-expires=1603573200&x-signature=4%2FrCxmt8FiH7M9RY%2Bx%2F7WVzd0Og%3D',
+                duration: 15,
             },
             imageUrl:
                 'https://p16-sign-sg.tiktokcdn.com/obj/tos-maliva-p-0068/5f1e128e900c4008bd6d612964ef7d1b?x-expires=1603508400&x-signature=lXSV%2BKG4%2B8G%2BGJREfeNEys6m3eg%3D',
             videoUrl:
                 'https://v16-web-newkey.tiktokcdn.com/2ea83f8b07e61eb2844a644d0b1ff238/5f939968/video/tos/useast2a/tos-useast2a-pve-0068/2141262fa24c4f7687f2d6b0df121616/?a=1988&br=3316&bt=1658&cr=0&cs=0&cv=1&dr=0&ds=3&er=&l=202010232102490101902192101109C365&lr=tiktok_m&mime_type=video_mp4&qs=0&rc=anFwZTh4N2R3dzMzZzczM0ApNWY0O2QzaDszNzxlOTRlN2dkbzVlbGRkM3NfLS0xMTZzc2EwNC4vLWEuYS5hMmFiMy06Yw%3D%3D&vl=&vr=',
-            videoUrlNoWaterMark: null,
+            videoUrlNoWaterMark: '',
+            videoApiUrlNoWaterMark: '',
             videoMeta: {
                 width: 576,
                 height: 1024,
@@ -560,6 +505,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             diggCount: 1300000,
             shareCount: 13100,
             playCount: 25700,
+            secretID: 'awesome',
             commentCount: 25700,
             downloaded: false,
             mentions: ['@420doggface208', '@mickfleetwood', '@tomhayes603'],
@@ -574,6 +520,6 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
 
     it(`Throw error if user has provided incorrect URL`, async () => {
         instance.input = 'na';
-        await expect(instance.getVideoMeta()).rejects.toBe(`Can't extract metadata from the video: na`);
+        await expect(instance.getVideoMeta()).rejects.toBe(`Can't extract video metadata: na`);
     });
 });
