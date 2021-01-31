@@ -4,7 +4,7 @@
 import request, { OptionsWithUri } from 'request';
 import rp from 'request-promise';
 import { Agent } from 'http';
-import { createWriteStream, writeFile } from 'fs';
+import { createWriteStream, writeFile, readdirSync } from 'fs';
 import { fromCallback } from 'bluebird';
 import archiver from 'archiver';
 import { SocksProxyAgent } from 'socks-proxy-agent';
@@ -86,6 +86,12 @@ export class Downloader {
      * @param {*} item
      */
     public toBuffer(item: PostCollector): Promise<Buffer> {
+        var ciFE = readdirSync(`./${item.authorMeta.name}`).filter(fn => fn.includes(`${item.id}`))
+        if(ciFE.length > 0) return new Promise(
+          function(resolve, reject) {
+            reject(new Error("File already downloaded."))
+          })
+        else
         return new Promise((resolve, reject) => {
             const proxy = this.getProxy;
             let r = request;
@@ -122,6 +128,30 @@ export class Downloader {
     }
 
     /**
+     * Sanitizes a string
+     * Removes all unuseable characters from a string
+     */
+    public static sanitize(input, replacement = '') {
+      var illegalRe = /[\/\?<>\\:\*\|"]/g;
+      var controlRe = /[\x00-\x1f\x80-\x9f]/g;
+      var reservedRe = /^\.+$/;
+      var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+      var windowsTrailingRe = /[\. ]+$/;
+
+      if (typeof input !== 'string') {
+        throw new Error('Input must be string');
+      } else {
+      var sanitized = input
+        .replace(illegalRe, replacement)
+        .replace(controlRe, replacement)
+        .replace(reservedRe, replacement)
+        .replace(windowsReservedRe, replacement)
+        .replace(windowsTrailingRe, replacement);
+        return sanitized;
+      }
+    }
+
+    /**
      * Download posts
      * if {zip} is true then zip the result else save posts to the {folder}
      */
@@ -147,7 +177,9 @@ export class Downloader {
                             if (zip) {
                                 archive.append(buffer, { name: `${item.id}.mp4` });
                             } else {
-                                await fromCallback(cback => writeFile(`${saveDestination}/${item.id}.mp4`, buffer, cback));
+                              var ciFE = readdirSync(`${saveDestination}`).filter(fn => fn.includes(`${item.id}`))
+                              if(ciFE.length == 0)
+                                await fromCallback(cback => writeFile(`${saveDestination}/` + Downloader.sanitize(`${item.authorMeta.name} ${item.text} ${item.id}.mp4`), buffer, cback));
                             }
                             cb(null);
                         })
@@ -193,6 +225,8 @@ export class Downloader {
 
         const result = await rp(options);
 
-        await fromCallback(cb => writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
+        var checkFileExist = readdirSync(`${this.filepath}`).filter(fn => fn.includes(`${post.id}`))
+        if(checkFileExist.length == 0)
+          await fromCallback(cb => writeFile(`${this.filepath}/` + Downloader.sanitize(`${post.authorMeta.name} ${post.text} ${post.id}.mp4`), result, cb));
     }
 }
