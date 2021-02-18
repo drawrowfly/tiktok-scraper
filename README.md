@@ -44,7 +44,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 	        - [getVideoMeta](#getVideoMeta)
             - [getMusicInfo](#getMusicInfo)
 ## Important notes
-- It is possible to download video without the watermark
+- As of right now it is NOT possible to download video without the watermark
 
 ## Features
 
