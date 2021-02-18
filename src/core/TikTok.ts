@@ -266,22 +266,16 @@ export class TikTokScraper extends EventEmitter {
      * Get proxy
      */
     private get getProxy(): Proxy {
-        if (Array.isArray(this.proxy)) {
-            const selectProxy = this.proxy.length ? this.proxy[Math.floor(Math.random() * this.proxy.length)] : '';
-            return {
-                socks: false,
-                proxy: selectProxy,
-            };
-        }
-        if (this.proxy.indexOf('socks4://') > -1 || this.proxy.indexOf('socks5://') > -1) {
+        const selectProxy = Array.isArray(this.proxy) && this.proxy.length ? this.proxy[Math.floor(Math.random() * this.proxy.length)] : this.proxy;
+        if (selectProxy.indexOf('socks4://') > -1 || selectProxy.indexOf('socks5://') > -1) {
             return {
                 socks: true,
-                proxy: new SocksProxyAgent(this.proxy as string),
+                proxy: new SocksProxyAgent(selectProxy as string),
             };
         }
         return {
             socks: false,
-            proxy: this.proxy as string,
+            proxy: selectProxy as string,
         };
     }
 
