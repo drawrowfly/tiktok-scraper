@@ -252,7 +252,7 @@ export class TikTokScraper extends EventEmitter {
         switch (this.scrapeType) {
             case 'user':
             case 'trend':
-                return `${this.mainHost}api/item_list/`;
+                return `${this.mainHost}api/post/item_list/`;
             case 'hashtag':
                 return `${this.mainHost}api/challenge/item_list/`;
             case 'music':
@@ -266,7 +266,7 @@ export class TikTokScraper extends EventEmitter {
      * Get proxy
      */
     private get getProxy(): Proxy {
-        const selectProxy = Array.isArray(this.proxy) && this.proxy.length ? this.proxy[Math.floor(Math.random() * this.proxy.length)] : this.proxy;
+        const selectProxy = Array.isArray(this.proxy) && this.proxy.length ? this.proxy[Math.floor(Math.random() * this.proxy.length)] : '';
         if (selectProxy.indexOf('socks4://') > -1 || selectProxy.indexOf('socks5://') > -1) {
             return {
                 socks: true,
@@ -469,7 +469,7 @@ export class TikTokScraper extends EventEmitter {
                     switch (this.scrapeType) {
                         case 'user':
                             this.getUserId()
-                                .then(query => this.submitScrapingRequest({ ...query, maxCursor: this.maxCursor }))
+                                .then(query => this.submitScrapingRequest({ ...query, cursor: this.maxCursor }, true))
                                 .then(() => cb(null))
                                 .catch(error => cb(error));
                             break;
@@ -513,7 +513,6 @@ export class TikTokScraper extends EventEmitter {
                 throw new Error(`Can't scrape more posts`);
             }
             const { hasMore, maxCursor, cursor } = result;
-
             if ((updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items)) {
                 throw new Error('No more posts');
             }
@@ -526,7 +525,7 @@ export class TikTokScraper extends EventEmitter {
             if (this.collector.length >= this.number && this.number !== 0) {
                 throw new Error('Done');
             }
-            this.maxCursor = parseInt(maxCursor === 'undefined' ? cursor : maxCursor, 10);
+            this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
         } catch (error) {
             throw error.message;
         }
@@ -882,29 +881,26 @@ export class TikTokScraper extends EventEmitter {
     private async getUserId(): Promise<RequestQuery> {
         if (this.byUserId || this.idStore) {
             return {
-                id: this.idStore ? this.idStore : this.input,
-                secUid: '',
+                secUid: this.idStore ? this.idStore : this.input,
                 lang: '',
                 aid: 1988,
                 sourceType: CONST.sourceType.user,
                 count: 30,
-                minCursor: 0,
-                maxCursor: 0,
+                cursor: 0,
                 verifyFp: this.verifyFp,
             };
         }
 
         try {
             const response = await this.getUserProfileInfo();
-            this.idStore = response.user.id;
+            this.idStore = response.user.secUid;
             return {
-                id: this.idStore,
-                secUid: '',
+                aid: 1988,
+                secUid: this.idStore,
                 sourceType: CONST.sourceType.user,
-                count: this.number > 30 ? 50 : 30,
-                minCursor: 0,
-                maxCursor: 0,
+                count: 30,
                 lang: '',
+                cursor: 0,
                 verifyFp: this.verifyFp,
             };
         } catch (error) {
