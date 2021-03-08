@@ -251,8 +251,9 @@ export class TikTokScraper extends EventEmitter {
     private get getApiEndpoint(): string {
         switch (this.scrapeType) {
             case 'user':
-            case 'trend':
                 return `${this.mainHost}api/post/item_list/`;
+            case 'trend':
+                return `${this.mainHost}api/recommend/item_list/`;
             case 'hashtag':
                 return `${this.mainHost}api/challenge/item_list/`;
             case 'music':
@@ -481,7 +482,7 @@ export class TikTokScraper extends EventEmitter {
                             break;
                         case 'trend':
                             this.getTrendingFeedQuery()
-                                .then(query => this.submitScrapingRequest({ ...query, maxCursor: this.maxCursor }))
+                                .then(query => this.submitScrapingRequest({ ...query }, true))
                                 .then(() => cb(null))
                                 .catch(error => cb(error));
                             break;
@@ -796,13 +797,9 @@ export class TikTokScraper extends EventEmitter {
     // eslint-disable-next-line class-methods-use-this
     private async getTrendingFeedQuery(): Promise<RequestQuery> {
         return {
-            id: '1',
-            secUid: '',
+            aid: 1988,
             lang: '',
-            sourceType: CONST.sourceType.trend,
-            count: this.number > 30 ? 50 : 30,
-            minCursor: 0,
-            maxCursor: 0,
+            count: 30,
             verifyFp: this.verifyFp,
             user_agent: this.headers['user-agent'],
         };
