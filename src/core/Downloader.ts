@@ -102,14 +102,20 @@ export class Downloader {
                 headers: this.headers,
             })
                 .on('response', response => {
-                    if (this.progress && !this.bulk) {
-                        barIndex = this.addBar(!!item.videoUrlNoWaterMark, parseInt(response.headers['content-length'] as string, 10));
+                    const len = parseInt(response.headers['content-length'] as string, 10);
+                    if (this.progress && !this.bulk && len) {
+                        barIndex = this.addBar(!!item.videoUrlNoWaterMark, len);
+                    }
+                    if (this.progress && !this.bulk && !len) {
+                        console.log(`Empty response! You can try again with a proxy! Can't download video: ${item.id}`);
                     }
                 })
                 .on('data', chunk => {
-                    buffer = Buffer.concat([buffer, chunk as Buffer]);
-                    if (this.progress && !this.bulk) {
-                        barIndex.tick(chunk.length, { id: item.id });
+                    if (chunk.length) {
+                        buffer = Buffer.concat([buffer, chunk as Buffer]);
+                        if (this.progress && !this.bulk) {
+                            barIndex.tick(chunk.length, { id: item.id });
+                        }
                     }
                 })
                 .on('end', () => {
@@ -143,11 +149,15 @@ export class Downloader {
                 (item: PostCollector, cb) => {
                     this.toBuffer(item)
                         .then(async buffer => {
-                            item.downloaded = true;
-                            if (zip) {
-                                archive.append(buffer, { name: `${item.id}.mp4` });
+                            if (buffer.length) {
+                                item.downloaded = true;
+                                if (zip) {
+                                    archive.append(buffer, { name: `${item.id}.mp4` });
+                                } else {
+                                    await fromCallback(cback => writeFile(`${saveDestination}/${item.id}.mp4`, buffer, cback));
+                                }
                             } else {
-                                await fromCallback(cback => writeFile(`${saveDestination}/${item.id}.mp4`, buffer, cback));
+                                item.downloaded = false;
                             }
                             cb(null);
                         })
@@ -163,9 +173,9 @@ export class Downloader {
 
                     if (zip) {
                         archive.finalize();
-                        archive.on('end', () => resolve());
+                        archive.on('end', () => resolve(''));
                     } else {
-                        resolve();
+                        resolve('');
                     }
                 },
             );

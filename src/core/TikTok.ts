@@ -114,6 +114,8 @@ export class TikTokScraper extends EventEmitter {
 
     private verifyFp: string;
 
+    private store: string[];
+
     constructor({
         download,
         filepath,
@@ -198,6 +200,7 @@ export class TikTokScraper extends EventEmitter {
             good: 0,
             bad: 0,
         };
+        this.store = [];
     }
 
     /**
@@ -372,7 +375,7 @@ export class TikTokScraper extends EventEmitter {
         }
 
         if (this.storeHistory) {
-            await this.storeDownlodProgress();
+            await this.getDownloadedVideosFromHistory();
         }
 
         if (this.noWaterMark) {
@@ -380,6 +383,16 @@ export class TikTokScraper extends EventEmitter {
         }
 
         const [json, csv, zip] = await this.saveCollectorData();
+
+        if (this.storeHistory) {
+            // We need to make sure that we save data only about downloaded videos
+            this.collector.forEach(item => {
+                if (this.store.indexOf(item.id) === -1 && item.downloaded) {
+                    this.store.push(item.id);
+                }
+            });
+            await this.storeDownloadProgress();
+        }
 
         if (this.webHookUrl) {
             await this.sendDataToWebHookUrl();
@@ -601,12 +614,38 @@ export class TikTokScraper extends EventEmitter {
     }
 
     /**
+     * If option -s is being used then we need to
+     * retrieve already downloaded video id's to prevent them to be downloaded again
+     */
+    private async getDownloadedVideosFromHistory() {
+        try {
+            const readFromStore = (await fromCallback(cb =>
+                readFile(`${this.historyPath}/${this.storeValue}.json`, { encoding: 'utf-8' }, cb),
+            )) as string;
+            this.store = JSON.parse(readFromStore);
+        } catch {
+            // continue regardless of error
+        }
+
+        this.collector = this.collector.map(item => {
+            if (this.store.indexOf(item.id) !== -1) {
+                item.repeated = true;
+            }
+            return item;
+        });
+
+        this.collector = this.collector.filter(item => !item.repeated);
+    }
+
+    /**
      * Store progress to avoid downloading duplicates
      * Only available from the CLI
      */
-    private async storeDownlodProgress() {
+    private async storeDownloadProgress() {
         const historyType = this.scrapeType === 'trend' ? 'trend' : `${this.scrapeType}_${this.input}`;
-        if (this.storeValue) {
+        const totalNewDownloadedVideos = this.collector.filter(item => item.downloaded).length;
+
+        if (this.storeValue && totalNewDownloadedVideos) {
             let history = {} as History;
 
             try {
@@ -634,37 +673,17 @@ export class TikTokScraper extends EventEmitter {
                     file_location: `${this.historyPath}/${this.storeValue}.json`,
                 };
             }
-            let store: string[];
-            try {
-                const readFromStore = (await fromCallback(cb =>
-                    readFile(`${this.historyPath}/${this.storeValue}.json`, { encoding: 'utf-8' }, cb),
-                )) as string;
-                store = JSON.parse(readFromStore);
-            } catch (error) {
-                store = [];
-            }
-
-            this.collector = this.collector.map(item => {
-                if (store.indexOf(item.id) === -1) {
-                    store.push(item.id);
-                } else {
-                    // eslint-disable-next-line no-param-reassign
-                    item.repeated = true;
-                }
-                return item;
-            });
-            this.collector = this.collector.filter(item => !item.repeated);
 
             history[historyType] = {
                 type: this.scrapeType,
                 input: this.input,
-                downloaded_posts: history[historyType].downloaded_posts + this.collector.length,
+                downloaded_posts: history[historyType].downloaded_posts + totalNewDownloadedVideos,
                 last_change: new Date(),
                 file_location: `${this.historyPath}/${this.storeValue}.json`,
             };
 
             try {
-                await fromCallback(cb => writeFile(`${this.historyPath}/${this.storeValue}.json`, JSON.stringify(store), cb));
+                await fromCallback(cb => writeFile(`${this.historyPath}/${this.storeValue}.json`, JSON.stringify(this.store), cb));
             } catch {
                 // continue regardless of error
             }
@@ -776,7 +795,7 @@ export class TikTokScraper extends EventEmitter {
         const signature = this.signature ? this.signature : sign(this.headers['user-agent'], urlToSign);
 
         this.signature = '';
-        this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
+        this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.secUid || qs.challengeID! || qs.musicID!;
 
         const options = {
             uri: this.getApiEndpoint,
@@ -993,8 +1012,12 @@ export class TikTokScraper extends EventEmitter {
             throw `Music is missing`;
         }
 
+        const musicId = /music\/([\w-]+)/.exec(this.input);
+
+        this.input = musicId ? musicId[1] : `-${this.input}`;
+
         const query = {
-            uri: `${this.mainHost}node/share/music/-${this.input}`,
+            uri: `${this.mainHost}node/share/music/${this.input}`,
             qs: {
                 user_agent: this.headers['user-agent'],
                 screen_width: 1792,
@@ -1006,9 +1029,9 @@ export class TikTokScraper extends EventEmitter {
                 isMobile: false,
                 isAndroid: false,
                 appType: 'm',
-                browser_online: true,
-                browser_version: '5.0 (Macintosh)',
-                browser_name: 'Mozilla',
+                aid: 1988,
+                app_name: 'tiktok_web',
+                device_platform: 'web',
             },
             method: 'GET',
             json: true,

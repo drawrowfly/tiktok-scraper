@@ -102,7 +102,7 @@ yargs
     .command('history', 'View previous download history', {}, argv => {
         startScraper(argv);
     })
-    .command('from-file [file] [async]', 'Scrape users, hashtags, music, videos mentioned in a file. 1 value per 1 lin', {}, argv => {
+    .command('from-file [file] [async]', 'Scrape users, hashtags, music, videos mentioned in a file. One value per one line', {}, argv => {
         startScraper(argv);
     })
     .command('userprofile [id]', 'Show user metadata', {}, argv => {

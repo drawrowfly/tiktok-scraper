@@ -29,7 +29,7 @@ const getInitOptions = () => {
         zip: false,
         asyncDownload: 5,
         asyncScraping: 3,
-        proxy: [],
+        proxy: '',
         filepath: '',
         filetype: 'na',
         progress: false,
