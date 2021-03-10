@@ -75,6 +75,8 @@ export class TikTokScraper extends EventEmitter {
 
     private idStore: string;
 
+    private userIdStore: string;
+
     public Downloader: Downloader;
 
     private storeValue: string = '';
@@ -181,6 +183,7 @@ export class TikTokScraper extends EventEmitter {
         this.storeHistory = cli && download && store_history;
         this.historyPath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : historyPath || tmpdir();
         this.idStore = '';
+        this.userIdStore = '';
         this.noWaterMark = noWaterMark;
         this.maxCursor = 0;
         this.noDuplicates = [];
@@ -419,9 +422,7 @@ export class TikTokScraper extends EventEmitter {
                 5,
                 async (item: PostCollector) => {
                     try {
-                        const videoData = await this.getVideoMetadata(item.webVideoUrl);
-                        item.secretID = videoData.video.id;
-                        item.videoApiUrlNoWaterMark = this.getApiUrlWithoutWatermark(item);
+                        item.videoApiUrlNoWaterMark = await this.extractVideoId(item);
                         item.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(item.videoApiUrlNoWaterMark!);
                     } catch {
                         throw new Error(`Can't extract unique video id`);
@@ -432,6 +433,39 @@ export class TikTokScraper extends EventEmitter {
                 },
             );
         });
+    }
+
+    /**
+     * Extract uniq video id
+     * All videos after July 27 2020 do not store unique video id
+     * it means that we can't extract url to the video without the watermark
+     * @param uri
+     */
+    // eslint-disable-next-line class-methods-use-this
+    private async extractVideoId(item: PostCollector): Promise<string> {
+        if (item.createTime > 1595808000) {
+            return '';
+        }
+
+        try {
+            const result = await rp({
+                uri: item.videoUrl,
+                headers: this.headers,
+            });
+            const position = Buffer.from(result).indexOf('vid:');
+            if (position !== -1) {
+                const id = Buffer.from(result)
+                    .slice(position + 4, position + 36)
+                    .toString();
+
+                return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${
+                    this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
+                }`;
+            }
+        } catch {
+            // continue regardless of error
+        }
+        return '';
     }
 
     /**
@@ -463,19 +497,6 @@ export class TikTokScraper extends EventEmitter {
         } catch (err) {
             throw new Error(`Can't extract video url without the watermark`);
         }
-    }
-
-    /**
-     * Get url that can be used to extract video url without the watermark
-     * @param uri
-     */
-    // eslint-disable-next-line class-methods-use-this
-    private getApiUrlWithoutWatermark(item: PostCollector) {
-        return item.secretID
-            ? `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${
-                  item.secretID
-              }&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''}`
-            : '';
     }
 
     /**
@@ -795,7 +816,7 @@ export class TikTokScraper extends EventEmitter {
         const signature = this.signature ? this.signature : sign(this.headers['user-agent'], urlToSign);
 
         this.signature = '';
-        this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.secUid || qs.challengeID! || qs.musicID!;
+        this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
         const options = {
             uri: this.getApiEndpoint,
@@ -905,6 +926,7 @@ export class TikTokScraper extends EventEmitter {
     private async getUserId(): Promise<RequestQuery> {
         if (this.byUserId || this.idStore) {
             return {
+                id: this.userIdStore,
                 secUid: this.idStore ? this.idStore : this.input,
                 lang: '',
                 aid: 1988,
@@ -918,7 +940,9 @@ export class TikTokScraper extends EventEmitter {
         try {
             const response = await this.getUserProfileInfo();
             this.idStore = response.user.secUid;
+            this.userIdStore = response.user.id;
             return {
+                id: this.userIdStore,
                 aid: 1988,
                 secUid: this.idStore,
                 sourceType: CONST.sourceType.user,
@@ -1229,7 +1253,7 @@ export class TikTokScraper extends EventEmitter {
 
         try {
             if (this.noWaterMark) {
-                videoItem.videoApiUrlNoWaterMark = this.getApiUrlWithoutWatermark(videoItem);
+                videoItem.videoApiUrlNoWaterMark = await this.extractVideoId(videoItem);
                 videoItem.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(videoItem.videoApiUrlNoWaterMark);
             }
         } catch {
