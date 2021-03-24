@@ -232,6 +232,10 @@ export interface FeedItems {
     duetEnabled: boolean;
     stitchEnabled: boolean;
     duetInfo: DuetInfo;
+    effectStickers: {
+        name: string;
+        ID: string;
+    }[];
 }
 
 /**

@@ -794,6 +794,12 @@ export class TikTokScraper extends EventEmitter {
                               cover: coverLarger,
                           }))
                         : [],
+                    effectStickers: posts[i].effectStickers
+                        ? posts[i].effectStickers.map(({ ID, name }) => ({
+                              id: ID,
+                              name,
+                          }))
+                        : [],
                 };
 
                 if (this.event) {
@@ -1247,6 +1253,12 @@ export class TikTokScraper extends EventEmitter {
                       name: title,
                       title: desc,
                       cover: profileLarger,
+                  }))
+                : [],
+            effectStickers: videoData.effectStickers
+                ? videoData.effectStickers.map(({ ID, name }) => ({
+                      id: ID,
+                      name,
                   }))
                 : [],
         } as PostCollector;
