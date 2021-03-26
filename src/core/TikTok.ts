@@ -99,8 +99,6 @@ export class TikTokScraper extends EventEmitter {
 
     private hdVideo: boolean;
 
-    private signature: string;
-
     private webHookUrl: string;
 
     private method: string;
@@ -140,7 +138,6 @@ export class TikTokScraper extends EventEmitter {
         zip = false,
         test = false,
         hdVideo = false,
-        signature = '',
         webHookUrl = '',
         method = 'POST',
         headers,
@@ -164,7 +161,6 @@ export class TikTokScraper extends EventEmitter {
         this.hdVideo = hdVideo;
         this.sessionList = sessionList;
         this.asyncDownload = asyncDownload || 5;
-        this.signature = signature;
         this.asyncScraping = (): number => {
             switch (this.scrapeType) {
                 case 'user':
@@ -807,15 +803,6 @@ export class TikTokScraper extends EventEmitter {
     }
 
     private async scrapeData<T>(qs: RequestQuery): Promise<T> {
-        const query = Object.keys(qs)
-            .map(key => `${key}=${qs[key]}`)
-            .join('&');
-
-        const urlToSign = `${this.getApiEndpoint}?${query}`;
-
-        const signature = this.signature ? this.signature : sign(this.headers['user-agent'], urlToSign);
-
-        this.signature = '';
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
         const options = {
@@ -823,7 +810,6 @@ export class TikTokScraper extends EventEmitter {
             method: 'GET',
             qs: {
                 ...qs,
-                _signature: signature,
             },
             headers: {
                 cookie: this.getCookies(true),
