@@ -903,7 +903,7 @@ export class TikTokScraper extends EventEmitter {
     private getCookies(auth = false) {
         const session = auth ? this.sessionList[Math.floor(Math.random() * this.sessionList.length)] : '';
 
-        return `${this.headers.cookie}; ${session}`;
+        return `${this.headers.cookie};${session || ''}`;
     }
 
     /**
@@ -954,6 +954,9 @@ export class TikTokScraper extends EventEmitter {
             method: 'GET',
             uri: `https://www.tiktok.com/@${this.input}`,
             json: true,
+            headers: {
+                cookie: this.getCookies(true),
+            },
         };
         try {
             const response = await this.request<string>(options);
