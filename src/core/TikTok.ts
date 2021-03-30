@@ -984,19 +984,10 @@ export class TikTokScraper extends EventEmitter {
         const query = {
             uri: `${this.mainHost}node/share/tag/${this.input}?uniqueId=${this.input}`,
             qs: {
-                user_agent: this.headers['user-agent'],
-                screen_width: 1792,
-                screen_height: 1120,
-                browser_language: 'en-US',
-                browser_platform: 'MacIntel',
                 appId: 1233,
-                isIOS: false,
-                isMobile: false,
-                isAndroid: false,
-                appType: 'm',
-                browser_online: true,
-                browser_version: '5.0 (Macintosh)',
-                browser_name: 'Mozilla',
+            },
+            headers: {
+                cookie: this.getCookies(true),
             },
             method: 'GET',
             json: true,
