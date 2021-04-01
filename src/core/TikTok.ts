@@ -961,7 +961,7 @@ export class TikTokScraper extends EventEmitter {
         try {
             const response = await this.request<string>(options);
             const breakResponse = response
-                .split(`<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">`)[1]
+                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
                 .split(`</script>`)[0];
             if (breakResponse) {
                 const userMetadata: WebHtmlUserMetadata = JSON.parse(breakResponse);
