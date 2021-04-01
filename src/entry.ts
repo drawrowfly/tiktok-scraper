@@ -227,33 +227,37 @@ export const video = async (input: string, options = {} as Options): Promise<any
     }
     const contructor: TikTokConstructor = { ...getInitOptions(), ...options, ...{ type: 'video' as ScrapeType, input } };
     const scraper = new TikTokScraper(contructor);
-    const result: PostCollector = await scraper.getVideoMeta();
+    try {
+        const result: PostCollector = await scraper.getVideoMeta();
 
-    const path = options?.filepath ? `${options?.filepath}/${result.id}` : result.id;
-    let outputMessage = {};
+        const path = options?.filepath ? `${options?.filepath}/${result.id}` : result.id;
+        let outputMessage = {};
 
-    if (options?.download) {
-        try {
-            await scraper.Downloader.downloadSingleVideo(result);
-        } catch {
-            throw new Error('Unable to download the video');
+        if (options?.download) {
+            try {
+                await scraper.Downloader.downloadSingleVideo(result);
+            } catch {
+                throw new Error('Unable to download the video');
+            }
         }
-    }
 
-    if (options?.filetype) {
-        await scraper.saveMetadata({ json: `${path}.json`, csv: `${path}.csv` });
+        if (options?.filetype) {
+            await scraper.saveMetadata({ json: `${path}.json`, csv: `${path}.csv` });
 
-        outputMessage = {
-            ...(options?.filetype === 'all' ? { json: `${path}.json`, csv: `${path}.csv` } : {}),
-            ...(options?.filetype === 'json' ? { json: `${path}.json` } : {}),
-            ...(options?.filetype === 'csv' ? { csv: `${path}.csv` } : {}),
+            outputMessage = {
+                ...(options?.filetype === 'all' ? { json: `${path}.json`, csv: `${path}.csv` } : {}),
+                ...(options?.filetype === 'json' ? { json: `${path}.json` } : {}),
+                ...(options?.filetype === 'csv' ? { csv: `${path}.csv` } : {}),
+            };
+        }
+
+        return {
+            ...(options?.download ? { message: `Video location: ${contructor.filepath}/${result.id}.mp4` } : {}),
+            ...outputMessage,
         };
+    } catch (e) {
+        console.log(e);
     }
-
-    return {
-        ...(options?.download ? { message: `Video location: ${contructor.filepath}/${result.id}.mp4` } : {}),
-        ...outputMessage,
-    };
 };
 
 // eslint-disable-next-line no-unused-vars

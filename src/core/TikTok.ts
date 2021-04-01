@@ -1071,57 +1071,26 @@ export class TikTokScraper extends EventEmitter {
      */
     private async getVideoMetadataFromHtml(): Promise<FeedItems> {
         const options = {
-            uri: `${this.input}?verifyFp=${this.verifyFp}`,
+            uri: `${this.input}`,
             method: 'GET',
             json: true,
         };
         try {
-            let short = false;
-            let regex: RegExpExecArray | null;
             const response = await this.request<string>(options);
             if (!response) {
                 throw new Error(`Can't extract video meta data`);
             }
 
-            if (response.indexOf('<script>window.__INIT_PROPS__ = ') > -1) {
-                short = true;
-            }
+            const rawVideoMetadata = response
+                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
+                .split(`</script>`)[0];
 
-            if (short) {
-                regex = /<script>window.__INIT_PROPS__ = ([^]*)\}<\/script>/.exec(response);
-            } else {
-                regex = /<script id="__NEXT_DATA__" type="application\/json" crossorigin="anonymous">(.+)<\/script><script cros/.exec(response);
-            }
-
-            if (regex) {
-                const videoProps = JSON.parse(short ? `${regex[1]}}` : regex[1]);
-                let shortKey = '/v/:id';
-
-                if (short) {
-                    if (videoProps['/v/:id']) {
-                        if (videoProps['/v/:id'].statusCode) {
-                            throw new Error();
-                        }
-                    } else if (videoProps['/i18n/share/video/:id']) {
-                        shortKey = '/i18n/share/video/:id';
-                        if (videoProps['/i18n/share/video/:id'].statusCode) {
-                            throw new Error();
-                        }
-                    } else {
-                        throw new Error();
-                    }
-                } else if (videoProps.props.pageProps.statusCode) {
-                    throw new Error();
-                }
-
-                const videoData = short ? videoProps[shortKey].videoData : videoProps.props.pageProps.itemInfo.itemStruct;
-                return videoData as FeedItems;
-            }
+            const videoProps = JSON.parse(rawVideoMetadata);
+            const videoData = videoProps.props.pageProps.itemInfo.itemStruct;
+            return videoData as FeedItems;
         } catch (error) {
             throw `Can't extract video metadata: ${this.input}`;
         }
-
-        throw new Error();
     }
 
     /**
