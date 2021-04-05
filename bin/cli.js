@@ -145,6 +145,11 @@ yargs
             default: false,
             describe: 'Download video posts to the folder with the name input [id]',
         },
+        useTestEndpoints: {
+            boolean: true,
+            default: false,
+            describe: 'Use Tiktok test endpoints. When your requests are blocked by captcha you can try to use Tiktok test endpoints.',
+        },
         asyncDownload: {
             alias: 'a',
             default: 5,

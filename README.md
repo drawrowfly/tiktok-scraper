@@ -185,7 +185,7 @@ Examples:
 - [Terminal Examples](https://github.com/drawrowfly/tiktok-scraper/tree/master/examples/CLI/Examples.md)
 - [Manage Download History](https://github.com/drawrowfly/tiktok-scraper/tree/master/examples/CLI/DownloadHistory.md)
 - [Scrape and Download in Batch](https://github.com/drawrowfly/tiktok-scraper/tree/master/examples/CLI/BatchDownload.md)
-	    
+
 ### Output File Example
 
 ![Demo](https://i.imgur.com/6gIbBzo.png)
@@ -244,7 +244,7 @@ docker run -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d 
 const options = {
     // Number of posts to scrape: {int default: 20}
     number: 50,
-    
+
     // Set session: {string[] default: ['']}
     // Authenticated session cookie value is required to scrape user/trending/music/hashtag feed
     // You can put here any number of sessions, each request will select random session from the list
@@ -289,21 +289,25 @@ const options = {
         referer: 'https://www.tiktok.com/',
         cookie: `tt_webid_v2=68dssds`,
     },
-    
+
     // Download video without the watermark: {boolean default: false}
     // Set to true to download without the watermark
     // This option will affect the execution speed
     noWaterMark: false,
-    
+
     // Create link to HD video: {boolean default: false}
     // This option will only work if {noWaterMark} is set to {true}
     hdVideo: false,
 
     // verifyFp is used to verify the request and avoid captcha
-    // When you are using proxy then there are high chances that the request will be 
+    // When you are using proxy then there are high chances that the request will be
     // blocked with captcha
     // You can set your own verifyFp value or default(hardcoded) will be used
-    verifyFp: ''
+    verifyFp: '',
+
+    // Switch main host to Tiktok test enpoint.
+    // When your requests are blocked by captcha you can try to use Tiktok test endpoints.
+    useTestEndpoints: false
 };
 ```
 
@@ -317,9 +321,9 @@ const TikTokScraper = require('tiktok-scraper');
 // User feed by username
 (async () => {
     try {
-        const posts = await TikTokScraper.user('USERNAME', { 
-            number: 100, 
-            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;'] 
+        const posts = await TikTokScraper.user('USERNAME', {
+            number: 100,
+            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;']
         });
         console.log(posts);
     } catch (error) {
@@ -331,10 +335,10 @@ const TikTokScraper = require('tiktok-scraper');
 // Some TikTok user id's are larger then MAX_SAFE_INTEGER, you need to pass user id as a string
 (async () => {
     try {
-        const posts = await TikTokScraper.user(`USER_ID`, { 
-            number: 100, 
+        const posts = await TikTokScraper.user(`USER_ID`, {
+            number: 100,
             by_user_id: true,
-            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;'] 
+            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;']
         });
         console.log(posts);
     } catch (error) {
@@ -345,9 +349,9 @@ const TikTokScraper = require('tiktok-scraper');
 // Trending feed
 (async () => {
     try {
-        const posts = await TikTokScraper.trend('', { 
+        const posts = await TikTokScraper.trend('', {
             number: 100,
-            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;'] 
+            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;']
         });
         console.log(posts);
     } catch (error) {
@@ -358,9 +362,9 @@ const TikTokScraper = require('tiktok-scraper');
 // Hashtag feed
 (async () => {
     try {
-        const posts = await TikTokScraper.hashtag('HASHTAG', { 
+        const posts = await TikTokScraper.hashtag('HASHTAG', {
             number: 100,
-            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;'] 
+            sessionList: ['sid_tt=58ba9e34431774703d3c34e60d584475;']
         });
         console.log(posts);
     } catch (error) {
@@ -460,7 +464,7 @@ Set the session:
         sid_tt=521kkadkasdaskdj4j213j12j312;
         sid_tt=521kkadkasdaskdj4j213j12j312;
         ```
-         
+
 - In the **MODULE** you can set session by setting the option value sessionList . For example **sessionList:["sid_tt=521kkadkasdaskdj4j213j12j312;", "sid_tt=12312312312312;"]**
 
 ### Download Video
