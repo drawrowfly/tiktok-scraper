@@ -2,6 +2,8 @@
 /* eslint-disable no-console */
 /* eslint-disable no-throw-literal */
 /* eslint-disable no-await-in-loop */
+/* eslint-disable no-underscore-dangle */
+
 import rp, { OptionsWithUri } from 'request-promise';
 import { tmpdir } from 'os';
 import { writeFile, readFile, mkdir } from 'fs';
@@ -11,7 +13,7 @@ import { fromCallback } from 'bluebird';
 import { EventEmitter } from 'events';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
-import { URLSearchParams } from "url"
+import { URLSearchParams } from 'url';
 
 import CONST from '../constant';
 import { sign } from '../helpers';
