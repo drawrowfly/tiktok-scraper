@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
+/* eslint-disable no-console */
 import request, { OptionsWithUri } from 'request';
 import rp from 'request-promise';
 import { Agent } from 'http';

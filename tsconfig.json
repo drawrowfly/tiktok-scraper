@@ -2,7 +2,7 @@
     "compilerOptions": {
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "lib": ["es7"],
+        "lib": ["es7", "DOM"],
         "module": "commonjs",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
