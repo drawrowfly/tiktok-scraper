@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+
 import { DuetInfo } from '.';
 
 export interface ItemInfos {
@@ -116,6 +118,7 @@ export interface RequestQuery {
     OS?: string;
     app_name?: string;
     device_platform?: string;
+    _signature?: string;
 }
 
 export interface VideoProps {
