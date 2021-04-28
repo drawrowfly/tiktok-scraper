@@ -11,6 +11,7 @@ import { fromCallback } from 'bluebird';
 import { EventEmitter } from 'events';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
+import { URLSearchParams } from "url"
 
 import CONST from '../constant';
 import { sign } from '../helpers';
@@ -805,6 +806,11 @@ export class TikTokScraper extends EventEmitter {
     private async scrapeData<T>(qs: RequestQuery): Promise<T> {
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
+        const query: any = qs;
+        const unsignedURL = `${this.getApiEndpoint}?${new URLSearchParams(query).toString()}`;
+        const _signature = sign(this.headers['user-agent'], unsignedURL);
+        qs._signature = _signature;
+
         const options = {
             uri: this.getApiEndpoint,
             method: 'GET',
@@ -1060,7 +1066,6 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-
         return sign(this.headers['user-agent'], this.input);
     }
 
