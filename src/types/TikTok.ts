@@ -93,6 +93,11 @@ export interface DuetInfo {
     duetFromId: string;
 }
 
+export interface EffectStickers {
+    id: string;
+    name: string;
+}
+
 export interface PostCollector {
     id: string;
     secretID: string;
@@ -152,6 +157,7 @@ export interface PostCollector {
     hashtags: Hashtags[];
     repeated?: boolean;
     downloaded: boolean;
+    effectStickers: EffectStickers[];
 }
 
 export interface Result {

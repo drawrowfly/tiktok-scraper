@@ -510,6 +510,7 @@ describe('TikTok Scraper MODULE(promise): getVideoMeta', () => {
             downloaded: false,
             mentions: ['@420doggface208', '@mickfleetwood', '@tomhayes603'],
             hashtags: [],
+            effectStickers: [],
         });
     });
 
