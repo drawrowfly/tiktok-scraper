@@ -809,7 +809,7 @@ export class TikTokScraper extends EventEmitter {
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
         const query: any = qs;
-        const unsignedURL = `${this.getApiEndpoint}?${new URLSearchParams(query).toString()}`;
+        const unsignedURL = `${this.getApiEndpoint}?${new URLSearchParams(query).toString().replace(/\+/g, '%20')}`;
         const _signature = sign(this.headers['user-agent'], unsignedURL);
         qs._signature = _signature;
 
