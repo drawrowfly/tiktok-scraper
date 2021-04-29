@@ -1,6 +1,4 @@
-/* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
-/* eslint-disable no-throw-literal */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 
@@ -808,16 +806,15 @@ export class TikTokScraper extends EventEmitter {
     private async scrapeData<T>(qs: RequestQuery): Promise<T> {
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
-        const query: any = qs;
-        const unsignedURL = `${this.getApiEndpoint}?${new URLSearchParams(query).toString()}`;
-        const _signature = sign(this.headers['user-agent'], unsignedURL);
-        qs._signature = _signature;
+        const unsignedURL = `${this.getApiEndpoint}?${new URLSearchParams(qs as any).toString()}`;
+        const _signature = sign(unsignedURL);
 
         const options = {
             uri: this.getApiEndpoint,
             method: 'GET',
             qs: {
                 ...qs,
+                _signature,
             },
             headers: {
                 cookie: this.getCookies(true),
@@ -862,7 +859,6 @@ export class TikTokScraper extends EventEmitter {
             count: 30,
             cursor: 0,
             verifyFp: '',
-            user_agent: this.headers['user-agent'],
         };
     }
 
@@ -877,7 +873,6 @@ export class TikTokScraper extends EventEmitter {
                 cursor: 0,
                 aid: 1988,
                 verifyFp: this.verifyFp,
-                user_agent: this.headers['user-agent'],
             };
         }
         const id = encodeURIComponent(this.input);
@@ -901,7 +896,6 @@ export class TikTokScraper extends EventEmitter {
                 cursor: 0,
                 aid: 1988,
                 verifyFp: this.verifyFp,
-                user_agent: this.headers['user-agent'],
             };
         } catch (error) {
             throw error.message;
@@ -1068,7 +1062,7 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        return sign(this.headers['user-agent'], this.input);
+        return sign(this.input);
     }
 
     /**
