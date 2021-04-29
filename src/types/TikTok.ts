@@ -26,6 +26,7 @@ export interface Options {
     proxyFile?: string;
     sessionFile?: string;
     event?: boolean;
+    useTestEndpoints?: boolean;
     by_user_id?: boolean;
     download?: boolean;
     bulk?: boolean;
@@ -53,6 +54,7 @@ export interface TikTokConstructor {
     download: boolean;
     filepath: string;
     filetype: string;
+    useTestEndpoints?: boolean;
     proxy: string[] | string;
     asyncDownload: number;
     asyncScraping: number;

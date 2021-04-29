@@ -133,6 +133,7 @@ export class TikTokScraper extends EventEmitter {
         store_history = false,
         historyPath = '',
         noWaterMark = false,
+        useTestEndpoints = false,
         fileName = '',
         timeout = 0,
         bulk = false,
@@ -147,7 +148,7 @@ export class TikTokScraper extends EventEmitter {
     }: TikTokConstructor) {
         super();
         this.verifyFp = verifyFp;
-        this.mainHost = 'https://m.tiktok.com/';
+        this.mainHost = useTestEndpoints ? 'https://t.tiktok.com/' : 'https://m.tiktok.com/';
         this.headers = headers;
         this.download = download;
         this.filepath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '';
