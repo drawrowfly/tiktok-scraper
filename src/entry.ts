@@ -25,6 +25,7 @@ import { makeid, makeVerifyFp } from './helpers';
 const getInitOptions = () => {
     return {
         number: 30,
+        since: 0,
         download: false,
         zip: false,
         asyncDownload: 5,
