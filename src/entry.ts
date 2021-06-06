@@ -45,6 +45,7 @@ const getInitOptions = () => {
             'user-agent': CONST.userAgent(),
             referer: 'https://www.tiktok.com/',
             cookie: `tt_webid_v2=68${makeid(16)}`,
+            'x-secsdk-csrf-token': `${makeid(92)}`,
         },
     };
 };
