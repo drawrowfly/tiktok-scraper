@@ -568,7 +568,7 @@ export class TikTokScraper extends EventEmitter {
             }
             this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
         } catch (error) {
-            throw error.message;
+            throw error.message ? error.message : error;
         }
     }
 
@@ -961,7 +961,7 @@ export class TikTokScraper extends EventEmitter {
         }
         const options = {
             method: 'GET',
-            uri: `https://www.tiktok.com/@${this.input}`,
+            uri: `https://www.tiktok.com/@${encodeURIComponent(this.input)}`,
             json: true,
             headers: {
                 cookie: this.getCookies(true),

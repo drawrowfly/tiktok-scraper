@@ -20,7 +20,7 @@ import {
     MusicMetadata,
 } from './types';
 import CONST from './constant';
-import { makeid, makeVerifyFp } from './helpers';
+import { makeid, makeVerifyFp, makeidHex } from './helpers';
 
 const getInitOptions = () => {
     return {
@@ -45,7 +45,7 @@ const getInitOptions = () => {
             'user-agent': CONST.userAgent(),
             referer: 'https://www.tiktok.com/',
             cookie: `tt_webid_v2=68${makeid(16)}`,
-            'x-secsdk-csrf-token': `${makeid(92)}`,
+            'x-secsdk-csrf-token': `000100000001${makeidHex(80)}`,
         },
     };
 };
@@ -384,6 +384,7 @@ export const fromfile = async (input: string, options = {} as Options) => {
         .split('\n')
         .filter(item => item.indexOf('##') === -1 && item.length)
         .map(item => {
+            console.log(item);
             item = item.replace(/\s/g, '');
             if (item.indexOf('#') > -1) {
                 return {
@@ -391,7 +392,7 @@ export const fromfile = async (input: string, options = {} as Options) => {
                     input: item.split('#')[1],
                 };
             }
-            if (/^https:\/\/(www|v[a-z]{1})+\.tiktok\.com\/(\w.+|@(\w.+)\/video\/(\d+))$/.test(item)) {
+            if (/^https:\/\/(www|v[a-z]{1}|[a-z])+\.(tiktok|tiktokv)\.com\/@?\w.+\/video\/(\d+)(.+)?$/.test(item)) {
                 return {
                     type: 'video',
                     input: item,

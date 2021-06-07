@@ -7,6 +7,15 @@ export const makeid = (len: number) => {
     return text;
 };
 
+export const makeidHex = (len: number) => {
+    let text = '';
+    const char_list = '0123456789abcdef';
+    for (let i = 0; i < len; i += 1) {
+        text += char_list.charAt(Math.floor(Math.random() * char_list.length));
+    }
+    return text;
+};
+
 export const makeVerifyFp = () => {
     const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     const charlen = chars.length;
