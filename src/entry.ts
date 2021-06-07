@@ -384,7 +384,6 @@ export const fromfile = async (input: string, options = {} as Options) => {
         .split('\n')
         .filter(item => item.indexOf('##') === -1 && item.length)
         .map(item => {
-            console.log(item);
             item = item.replace(/\s/g, '');
             if (item.indexOf('#') > -1) {
                 return {
