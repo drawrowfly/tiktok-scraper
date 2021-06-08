@@ -844,7 +844,6 @@ export class TikTokScraper extends EventEmitter {
     private async getTrendingFeedQuery(): Promise<RequestQuery> {
         return {
             aid: 1988,
-            lang: '',
             count: 30,
             verifyFp: this.verifyFp,
             user_agent: this.headers['user-agent'],
@@ -861,7 +860,6 @@ export class TikTokScraper extends EventEmitter {
         }
         return {
             musicID: this.input,
-            lang: '',
             aid: 1988,
             count: 30,
             cursor: 0,
@@ -923,7 +921,6 @@ export class TikTokScraper extends EventEmitter {
             return {
                 id: this.userIdStore,
                 secUid: this.idStore ? this.idStore : this.input,
-                lang: '',
                 aid: 1988,
                 sourceType: CONST.sourceType.user,
                 count: 30,
@@ -942,7 +939,6 @@ export class TikTokScraper extends EventEmitter {
                 secUid: this.idStore,
                 sourceType: CONST.sourceType.user,
                 count: 30,
-                lang: '',
                 cursor: 0,
                 verifyFp: this.verifyFp,
             };
