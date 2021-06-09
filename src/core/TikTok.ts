@@ -12,7 +12,6 @@ import { EventEmitter } from 'events';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 import { URLSearchParams } from 'url';
-
 import CONST from '../constant';
 import { sign } from '../helpers';
 
@@ -36,6 +35,9 @@ import {
 } from '../types';
 
 import { Downloader } from '../core';
+
+// Cookie jar. Where all valid cookies will be stored
+const cookieJar = rp.jar();
 
 export class TikTokScraper extends EventEmitter {
     private mainHost: string;
@@ -91,6 +93,10 @@ export class TikTokScraper extends EventEmitter {
     private timeout: number;
 
     private bulk: boolean;
+
+    private validHeaders: boolean;
+
+    private csrf: string;
 
     private zip: boolean;
 
@@ -159,6 +165,7 @@ export class TikTokScraper extends EventEmitter {
         this.test = test;
         this.proxy = proxy;
         this.number = number;
+        this.csrf = '';
         this.zip = zip;
         this.hdVideo = hdVideo;
         this.sessionList = sessionList;
@@ -187,6 +194,7 @@ export class TikTokScraper extends EventEmitter {
         this.noDuplicates = [];
         this.timeout = timeout;
         this.bulk = bulk;
+        this.validHeaders = false;
         this.Downloader = new Downloader({
             progress,
             proxy,
@@ -304,6 +312,7 @@ export class TikTokScraper extends EventEmitter {
         return new Promise(async (resolve, reject) => {
             const proxy = this.getProxy;
             const options = ({
+                jar: cookieJar,
                 uri,
                 method,
                 ...(qs ? { qs } : {}),
@@ -312,6 +321,7 @@ export class TikTokScraper extends EventEmitter {
                 headers: {
                     ...this.headers,
                     ...headers,
+                    ...(this.csrf ? { 'x-secsdk-csrf-token': this.csrf } : {}),
                 },
                 ...(json ? { json: true } : {}),
                 ...(gzip ? { gzip: true } : {}),
@@ -325,6 +335,11 @@ export class TikTokScraper extends EventEmitter {
 
             try {
                 const response = await rp(options);
+                // Extract valid csrf token
+                if (options.method === 'HEAD') {
+                    const csrf = response.headers['x-ware-csrf-token'];
+                    this.csrf = csrf.split(',')[1] as string;
+                }
                 setTimeout(() => {
                     resolve(bodyOnly ? response.body : response);
                 }, this.timeout);
@@ -400,7 +415,7 @@ export class TikTokScraper extends EventEmitter {
         }
 
         return {
-            headers: this.headers,
+            headers: { ...this.headers, cookie: cookieJar.getCookieString('https://tiktok.com') },
             collector: this.collector,
             ...(this.download ? { zip } : {}),
             ...(this.filetype === 'all' ? { json, csv } : {}),
@@ -549,6 +564,9 @@ export class TikTokScraper extends EventEmitter {
      */
     private async submitScrapingRequest(query: RequestQuery, updatedApiResponse = false): Promise<any> {
         try {
+            if (!this.validHeaders) {
+                await this.getValidHeaders();
+            }
             const result = await this.scrapeData<ItemListData>(query);
             if (result.statusCode !== 0) {
                 throw new Error(`Can't scrape more posts`);
@@ -810,6 +828,33 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
+    /**
+     * In order to execute valid request, we need to extract valid cookie headers and valid csrf token
+     * This request is being executed only once per run
+     */
+    private async getValidHeaders() {
+        const _signature = sign(this.getApiEndpoint);
+
+        const options = {
+            uri: this.getApiEndpoint,
+            method: 'HEAD',
+            qs: {
+                _signature,
+            },
+            headers: {
+                'x-secsdk-csrf-request': 1,
+                'x-secsdk-csrf-version': '1.2.5',
+            },
+        };
+
+        try {
+            await this.request<string>(options);
+            this.validHeaders = true;
+        } catch (error) {
+            throw error.message;
+        }
+    }
+
     private async scrapeData<T>(qs: RequestQuery): Promise<T> {
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
@@ -823,9 +868,9 @@ export class TikTokScraper extends EventEmitter {
                 ...qs,
                 _signature,
             },
-            headers: {
-                cookie: this.getCookies(true),
-            },
+            // headers: {
+            //     cookie: this.getCookies(true),
+            // },
             json: true,
         };
 
@@ -937,14 +982,19 @@ export class TikTokScraper extends EventEmitter {
             this.idStore = response.user.secUid;
             this.userIdStore = response.user.id;
             return {
-                id: this.userIdStore,
                 aid: 1988,
                 secUid: this.idStore,
-                sourceType: CONST.sourceType.user,
                 count: 30,
                 lang: '',
                 cursor: 0,
-                verifyFp: this.verifyFp,
+                // verifyFp: this.verifyFp,
+                app_name: 'tiktok_web',
+                device_platform: 'web_pc',
+                os: 'mac',
+                cookie_enabled: true,
+                history_len: 2,
+                focus_state: true,
+                is_fullscreen: false,
             };
         } catch (error) {
             throw error.message;
@@ -963,9 +1013,9 @@ export class TikTokScraper extends EventEmitter {
             method: 'GET',
             uri: `https://www.tiktok.com/@${encodeURIComponent(this.input)}`,
             json: true,
-            headers: {
-                cookie: this.getCookies(true),
-            },
+            // headers: {
+            //     cookie: this.getCookies(true),
+            // },
         };
         try {
             const response = await this.request<string>(options);

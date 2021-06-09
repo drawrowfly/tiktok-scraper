@@ -20,7 +20,7 @@ import {
     MusicMetadata,
 } from './types';
 import CONST from './constant';
-import { makeid, makeVerifyFp, makeidHex } from './helpers';
+import { makeVerifyFp } from './helpers';
 
 const getInitOptions = () => {
     return {
@@ -44,8 +44,6 @@ const getInitOptions = () => {
         headers: {
             'user-agent': CONST.userAgent(),
             referer: 'https://www.tiktok.com/',
-            cookie: `tt_webid_v2=68${makeid(16)}`,
-            'x-secsdk-csrf-token': `000100000001${makeidHex(80)}`,
         },
     };
 };
