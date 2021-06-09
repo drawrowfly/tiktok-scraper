@@ -573,7 +573,8 @@ export class TikTokScraper extends EventEmitter {
     private async submitScrapingRequest(query: RequestQuery, updatedApiResponse = false): Promise<any> {
         try {
             if (!this.validHeaders) {
-                await this.getValidHeaders();
+                await this.getValidHeaders(this.getApiEndpoint);
+                this.validHeaders = true;
             }
             const result = await this.scrapeData<ItemListData>(query);
             if (result.statusCode !== 0) {
@@ -840,15 +841,17 @@ export class TikTokScraper extends EventEmitter {
      * In order to execute valid request, we need to extract valid cookie headers and valid csrf token
      * This request is being executed only once per run
      */
-    private async getValidHeaders() {
-        const _signature = sign(this.getApiEndpoint);
-
+    private async getValidHeaders(url = '', signUrl = true) {
         const options = {
-            uri: this.getApiEndpoint,
+            uri: url,
             method: 'HEAD',
-            qs: {
-                _signature,
-            },
+            ...(signUrl
+                ? {
+                      qs: {
+                          _signature: sign(url),
+                      },
+                  }
+                : {}),
             headers: {
                 'x-secsdk-csrf-request': 1,
                 'x-secsdk-csrf-version': '1.2.5',
@@ -857,7 +860,6 @@ export class TikTokScraper extends EventEmitter {
 
         try {
             await this.request<string>(options);
-            this.validHeaders = true;
         } catch (error) {
             throw error.message;
         }
@@ -1008,6 +1010,8 @@ export class TikTokScraper extends EventEmitter {
      * @param {} username
      */
     public async getUserProfileInfo(): Promise<UserMetadata> {
+        await this.getValidHeaders(`https://www.tiktok.com/@${encodeURIComponent(this.input)}`, false);
+
         if (!this.input) {
             throw `Username is missing`;
         }
@@ -1067,6 +1071,7 @@ export class TikTokScraper extends EventEmitter {
      * @param {} music link
      */
     public async getMusicInfo(): Promise<MusicMetadata> {
+        await this.getValidHeaders(this.input, false);
         if (!this.input) {
             throw `Music is missing`;
         }
@@ -1134,7 +1139,7 @@ export class TikTokScraper extends EventEmitter {
      */
     private async getVideoMetadataFromHtml(): Promise<FeedItems> {
         const options = {
-            uri: `${this.input}`,
+            uri: this.input,
             method: 'GET',
             json: true,
         };
@@ -1189,6 +1194,7 @@ export class TikTokScraper extends EventEmitter {
      */
 
     public async getVideoMeta(html = true): Promise<PostCollector> {
+        await this.getValidHeaders(this.input, false);
         if (!this.input) {
             throw `Url is missing`;
         }
