@@ -1057,28 +1057,10 @@ export class TikTokScraper extends EventEmitter {
     }
 
     /**
-     * In order to execute valid request, we need to extract valid cookie headers and valid csrf token
-     * This request is being executed only once per run
-     */
-    private async blah() {
-        const options = {
-            uri: 'https://www.tiktok.com',
-            method: 'GET',
-        };
-
-        try {
-            await this.request<string>(options);
-        } catch (error) {
-            throw error.message;
-        }
-    }
-
-    /**
      * Get music information
      * @param {} music link
      */
     public async getMusicInfo(): Promise<MusicMetadata> {
-        await this.blah();
         if (!this.input) {
             throw `Music is missing`;
         }
