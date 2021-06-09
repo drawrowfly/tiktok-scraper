@@ -78,8 +78,6 @@ export class TikTokScraper extends EventEmitter {
 
     private idStore: string;
 
-    private userIdStore: string;
-
     public Downloader: Downloader;
 
     private storeValue: string = '';
@@ -188,7 +186,6 @@ export class TikTokScraper extends EventEmitter {
         this.storeHistory = cli && download && store_history;
         this.historyPath = process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : historyPath || tmpdir();
         this.idStore = '';
-        this.userIdStore = '';
         this.noWaterMark = noWaterMark;
         this.maxCursor = 0;
         this.noDuplicates = [];
@@ -332,6 +329,11 @@ export class TikTokScraper extends EventEmitter {
                 ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
                 timeout: 10000,
             } as unknown) as OptionsWithUri;
+
+            const session = this.sessionList[Math.floor(Math.random() * this.sessionList.length)];
+            if (session) {
+                cookieJar.setCookie(session, 'https://tiktok.com');
+            }
 
             try {
                 const response = await rp(options);
@@ -868,9 +870,6 @@ export class TikTokScraper extends EventEmitter {
                 ...qs,
                 _signature,
             },
-            // headers: {
-            //     cookie: this.getCookies(true),
-            // },
             json: true,
         };
 
@@ -954,43 +953,37 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
-    private getCookies(auth = false) {
-        const session = auth ? this.sessionList[Math.floor(Math.random() * this.sessionList.length)] : '';
-
-        return `${this.headers.cookie};${session || ''}`;
-    }
-
     /**
      * Get user ID
      */
     private async getUserId(): Promise<RequestQuery> {
         if (this.byUserId || this.idStore) {
             return {
-                id: this.userIdStore,
                 secUid: this.idStore ? this.idStore : this.input,
                 lang: '',
                 aid: 1988,
-                sourceType: CONST.sourceType.user,
                 count: 30,
                 cursor: 0,
-                verifyFp: this.verifyFp,
+                app_name: 'tiktok_web',
+                device_platform: 'web_pc',
+                cookie_enabled: true,
+                history_len: 2,
+                focus_state: true,
+                is_fullscreen: false,
             };
         }
 
         try {
             const response = await this.getUserProfileInfo();
             this.idStore = response.user.secUid;
-            this.userIdStore = response.user.id;
             return {
                 aid: 1988,
                 secUid: this.idStore,
                 count: 30,
                 lang: '',
                 cursor: 0,
-                // verifyFp: this.verifyFp,
                 app_name: 'tiktok_web',
                 device_platform: 'web_pc',
-                os: 'mac',
                 cookie_enabled: true,
                 history_len: 2,
                 focus_state: true,
@@ -1013,9 +1006,6 @@ export class TikTokScraper extends EventEmitter {
             method: 'GET',
             uri: `https://www.tiktok.com/@${encodeURIComponent(this.input)}`,
             json: true,
-            // headers: {
-            //     cookie: this.getCookies(true),
-            // },
         };
         try {
             const response = await this.request<string>(options);
@@ -1044,9 +1034,6 @@ export class TikTokScraper extends EventEmitter {
             uri: `${this.mainHost}node/share/tag/${this.input}?uniqueId=${this.input}`,
             qs: {
                 appId: 1233,
-            },
-            headers: {
-                cookie: this.getCookies(true),
             },
             method: 'GET',
             json: true,
