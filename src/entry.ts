@@ -208,7 +208,7 @@ export const getVideoMeta = async (input: string, options = {} as Options): Prom
     const fullUrl = /^https:\/\/www\.tiktok\.com\/@[\w.-]+\/video\/\d+/.test(input);
     const result = await scraper.getVideoMeta(!fullUrl);
     return {
-        headers: contructor.headers,
+        headers: { ...scraper.headers, cookie: scraper.cookieJar!.getCookieString('https://tiktok.com') },
         collector: [result],
     };
 };

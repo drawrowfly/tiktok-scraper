@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import rp, { OptionsWithUri } from 'request-promise';
+import { CookieJar } from 'request';
 import { tmpdir } from 'os';
 import { writeFile, readFile, mkdir } from 'fs';
 import { Parser } from 'json2csv';
@@ -35,9 +36,6 @@ import {
 } from '../types';
 
 import { Downloader } from '../core';
-
-// Cookie jar. Where all valid cookies will be stored
-const cookieJar = rp.jar();
 
 export class TikTokScraper extends EventEmitter {
     private mainHost: string;
@@ -113,13 +111,15 @@ export class TikTokScraper extends EventEmitter {
         bad: number;
     };
 
-    private headers: Headers;
+    public headers: Headers;
 
     private sessionList: string[];
 
     private verifyFp: string;
 
     private store: string[];
+
+    public cookieJar: CookieJar;
 
     constructor({
         download,
@@ -165,6 +165,8 @@ export class TikTokScraper extends EventEmitter {
         this.number = number;
         this.csrf = '';
         this.zip = zip;
+        // Cookie jar. Where all valid cookies will be stored
+        this.cookieJar = rp.jar();
         this.hdVideo = hdVideo;
         this.sessionList = sessionList;
         this.asyncDownload = asyncDownload || 5;
@@ -194,6 +196,7 @@ export class TikTokScraper extends EventEmitter {
         this.validHeaders = false;
         this.Downloader = new Downloader({
             progress,
+            cookieJar: this.cookieJar,
             proxy,
             noWaterMark,
             headers,
@@ -309,7 +312,7 @@ export class TikTokScraper extends EventEmitter {
         return new Promise(async (resolve, reject) => {
             const proxy = this.getProxy;
             const options = ({
-                jar: cookieJar,
+                jar: this.cookieJar,
                 uri,
                 method,
                 ...(qs ? { qs } : {}),
@@ -332,7 +335,7 @@ export class TikTokScraper extends EventEmitter {
 
             const session = this.sessionList[Math.floor(Math.random() * this.sessionList.length)];
             if (session) {
-                cookieJar.setCookie(session, 'https://tiktok.com');
+                this.cookieJar.setCookie(session, 'https://tiktok.com');
             }
 
             try {
@@ -417,7 +420,7 @@ export class TikTokScraper extends EventEmitter {
         }
 
         return {
-            headers: { ...this.headers, cookie: cookieJar.getCookieString('https://tiktok.com') },
+            headers: { ...this.headers, cookie: this.cookieJar.getCookieString('https://tiktok.com') },
             collector: this.collector,
             ...(this.download ? { zip } : {}),
             ...(this.filetype === 'all' ? { json, csv } : {}),
@@ -1054,38 +1057,65 @@ export class TikTokScraper extends EventEmitter {
     }
 
     /**
+     * In order to execute valid request, we need to extract valid cookie headers and valid csrf token
+     * This request is being executed only once per run
+     */
+    private async blah() {
+        const options = {
+            uri: 'https://www.tiktok.com',
+            method: 'GET',
+        };
+
+        try {
+            await this.request<string>(options);
+        } catch (error) {
+            throw error.message;
+        }
+    }
+
+    /**
      * Get music information
      * @param {} music link
      */
     public async getMusicInfo(): Promise<MusicMetadata> {
+        await this.blah();
         if (!this.input) {
             throw `Music is missing`;
         }
 
-        const musicId = /music\/([\w-]+)/.exec(this.input);
-
-        this.input = musicId ? musicId[1] : `-${this.input}`;
+        const musicTitle = /music\/([\w-]+)-\d+/.exec(this.input);
+        const musicId = /music\/[\w-]+-(\d+)/.exec(this.input);
 
         const query = {
-            uri: `${this.mainHost}node/share/music/${this.input}`,
+            uri: `${this.mainHost}node/share/music/${musicTitle ? musicTitle[1] : ''}-${musicId ? musicId[1] : ''}`,
             qs: {
-                user_agent: this.headers['user-agent'],
                 screen_width: 1792,
                 screen_height: 1120,
-                browser_language: 'en-US',
-                browser_platform: 'MacIntel',
-                appId: 1233,
-                isIOS: false,
-                isMobile: false,
-                isAndroid: false,
-                appType: 'm',
+                lang: 'en',
+                priority_region: '',
+                referer: '',
+                root_referer: '',
+                app_language: 'en',
+                is_page_visible: true,
+                history_len: 6,
+                focus_state: true,
+                is_fullscreen: false,
                 aid: 1988,
                 app_name: 'tiktok_web',
+                timezone_name: '',
                 device_platform: 'web',
+                musicId: musicId ? musicId[1] : '',
+                musicName: musicTitle ? musicTitle[1] : '',
             },
             method: 'GET',
             json: true,
         };
+
+        const unsignedURL = `${query.uri}?${new URLSearchParams(query.qs as any).toString()}`;
+        const _signature = sign(unsignedURL);
+
+        // @ts-ignore
+        query.qs._signature = _signature;
 
         try {
             const response = await this.request<TikTokMetadata>(query);
