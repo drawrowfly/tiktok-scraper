@@ -1068,56 +1068,28 @@ export class TikTokScraper extends EventEmitter {
 
     /**
      * Get music information
-     * @param {} music link
+     * @param {} music ID
      */
     public async getMusicInfo(): Promise<MusicMetadata> {
-        await this.getValidHeaders(this.input, false);
         if (!this.input) {
-            throw `Music is missing`;
+            throw `MusicID is missing`;
         }
-
-        const musicTitle = /music\/([\w-]+)-\d+/.exec(this.input);
-        const musicId = /music\/[\w-]+-(\d+)/.exec(this.input);
-
-        const query = {
-            uri: `${this.mainHost}node/share/music/${musicTitle ? musicTitle[1] : ''}-${musicId ? musicId[1] : ''}`,
-            qs: {
-                screen_width: 1792,
-                screen_height: 1120,
-                lang: 'en',
-                priority_region: '',
-                referer: '',
-                root_referer: '',
-                app_language: 'en',
-                is_page_visible: true,
-                history_len: 6,
-                focus_state: true,
-                is_fullscreen: false,
-                aid: 1988,
-                app_name: 'tiktok_web',
-                timezone_name: '',
-                device_platform: 'web',
-                musicId: musicId ? musicId[1] : '',
-                musicName: musicTitle ? musicTitle[1] : '',
-            },
+        const options = {
             method: 'GET',
+            uri: `https://www.tiktok.com/music/original-sound-${this.input}`,
             json: true,
         };
-
-        const unsignedURL = `${query.uri}?${new URLSearchParams(query.qs as any).toString()}`;
-        const _signature = sign(unsignedURL);
-
-        // @ts-ignore
-        query.qs._signature = _signature;
-
         try {
-            const response = await this.request<TikTokMetadata>(query);
-            if (response.statusCode !== 0) {
-                throw new Error(`Can't find music data: ${this.input}`);
+            const response = await this.request(options);
+            const breakResponse = response
+                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[a-z0-9\-\_]+" crossorigin="anonymous">/i)[1]
+                .split(`</script>`)[0];
+            if (breakResponse) {
+                const musicMetadata = JSON.parse(breakResponse);
+                return musicMetadata.props.pageProps.musicInfo;
             }
-            return response.musicInfo;
-        } catch (error) {
-            throw error.message;
+        }
+        catch (_a) {
         }
     }
 
