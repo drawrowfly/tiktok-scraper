@@ -54,6 +54,8 @@ export class TikTokScraper extends EventEmitter {
 
     private proxy: string[] | string;
 
+    private strictSSL: boolean;
+
     private number: number;
 
     private asyncDownload: number;
@@ -128,6 +130,7 @@ export class TikTokScraper extends EventEmitter {
         filepath,
         filetype,
         proxy,
+        strictSSL = true,
         asyncDownload,
         cli = false,
         event = false,
@@ -165,6 +168,7 @@ export class TikTokScraper extends EventEmitter {
         this.input = input;
         this.test = test;
         this.proxy = proxy;
+        this.strictSSL = strictSSL;
         this.number = number;
         this.csrf = '';
         this.zip = zip;
@@ -333,6 +337,7 @@ export class TikTokScraper extends EventEmitter {
                 simple,
                 ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
                 ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
+                ...(this.strictSSL === false ? { rejectUnauthorized: false } : {}),
                 timeout: 10000,
             } as unknown) as OptionsWithUri;
 
