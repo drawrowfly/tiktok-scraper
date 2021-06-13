@@ -344,7 +344,7 @@ export class TikTokScraper extends EventEmitter {
              * Set tt_webid_v2 cookie to access video url
              */
             const cookies = this.cookieJar.getCookieString('https://tiktok.com');
-            if (cookies.indexOf('tt_webid_v2')) {
+            if (cookies.indexOf('tt_webid_v2') === -1) {
                 this.cookieJar.setCookie(`tt_webid_v2=69${makeid(17)}; Domain=tiktok.com; Path=/; Secure; hostOnly=false`, 'https://tiktok.com');
             }
 
