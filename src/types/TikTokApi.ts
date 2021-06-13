@@ -97,8 +97,10 @@ export interface RequestQuery {
     lang?: string;
     verifyFp?: string;
     challengeID?: string;
+    fromPage?: string;
     cursor?: number;
     aid?: number;
+    itemID?: number;
     appId?: number;
     user_agent?: string;
     screen_width?: number;

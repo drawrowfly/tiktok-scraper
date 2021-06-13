@@ -14,7 +14,7 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 import { URLSearchParams } from 'url';
 import CONST from '../constant';
-import { sign } from '../helpers';
+import { sign, makeid } from '../helpers';
 
 import {
     PostCollector,
@@ -339,6 +339,13 @@ export class TikTokScraper extends EventEmitter {
             const session = this.sessionList[Math.floor(Math.random() * this.sessionList.length)];
             if (session) {
                 this.cookieJar.setCookie(session, 'https://tiktok.com');
+            }
+            /**
+             * Set tt_webid_v2 cookie to access video url
+             */
+            const cookies = this.cookieJar.getCookieString('https://tiktok.com');
+            if (cookies.indexOf('tt_webid_v2')) {
+                this.cookieJar.setCookie(`tt_webid_v2=69${makeid(17)}; Domain=tiktok.com; Path=/; Secure; hostOnly=false`, 'https://tiktok.com');
             }
 
             try {
@@ -894,12 +901,15 @@ export class TikTokScraper extends EventEmitter {
      */
     // eslint-disable-next-line class-methods-use-this
     private async getTrendingFeedQuery(): Promise<RequestQuery> {
+        // this.cookieJar.setCookie(`tt_webid_v2=69${makeid(16)};`, 'https://tiktok.com');
         return {
             aid: 1988,
+            app_name: 'tiktok_web',
+            device_platform: 'web_pc',
             lang: '',
             count: 30,
-            verifyFp: this.verifyFp,
-            user_agent: this.headers['user-agent'],
+            fromPage: 'fyp',
+            itemID: 1,
         };
     }
 
@@ -1080,7 +1090,7 @@ export class TikTokScraper extends EventEmitter {
         const musicId = /music\/[\w-]+-(\d+)/.exec(this.input);
 
         const query = {
-            uri: `${this.mainHost}node/share/music/${musicTitle ? musicTitle[1] : ''}-${musicId ? musicId[1] : ''}`,
+            uri: `https://www.tiktok.com/node/share/music/${musicTitle ? musicTitle[1] : ''}-${musicId ? musicId[1] : ''}`,
             qs: {
                 screen_width: 1792,
                 screen_height: 1120,
