@@ -901,7 +901,6 @@ export class TikTokScraper extends EventEmitter {
      */
     // eslint-disable-next-line class-methods-use-this
     private async getTrendingFeedQuery(): Promise<RequestQuery> {
-        // this.cookieJar.setCookie(`tt_webid_v2=69${makeid(16)};`, 'https://tiktok.com');
         return {
             aid: 1988,
             app_name: 'tiktok_web',
