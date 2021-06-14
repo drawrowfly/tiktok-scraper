@@ -3,7 +3,8 @@ FROM alpine:latest AS tiktok_scraper.build
 
 WORKDIR /usr/app
 
-RUN apk update && apk add --update nodejs nodejs-npm python3
+RUN apk update && apk add --update nodejs nodejs-npm python3 pkgconfig pixman-dev 
+RUN apk add --update cairo-dev pango-dev make g++
 
 COPY package*.json tsconfig.json .prettierrc.js bin ./
 COPY ./src ./src
@@ -18,7 +19,8 @@ FROM alpine:latest AS tiktok_scraper.use
 
 WORKDIR /usr/app
 
-RUN apk update && apk add --update nodejs nodejs-npm
+RUN apk update && apk add --update nodejs nodejs-npm python3 pkgconfig pixman-dev
+RUN apk add --update cairo-dev pango-dev make g++
 
 COPY --from=tiktok_scraper.build ./usr/app ./
 COPY ./bin ./bin
