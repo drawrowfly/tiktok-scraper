@@ -56,6 +56,7 @@ export interface TikTokConstructor {
     filetype: string;
     useTestEndpoints?: boolean;
     proxy: string[] | string;
+    strictSSL?: boolean;
     asyncDownload: number;
     asyncScraping: number;
     cli?: boolean;
