@@ -416,7 +416,7 @@ const TikTokScraper = require('tiktok-scraper');
 ```javascript
 const TikTokScraper = require('tiktok-scraper');
 
-const users = TikTokScraper.userEvent("tiktok" { number: 30 });
+const users = TikTokScraper.userEvent("tiktok", { number: 30 });
 users.on('data', json => {
     //data in JSON format
 });
