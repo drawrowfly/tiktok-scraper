@@ -12,7 +12,6 @@ export = {
         'from-file',
         'userprofile',
     ],
-    chronologicalTypes: ['user'],
     history: ['user', 'hashtag', 'trend', 'music'],
     requiredSession: ['user', 'hashtag', 'trend', 'music'],
     sourceType: {

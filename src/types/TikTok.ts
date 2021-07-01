@@ -38,7 +38,6 @@ export interface Options {
     filetype?: string;
     progress?: boolean;
     number?: number;
-    since?: number;
     noWaterMark?: boolean;
     remove?: string;
     fileName?: string;
@@ -67,7 +66,6 @@ export interface TikTokConstructor {
     bulk?: boolean;
     input: string;
     number: number;
-    since: number;
     type: ScrapeType;
     by_user_id?: boolean;
     store_history?: boolean;

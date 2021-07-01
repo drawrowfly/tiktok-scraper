@@ -134,8 +134,6 @@ Options:
                        1000 mls = 1 s                               [default: 0]
   --number, -n         Number of posts to scrape. If you will set 0 then all
                        posts will be scraped                        [default: 0]
-  --since              Scrape no posts published before this date (timestamp).
-                       If set to 0 the filter is deactived          [default: 0]
   --proxy, -p          Set single proxy                            [default: ""]
   --proxy-file         Use proxies from a file. Scraper will use random proxies
                        from the file per each request. 1 line 1 proxy.
@@ -246,9 +244,6 @@ docker run -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d 
 const options = {
     // Number of posts to scrape: {int default: 20}
     number: 50,
-
-    // Scrape posts published since this date: { int default: 0}
-    since: 0,
 
     // Set session: {string[] default: ['']}
     // Authenticated session cookie value is required to scrape user/trending/music/hashtag feed
