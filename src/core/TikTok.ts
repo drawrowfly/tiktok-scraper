@@ -1060,7 +1060,7 @@ export class TikTokScraper extends EventEmitter {
                 const userMetadata: WebHtmlUserMetadata = JSON.parse(breakResponse);
                 return userMetadata.props.pageProps.userInfo;
             }
-        } catch(err) {
+        } catch (err) {
             if (err.statusCode === 404) {
                 throw new Error('User does not exist');
             }
@@ -1214,7 +1214,7 @@ export class TikTokScraper extends EventEmitter {
                 if (response.statusCode === 0) {
                     return response.itemInfo.itemStruct;
                 }
-            } catch(err) {
+            } catch (err) {
                 if (err.statusCode === 404) {
                     throw new Error('Video does not exist');
                 }

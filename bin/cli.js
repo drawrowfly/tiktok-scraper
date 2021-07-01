@@ -132,7 +132,7 @@ yargs
         },
         since: {
             default: 0,
-            describe: 'Scrape no posts published before this date (timestamp). The default value 0 will deactivate filter',
+            describe: 'Scrape posts that are published after specified date (timestamp). The default value is 0 - scrape all posts',
         },
         proxy: {
             alias: 'p',
