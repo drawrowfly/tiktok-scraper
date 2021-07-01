@@ -58,6 +58,8 @@ export class TikTokScraper extends EventEmitter {
 
     private number: number;
 
+    private since: number;
+
     private asyncDownload: number;
 
     private asyncScraping: () => number;
@@ -137,6 +139,7 @@ export class TikTokScraper extends EventEmitter {
         progress = false,
         input,
         number,
+        since,
         type,
         by_user_id = false,
         store_history = false,
@@ -170,6 +173,7 @@ export class TikTokScraper extends EventEmitter {
         this.proxy = proxy;
         this.strictSSL = strictSSL;
         this.number = number;
+        this.since = since;
         this.csrf = '';
         this.zip = zip;
         // Cookie jar. Where all valid cookies will be stored
@@ -596,13 +600,13 @@ export class TikTokScraper extends EventEmitter {
             if ((updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items)) {
                 throw new Error('No more posts');
             }
-            await this.collectPosts(updatedApiResponse ? result.itemList : result.items);
+            const { done } = await this.collectPosts(updatedApiResponse ? result.itemList : result.items);
 
             if (!hasMore) {
                 throw new Error('No more posts');
             }
 
-            if (this.collector.length >= this.number && this.number !== 0) {
+            if (done) {
                 throw new Error('Done');
             }
             this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
@@ -759,11 +763,23 @@ export class TikTokScraper extends EventEmitter {
      * @param posts
      */
     private collectPosts(posts: FeedItems[]) {
+        const result = {
+            done: false,
+        };
         for (let i = 0; i < posts.length; i += 1) {
+            if (result.done) {
+                break;
+            }
             if (this.number) {
                 if (this.collector.length >= this.number) {
+                    result.done = true;
                     break;
                 }
+            }
+
+            if (this.since && posts[i].createTime < this.since) {
+                result.done = CONST.chronologicalTypes.indexOf(this.scrapeType) !== -1;
+                break;
             }
 
             if (this.noDuplicates.indexOf(posts[i].id) === -1) {
@@ -847,6 +863,7 @@ export class TikTokScraper extends EventEmitter {
                 }
             }
         }
+        return result;
     }
 
     /**

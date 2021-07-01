@@ -130,6 +130,10 @@ yargs
             default: 0,
             describe: 'Number of posts to scrape. If you will set 0 then all posts will be scraped',
         },
+        since: {
+            default: 0,
+            describe: 'Scrape no posts published before this date (timestamp). The default value 0 will deactivate filter',
+        },
         proxy: {
             alias: 'p',
             default: '',
