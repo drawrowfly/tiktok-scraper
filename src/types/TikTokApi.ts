@@ -97,8 +97,10 @@ export interface RequestQuery {
     lang?: string;
     verifyFp?: string;
     challengeID?: string;
+    fromPage?: string;
     cursor?: number;
     aid?: number;
+    itemID?: number;
     appId?: number;
     user_agent?: string;
     screen_width?: number;
@@ -106,8 +108,13 @@ export interface RequestQuery {
     browser_language?: string;
     browser_platform?: string;
     isIOS?: boolean;
+    os?: string;
     isMobile?: boolean;
     isAndroid?: boolean;
+    cookie_enabled?: boolean;
+    history_len?: number;
+    focus_state?: boolean;
+    is_fullscreen?: boolean;
     appType?: string;
     browser_online?: boolean;
     browser_version?: string;

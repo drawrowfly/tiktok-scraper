@@ -12,7 +12,7 @@ This is not an official API support and etc. This is just a scraper that is usin
 
 <a href="https://www.buymeacoffee.com/Usom2qC" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-<a href="https://discord.gg/7SZaUs4" target="_blank"><img src="https://i.imgur.com/dUwek7T.jpg" alt="Discord Server" width="435" height="190" ></a>
+<a href="https://discord.gg/ffskw9k" target="_blank"><img src="https://i.imgur.com/dUwek7T.jpg" alt="Discord Server" width="435" height="190" ></a>
 
 
 ---
@@ -421,7 +421,7 @@ const TikTokScraper = require('tiktok-scraper');
 ```javascript
 const TikTokScraper = require('tiktok-scraper');
 
-const users = TikTokScraper.userEvent("tiktok" { number: 30 });
+const users = TikTokScraper.userEvent("tiktok", { number: 30 });
 users.on('data', json => {
     //data in JSON format
 });

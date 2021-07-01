@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 /* eslint-disable no-console */
-import request, { OptionsWithUri } from 'request';
+import request, { OptionsWithUri, CookieJar } from 'request';
 import rp from 'request-promise';
 import { Agent } from 'http';
 import { createWriteStream, writeFile } from 'fs';
@@ -31,7 +31,9 @@ export class Downloader {
 
     public headers: Headers;
 
-    constructor({ progress, proxy, noWaterMark, headers, filepath, bulk }: DownloaderConstructor) {
+    public cookieJar: CookieJar;
+
+    constructor({ progress, proxy, noWaterMark, headers, filepath, bulk, cookieJar }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
         this.noWaterMark = noWaterMark;
@@ -40,6 +42,7 @@ export class Downloader {
         this.mbars = new MultipleBar();
         this.proxy = proxy;
         this.bulk = bulk;
+        this.cookieJar = cookieJar;
     }
 
     /**
@@ -101,6 +104,7 @@ export class Downloader {
             r.get({
                 url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
                 headers: this.headers,
+                jar: this.cookieJar,
             })
                 .on('response', response => {
                     const len = parseInt(response.headers['content-length'] as string, 10);
@@ -114,7 +118,7 @@ export class Downloader {
                 .on('data', chunk => {
                     if (chunk.length) {
                         buffer = Buffer.concat([buffer, chunk as Buffer]);
-                        if (this.progress && !this.bulk) {
+                        if (this.progress && !this.bulk && barIndex && barIndex.hasOwnProperty('tick')) {
                             barIndex.tick(chunk.length, { id: item.id });
                         }
                     }
@@ -196,6 +200,7 @@ export class Downloader {
         const options = ({
             uri: url,
             method: 'GET',
+            jar: this.cookieJar,
             headers: this.headers,
             encoding: null,
             ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
