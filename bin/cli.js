@@ -130,6 +130,10 @@ yargs
             default: 0,
             describe: 'Number of posts to scrape. If you will set 0 then all posts will be scraped',
         },
+        since: {
+            default: 0,
+            describe: 'Scrape posts that are published after specified date (timestamp). The default value is 0 - scrape all posts',
+        },
         proxy: {
             alias: 'p',
             default: '',
