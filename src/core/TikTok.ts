@@ -1109,8 +1109,8 @@ export class TikTokScraper extends EventEmitter {
             throw `Music is missing`;
         }
 
-        const musicTitle = /music\/([\w-]+)-\d+/.exec(this.input);
-        const musicId = /music\/[\w-]+-(\d+)/.exec(this.input);
+        const musicTitle = /music\/([\S-]+)-\d+/.exec(this.input);
+        const musicId = /music\/[\S-]+-(\d+)/.exec(this.input);
 
         const query = {
             uri: `https://www.tiktok.com/node/share/music/${musicTitle ? musicTitle[1] : ''}-${musicId ? musicId[1] : ''}`,
