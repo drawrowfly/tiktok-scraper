@@ -1190,6 +1190,9 @@ export class TikTokScraper extends EventEmitter {
             const videoData = videoProps.props.pageProps.itemInfo.itemStruct;
             return videoData as FeedItems;
         } catch (error) {
+            if (error.statusCode === 404) {
+                throw new Error('Video does not exist');
+            }
             throw `Can't extract video metadata: ${this.input}`;
         }
     }
