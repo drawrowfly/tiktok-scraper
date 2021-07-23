@@ -1179,7 +1179,7 @@ export class TikTokScraper extends EventEmitter {
         try {
             const response = await this.request<string>(options);
             if (!response) {
-                throw new Error(`Can't extract video meta data`);
+                throw new Error(`Can't extract video metadata`);
             }
 
             const rawVideoMetadata = response
