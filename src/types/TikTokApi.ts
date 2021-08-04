@@ -92,9 +92,13 @@ export interface RequestQuery {
     type?: number;
     sourceType?: number;
     count?: number;
+    priority_region?: string;
+    lang?: string;
+    referer?: string;
+    root_referer?: string;
     minCursor?: number;
     maxCursor?: number;
-    lang?: string;
+    language?: string;
     verifyFp?: string;
     challengeID?: string;
     fromPage?: string;
@@ -102,6 +106,8 @@ export interface RequestQuery {
     aid?: number;
     itemID?: number;
     appId?: number;
+    app_language?: string;
+    is_page_visible?: boolean;
     user_agent?: string;
     screen_width?: number;
     screen_height?: number;

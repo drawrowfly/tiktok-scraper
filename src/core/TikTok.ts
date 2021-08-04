@@ -40,8 +40,6 @@ import { Downloader } from '../core';
 export class TikTokScraper extends EventEmitter {
     private mainHost: string;
 
-    private userIdStore: string;
-
     private download: boolean;
 
     private filepath: string;
@@ -159,7 +157,6 @@ export class TikTokScraper extends EventEmitter {
         sessionList = [],
     }: TikTokConstructor) {
         super();
-        this.userIdStore = '';
         this.verifyFp = verifyFp;
         this.mainHost = useTestEndpoints ? 'https://t.tiktok.com/' : 'https://m.tiktok.com/';
         this.headers = headers;
@@ -877,7 +874,7 @@ export class TikTokScraper extends EventEmitter {
             ...(signUrl
                 ? {
                       qs: {
-                          _signature: sign(url),
+                          _signature: sign(url, this.headers['user-agent']),
                       },
                   }
                 : {}),
@@ -898,7 +895,7 @@ export class TikTokScraper extends EventEmitter {
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
         const unsignedURL = `${this.getApiEndpoint}?${new URLSearchParams(qs as any).toString()}`;
-        const _signature = sign(unsignedURL);
+        const _signature = sign(unsignedURL, this.headers['user-agent']);
 
         const options = {
             uri: this.getApiEndpoint,
@@ -998,7 +995,6 @@ export class TikTokScraper extends EventEmitter {
     private async getUserId(): Promise<RequestQuery> {
         if (this.byUserId || this.idStore) {
             return {
-                id: this.userIdStore,
                 secUid: this.idStore ? this.idStore : this.input,
                 lang: '',
                 aid: 1988,
@@ -1016,9 +1012,8 @@ export class TikTokScraper extends EventEmitter {
         try {
             const response = await this.getUserProfileInfo();
             this.idStore = response.user.secUid;
-            this.userIdStore = response.user.id;
+
             return {
-                id: this.userIdStore,
                 aid: 1988,
                 secUid: this.idStore,
                 count: 30,
@@ -1138,7 +1133,7 @@ export class TikTokScraper extends EventEmitter {
         };
 
         const unsignedURL = `${query.uri}?${new URLSearchParams(query.qs as any).toString()}`;
-        const _signature = sign(unsignedURL);
+        const _signature = sign(unsignedURL, this.headers['user-agent']);
 
         // @ts-ignore
         query.qs._signature = _signature;
@@ -1162,7 +1157,7 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw `Url is missing`;
         }
-        return sign(this.input);
+        return sign(this.input, this.headers['user-agent']);
     }
 
     /**
