@@ -40,6 +40,8 @@ import { Downloader } from '../core';
 export class TikTokScraper extends EventEmitter {
     private mainHost: string;
 
+    private userIdStore: string;
+
     private download: boolean;
 
     private filepath: string;
@@ -157,6 +159,7 @@ export class TikTokScraper extends EventEmitter {
         sessionList = [],
     }: TikTokConstructor) {
         super();
+        this.userIdStore = '';
         this.verifyFp = verifyFp;
         this.mainHost = useTestEndpoints ? 'https://t.tiktok.com/' : 'https://m.tiktok.com/';
         this.headers = headers;
@@ -995,6 +998,7 @@ export class TikTokScraper extends EventEmitter {
     private async getUserId(): Promise<RequestQuery> {
         if (this.byUserId || this.idStore) {
             return {
+                id: this.userIdStore,
                 secUid: this.idStore ? this.idStore : this.input,
                 lang: '',
                 aid: 1988,
@@ -1012,8 +1016,9 @@ export class TikTokScraper extends EventEmitter {
         try {
             const response = await this.getUserProfileInfo();
             this.idStore = response.user.secUid;
-
+            this.userIdStore = response.user.id;
             return {
+                id: this.userIdStore,
                 aid: 1988,
                 secUid: this.idStore,
                 count: 30,

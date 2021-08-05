@@ -22,7 +22,6 @@
         "request": "^2.88.0",
         "request-promise": "^4.2.4",
         "socks-proxy-agent": "^5.0.0",
-        "window": "^4.2.7",
         "yargs": "^14.2.0"
     },
     "devDependencies": {
