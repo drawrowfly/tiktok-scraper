@@ -554,25 +554,25 @@ export class TikTokScraper extends EventEmitter {
                         case 'user':
                             this.getUserId()
                                 .then(query => this.submitScrapingRequest({ ...query, cursor: this.maxCursor }, true))
-                                .then(kill => cb(kill))
+                                .then(kill => cb(kill || null))
                                 .catch(error => cb(error));
                             break;
                         case 'hashtag':
                             this.getHashTagId()
                                 .then(query => this.submitScrapingRequest({ ...query, cursor: item === 1 ? 0 : (item - 1) * query.count! }, true))
-                                .then(kill => cb(kill))
+                                .then(kill => cb(kill || null))
                                 .catch(error => cb(error));
                             break;
                         case 'trend':
                             this.getTrendingFeedQuery()
                                 .then(query => this.submitScrapingRequest({ ...query }, true))
-                                .then(kill => cb(kill))
+                                .then(kill => cb(kill || null))
                                 .catch(error => cb(error));
                             break;
                         case 'music':
                             this.getMusicFeedQuery()
                                 .then(query => this.submitScrapingRequest({ ...query, cursor: item === 1 ? 0 : (item - 1) * query.count! }, true))
-                                .then(kill => cb(kill))
+                                .then(kill => cb(kill || null))
                                 .catch(error => cb(error));
                             break;
                         default:
