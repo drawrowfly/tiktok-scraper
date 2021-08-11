@@ -453,7 +453,7 @@ export class TikTokScraper extends EventEmitter {
      * Extract uniq video id and create the url to the video without the watermark
      */
     private withoutWatermark() {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             forEachLimit(
                 this.collector,
                 5,
@@ -465,7 +465,11 @@ export class TikTokScraper extends EventEmitter {
                         throw new Error(`Can't extract unique video id`);
                     }
                 },
-                () => {
+                err => {
+                    if (err) {
+                        return reject(err);
+                    }
+
                     resolve(null);
                 },
             );
@@ -540,7 +544,7 @@ export class TikTokScraper extends EventEmitter {
      * Main loop that collects all required metadata from the tiktok web api
      */
     private mainLoop(): Promise<any> {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             const taskArray = Array.from({ length: 1000 }, (v, k) => k + 1);
             forEachLimit(
                 taskArray,
@@ -575,7 +579,11 @@ export class TikTokScraper extends EventEmitter {
                             break;
                     }
                 },
-                () => {
+                err => {
+                    if (err) {
+                        return reject(err);
+                    }
+
                     resolve(null);
                 },
             );
