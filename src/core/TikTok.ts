@@ -554,25 +554,25 @@ export class TikTokScraper extends EventEmitter {
                         case 'user':
                             this.getUserId()
                                 .then(query => this.submitScrapingRequest({ ...query, cursor: this.maxCursor }, true))
-                                .then(() => cb(null))
+                                .then(kill => cb(kill))
                                 .catch(error => cb(error));
                             break;
                         case 'hashtag':
                             this.getHashTagId()
                                 .then(query => this.submitScrapingRequest({ ...query, cursor: item === 1 ? 0 : (item - 1) * query.count! }, true))
-                                .then(() => cb(null))
+                                .then(kill => cb(kill))
                                 .catch(error => cb(error));
                             break;
                         case 'trend':
                             this.getTrendingFeedQuery()
                                 .then(query => this.submitScrapingRequest({ ...query }, true))
-                                .then(() => cb(null))
+                                .then(kill => cb(kill))
                                 .catch(error => cb(error));
                             break;
                         case 'music':
                             this.getMusicFeedQuery()
                                 .then(query => this.submitScrapingRequest({ ...query, cursor: item === 1 ? 0 : (item - 1) * query.count! }, true))
-                                .then(() => cb(null))
+                                .then(kill => cb(kill))
                                 .catch(error => cb(error));
                             break;
                         default:
@@ -580,7 +580,7 @@ export class TikTokScraper extends EventEmitter {
                     }
                 },
                 err => {
-                    if (err) {
+                    if (err && err !== true) {
                         return reject(err);
                     }
 
@@ -594,7 +594,7 @@ export class TikTokScraper extends EventEmitter {
      * Submit request to the TikTok web API
      * Collect received metadata
      */
-    private async submitScrapingRequest(query: RequestQuery, updatedApiResponse = false): Promise<any> {
+    private async submitScrapingRequest(query: RequestQuery, updatedApiResponse = false): Promise<boolean> {
         try {
             if (!this.validHeaders) {
                 await this.getValidHeaders(this.getApiEndpoint);
@@ -615,9 +615,11 @@ export class TikTokScraper extends EventEmitter {
             }
 
             if (done) {
-                throw new Error('Done');
+                return true;
             }
+
             this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
+            return false;
         } catch (error) {
             throw error.message ? new Error(error.message) : error;
         }
