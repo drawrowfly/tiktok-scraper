@@ -619,7 +619,7 @@ export class TikTokScraper extends EventEmitter {
             }
             this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
         } catch (error) {
-            throw error.message ? error.message : error;
+            throw error.message ? new Error(error.message) : error;
         }
     }
 
@@ -898,7 +898,7 @@ export class TikTokScraper extends EventEmitter {
         try {
             await this.request<string>(options);
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -922,7 +922,7 @@ export class TikTokScraper extends EventEmitter {
             const response = await this.request<T>(options);
             return response;
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -996,7 +996,7 @@ export class TikTokScraper extends EventEmitter {
                 verifyFp: this.verifyFp,
             };
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -1040,7 +1040,7 @@ export class TikTokScraper extends EventEmitter {
                 is_fullscreen: false,
             };
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -1052,7 +1052,7 @@ export class TikTokScraper extends EventEmitter {
         await this.getValidHeaders(`https://www.tiktok.com/@${encodeURIComponent(this.input)}`, false);
 
         if (!this.input) {
-            throw `Username is missing`;
+            throw new Error(`Username is missing`);
         }
         const options = {
             method: 'GET',
@@ -1082,7 +1082,7 @@ export class TikTokScraper extends EventEmitter {
      */
     public async getHashtagInfo(): Promise<HashtagMetadata> {
         if (!this.input) {
-            throw `Hashtag is missing`;
+            throw new Error(`Hashtag is missing`);
         }
         const query = {
             uri: `${this.mainHost}node/share/tag/${this.input}?uniqueId=${this.input}`,
@@ -1103,7 +1103,7 @@ export class TikTokScraper extends EventEmitter {
             }
             return response.challengeInfo;
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -1114,7 +1114,7 @@ export class TikTokScraper extends EventEmitter {
     public async getMusicInfo(): Promise<MusicMetadata> {
         await this.getValidHeaders(this.input, false);
         if (!this.input) {
-            throw `Music is missing`;
+            throw new Error(`Music is missing`);
         }
 
         const musicTitle = /music\/([\w-]+)-\d+/.exec(this.input);
@@ -1158,7 +1158,7 @@ export class TikTokScraper extends EventEmitter {
             }
             return response.musicInfo;
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -1168,7 +1168,7 @@ export class TikTokScraper extends EventEmitter {
      */
     public async signUrl() {
         if (!this.input) {
-            throw `Url is missing`;
+            throw new Error(`Url is missing`);
         }
         return sign(this.input, this.headers['user-agent']);
     }
@@ -1198,7 +1198,7 @@ export class TikTokScraper extends EventEmitter {
             const videoData = videoProps.props.pageProps.itemInfo.itemStruct;
             return videoData as FeedItems;
         } catch (error) {
-            throw `Can't extract video metadata: ${this.input}`;
+            throw new Error(`Can't extract video metadata: ${this.input}`);
         }
     }
 
@@ -1239,7 +1239,7 @@ export class TikTokScraper extends EventEmitter {
     public async getVideoMeta(html = true): Promise<PostCollector> {
         await this.getValidHeaders(this.input, false);
         if (!this.input) {
-            throw `Url is missing`;
+            throw new Error(`Url is missing`);
         }
 
         let videoData = {} as FeedItems;

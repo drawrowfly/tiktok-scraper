@@ -62,7 +62,7 @@ const proxyFromFile = async (file: string) => {
         }
         return proxyList;
     } catch (error) {
-        throw error.message;
+        throw new Error(error.message);
     }
 };
 
@@ -79,7 +79,7 @@ const sessionFromFile = async (file: string) => {
         }
         return proxyList;
     } catch (error) {
-        throw error.message;
+        throw new Error(error.message);
     }
 };
 
