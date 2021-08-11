@@ -611,7 +611,7 @@ export class TikTokScraper extends EventEmitter {
             }
             this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
         } catch (error) {
-            throw error.message ? error.message : error;
+            throw error.message ? new Error(error.message) : error;
         }
     }
 
@@ -890,7 +890,7 @@ export class TikTokScraper extends EventEmitter {
         try {
             await this.request<string>(options);
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -914,7 +914,7 @@ export class TikTokScraper extends EventEmitter {
             const response = await this.request<T>(options);
             return response;
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -988,7 +988,7 @@ export class TikTokScraper extends EventEmitter {
                 verifyFp: this.verifyFp,
             };
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -1032,7 +1032,7 @@ export class TikTokScraper extends EventEmitter {
                 is_fullscreen: false,
             };
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -1095,7 +1095,7 @@ export class TikTokScraper extends EventEmitter {
             }
             return response.challengeInfo;
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 
@@ -1150,7 +1150,7 @@ export class TikTokScraper extends EventEmitter {
             }
             return response.musicInfo;
         } catch (error) {
-            throw error.message;
+            throw new Error(error.message);
         }
     }
 

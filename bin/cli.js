@@ -66,7 +66,7 @@ const startScraper = async argv => {
                 console.log(scraper);
             }
         } catch (error) {
-            console.error(error.message ? error.message : error);
+            console.error(error.message || error);
         }
     } catch (error) {
         console.log(error);
