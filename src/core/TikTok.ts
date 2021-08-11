@@ -780,12 +780,6 @@ export class TikTokScraper extends EventEmitter {
             if (result.done) {
                 break;
             }
-            if (this.number) {
-                if (this.collector.length >= this.number) {
-                    result.done = true;
-                    break;
-                }
-            }
 
             if (this.since && posts[i].createTime < this.since) {
                 result.done = CONST.chronologicalTypes.indexOf(this.scrapeType) !== -1;
@@ -870,6 +864,13 @@ export class TikTokScraper extends EventEmitter {
                     this.collector.push({} as PostCollector);
                 } else {
                     this.collector.push(item);
+                }
+            }
+
+            if (this.number) {
+                if (this.collector.length >= this.number) {
+                    result.done = true;
+                    break;
                 }
             }
         }
