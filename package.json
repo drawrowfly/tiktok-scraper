@@ -1,6 +1,6 @@
 {
-    "name": "tiktok-scraper",
-    "version": "1.4.33",
+    "name": "tiktok-scraper-tweaked",
+    "version": "1.4.38",
     "description": "TikTok Scraper & Downloader. Scrape information from User, Trending and HashTag pages and download video posts",
     "main": "./build/index.js",
     "types": "./build/index.d.ts",
@@ -53,7 +53,8 @@
         "docker:build": "tsc",
         "format": "prettier --config ./.prettierrc.js --write './src/**/*.ts'",
         "lint": "eslint ./src/**/*.ts",
-        "test": "eslint ./src/**/*.ts && jest --coverage --verbose"
+        "test": "eslint ./src/**/*.ts && jest --coverage --verbose",
+        "start": "ts-node src/index.ts"
     },
     "jest": {
         "verbose": true,
