@@ -611,7 +611,8 @@ export class TikTokScraper extends EventEmitter {
             const { done } = await this.collectPosts(updatedApiResponse ? result.itemList : result.items);
 
             if (!hasMore) {
-                throw new Error('No more posts');
+                console.error(`Only ${this.collector.length} results could be found.`);
+                return true;
             }
 
             if (done) {
