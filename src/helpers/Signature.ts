@@ -1,15 +1,22 @@
 // @ts-nocheck
 /* eslint-disable */
 
-import { JSDOM } from 'jsdom';
+import { JSDOM, ResourceLoader } from 'jsdom';
 
-export function sign(url: string) {
+export function sign(url: string, userAgent: string) {
+
+
+    const resourceLoader = new ResourceLoader({
+        userAgent,
+    });
+
     const { window } = new JSDOM(``, {
         url: 'https://www.tiktok.com/',
         referrer: 'https://www.tiktok.com/',
         contentType: 'text/html',
         includeNodeLocations: true,
         runScripts: 'outside-only',
+        resources: resourceLoader
     });
 
     window.eval('console.log = () => {};');
