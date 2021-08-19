@@ -27,18 +27,21 @@ export class Downloader {
 
     public filepath: string;
 
+    public fileName: string;
+
     public bulk: boolean;
 
     public headers: Headers;
 
     public cookieJar: CookieJar;
 
-    constructor({ progress, proxy, noWaterMark, headers, filepath, bulk, cookieJar }: DownloaderConstructor) {
+    constructor({ progress, proxy, noWaterMark, headers, filepath, fileName, bulk, cookieJar }: DownloaderConstructor) {
         this.progress = true || progress;
         this.progressBar = [];
         this.noWaterMark = noWaterMark;
         this.headers = headers;
         this.filepath = filepath;
+        this.fileName = fileName
         this.mbars = new MultipleBar();
         this.proxy = proxy;
         this.bulk = bulk;
@@ -209,6 +212,6 @@ export class Downloader {
 
         const result = await rp(options);
 
-        await fromCallback(cb => writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
+        await fromCallback(cb => writeFile(`${this.filepath}/${this.fileName || post.id}.mp4`, result, cb));
     }
 }

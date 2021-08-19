@@ -7,6 +7,7 @@ export interface DownloaderConstructor {
     noWaterMark: boolean;
     headers: Headers;
     filepath: string;
+    fileName: string;
     bulk: boolean;
     cookieJar: CookieJar;
 }
