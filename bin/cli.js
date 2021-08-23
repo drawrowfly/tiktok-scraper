@@ -27,6 +27,10 @@ const startScraper = async argv => {
         if (argv.historypath) {
             argv.historyPath = argv.historypath;
         }
+        if (argv.throttleinterval || argv.throttlelimit) {
+            argv.throttleLimit = argv.throttlelimit;
+            argv.throttleInterval = argv.throttleinterval;
+        }
         if (argv.file) {
             argv.input = argv.file;
         }
@@ -204,6 +208,12 @@ yargs
         historypath: {
             default: process.env.SCRAPING_FROM_DOCKER ? '' : tmpdir(),
             describe: 'Set custom path where history file/files will be stored',
+        },
+        throttlelimit: {
+            describe: 'Set custom maximum number of calls to TikTok within an interval.',
+        },
+        throttleinterval: {
+            describe: 'Set custom timespan for throttle-interval in milliseconds',
         },
         remove: {
             alias: ['r'],

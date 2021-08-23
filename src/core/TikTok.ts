@@ -13,6 +13,7 @@ import { EventEmitter } from 'events';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 import { URLSearchParams } from 'url';
+import pThrottle from 'p-throttle';
 import CONST from '../constant';
 import { sign, makeid } from '../helpers';
 
@@ -125,6 +126,8 @@ export class TikTokScraper extends EventEmitter {
 
     private store: string[];
 
+    private throttle: ReturnType<typeof pThrottle> | false;
+
     public cookieJar: CookieJar;
 
     constructor({
@@ -157,6 +160,8 @@ export class TikTokScraper extends EventEmitter {
         headers,
         verifyFp = '',
         sessionList = [],
+        throttleLimit,
+        throttleInterval,
     }: TikTokConstructor) {
         super();
         this.userIdStore = '';
@@ -221,6 +226,16 @@ export class TikTokScraper extends EventEmitter {
             bad: 0,
         };
         this.store = [];
+        this.throttle =
+            !!(throttleLimit && throttleInterval) &&
+            pThrottle({
+                limit: throttleLimit,
+                interval: throttleInterval,
+            });
+
+        if (this.throttle) {
+            this.request = <TikTokScraper['request']>this.throttle(this.request);
+        }
     }
 
     /**
