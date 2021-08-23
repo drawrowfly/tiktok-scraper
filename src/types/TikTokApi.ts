@@ -100,8 +100,15 @@ export interface RequestQuery {
     maxCursor?: number;
     language?: string;
     verifyFp?: string;
+    device_id?: string;
+    region?: string;
+    'X-Bogus'?: string;
+    msToken?: string;
     challengeID?: string;
+    insertedItemID?: string;
+    noUser?: number;
     fromPage?: string;
+    from_page?: string;
     cursor?: number;
     aid?: number;
     itemID?: number;
