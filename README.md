@@ -115,14 +115,14 @@ $ tiktok-scraper --help
 Usage: tiktok-scraper <command> [options]
 
 Commands:
-  tiktok-scraper user [id]     Scrape videos from username. Enter only username
-  tiktok-scraper hashtag [id]  Scrape videos from hashtag. Enter hashtag without #
-  tiktok-scraper trend         Scrape posts from current trends
-  tiktok-scraper music [id]    Scrape posts from a music id number
-  tiktok-scraper video [id]    Download single video without the watermark
-  tiktok-scraper history       View previous download history
-  tiktok-scraper from-file [file] [async]  Scrape users, hashtags, music, videos mentioned
-                                in a file. 1 value per 1 line
+  tiktok-scraper user [id]                 Scrape videos from the User Feed. Enter only the username
+  tiktok-scraper hashtag [id]              Scrape videos from the Hashtag Feed. Enter hashtag without the #
+  tiktok-scraper trend                     Scrape posts from the Trend Feed
+  tiktok-scraper music [id]                Scrape videos from the Music Feed. Enter only the music id
+  tiktok-scraper video [id]                Extract metadata from a single video without the watermark. To download use -d flag
+  tiktok-scraper history                   View previous download history
+  tiktok-scraper from-file [file] [async]  Scrape users, hashtags, music, videos mentioned in a file. One value per one line
+  tiktok-scraper userprofile [id]          Show user metadata
 
 Options:
   --version            Show version number                             [boolean]
@@ -134,22 +134,22 @@ Options:
                        1000 mls = 1 s                               [default: 0]
   --number, -n         Number of posts to scrape. If you will set 0 then all
                        posts will be scraped                        [default: 0]
-  --since              Scrape no posts published before this date (timestamp).
-                       If set to 0 the filter is deactived          [default: 0]
+  --since              Scrape posts that are published after specified date
+                       (timestamp). The default value is 0 - scrape all posts [default: 0]
   --proxy, -p          Set single proxy                            [default: ""]
   --proxy-file         Use proxies from a file. Scraper will use random proxies
-                       from the file per each request. 1 line 1 proxy.
-                                                                   [default: ""]
+                       from the file per each request. 1 line 1 proxy. [default: ""]
   --download, -d       Download video posts to the folder with the name input
                        [id]                           [boolean] [default: false]
+  --useTestEndpoints   Use Tiktok test endpoints. When your requests are blocked
+                       by captcha you can try to use Tiktok test endpoints. [boolean] [default: false]
   --asyncDownload, -a  Number of concurrent downloads               [default: 5]
   --hd                 Download video in HD. Video size will be x5-x10 times
                        larger and this will affect scraper execution speed. This
-                       option only works in combination with -w flag
-                                                      [boolean] [default: false]
+                       option only works in combination with -w flag [boolean] [default: false]
   --zip, -z            ZIP all downloaded video posts [boolean] [default: false]
   --filepath           File path to save all output files.
-      [default: "/Users/karl.wint/Documents/projects/javascript/tiktok-scraper"]
+                          [default: "$(pwd)/tiktok-scraper"]
   --filetype, -t       Type of the output file where post information will be
                        saved. 'all' - save information about all posts to the`
                        'json' and 'csv'
@@ -163,15 +163,16 @@ Options:
                        folder and in the future usage will only download new
                        videos avoiding duplicates     [boolean] [default: false]
   --historypath        Set custom path where history file/files will be stored
-                   [default: "/var/folders/d5/fyh1_f2926q7c65g7skc0qh80000gn/T"]
+                          [default: <local temporary folder>]
+  --throttlelimit      Set custom maximum number of calls to TikTok within an
+                       interval.
+  --throttleinterval   Set custom timespan for throttle-interval in milliseconds
   --remove, -r         Delete the history record by entering "TYPE:INPUT" or
-                       "all" to clean all the history. For example: user:bob
-                                                                   [default: ""]
+                       "all" to clean all the history. For example: user:bob [default: ""]
   --webHookUrl         Set webhook url to receive scraper result as HTTP
                        requests. For example to your own API       [default: ""]
-  --method             Receive data to your webhook url as POST or GET request
-                                      [choices: "GET", "POST"] [default: "POST"]
-  --help               Show help                                       [boolean]
+  --method             Receive data to your webhook url as POST or GET request choices: "GET", "POST"] [default: "POST"]
+  --help               Show help [boolean]
 
 Examples:
   tiktok-scraper user USERNAME -d -n 100 --session sid_tt=dae32131231
