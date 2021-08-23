@@ -784,7 +784,12 @@ export class TikTokScraper extends EventEmitter {
 
             if (this.since && posts[i].createTime < this.since) {
                 result.done = CONST.chronologicalTypes.indexOf(this.scrapeType) !== -1;
-                break;
+
+                if (result.done) {
+                    break;
+                } else {
+                    continue;
+                }
             }
 
             if (this.noDuplicates.indexOf(posts[i].id) === -1) {
