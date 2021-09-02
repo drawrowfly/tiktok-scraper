@@ -14,6 +14,7 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 import { URLSearchParams } from 'url';
 import pThrottle from 'p-throttle';
+import pRetry from 'p-retry';
 import CONST from '../constant';
 import { sign, makeid } from '../helpers';
 
@@ -95,6 +96,8 @@ export class TikTokScraper extends EventEmitter {
 
     private timeout: number;
 
+    private retry: number;
+
     private bulk: boolean;
 
     private validHeaders: boolean;
@@ -151,6 +154,7 @@ export class TikTokScraper extends EventEmitter {
         useTestEndpoints = false,
         fileName = '',
         timeout = 0,
+        retry = 3,
         bulk = false,
         zip = false,
         test = false,
@@ -208,6 +212,7 @@ export class TikTokScraper extends EventEmitter {
         this.maxCursor = 0;
         this.noDuplicates = [];
         this.timeout = timeout;
+        this.retry = retry;
         this.bulk = bulk;
         this.validHeaders = false;
         this.Downloader = new Downloader({
@@ -215,6 +220,7 @@ export class TikTokScraper extends EventEmitter {
             cookieJar: this.cookieJar,
             proxy,
             noWaterMark,
+            retry,
             headers,
             filepath: process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '',
             bulk,
@@ -335,57 +341,64 @@ export class TikTokScraper extends EventEmitter {
         bodyOnly = true,
     ): Promise<T> {
         // eslint-disable-next-line no-async-promise-executor
-        return new Promise(async (resolve, reject) => {
-            const proxy = this.getProxy;
-            const options = ({
-                jar: this.cookieJar,
-                uri,
-                method,
-                ...(qs ? { qs } : {}),
-                ...(body ? { body } : {}),
-                ...(form ? { form } : {}),
-                headers: {
-                    ...this.headers,
-                    ...headers,
-                    ...(this.csrf ? { 'x-secsdk-csrf-token': this.csrf } : {}),
-                },
-                ...(json ? { json: true } : {}),
-                ...(gzip ? { gzip: true } : {}),
-                resolveWithFullResponse: true,
-                followAllRedirects: followAllRedirects || false,
-                simple,
-                ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
-                ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
-                ...(this.strictSSL === false ? { rejectUnauthorized: false } : {}),
-                timeout: 10000,
-            } as unknown) as OptionsWithUri;
+        return pRetry(
+            () =>
+                new Promise(async (resolve, reject) => {
+                    const proxy = this.getProxy;
+                    const options = ({
+                        jar: this.cookieJar,
+                        uri,
+                        method,
+                        ...(qs ? { qs } : {}),
+                        ...(body ? { body } : {}),
+                        ...(form ? { form } : {}),
+                        headers: {
+                            ...this.headers,
+                            ...headers,
+                            ...(this.csrf ? { 'x-secsdk-csrf-token': this.csrf } : {}),
+                        },
+                        ...(json ? { json: true } : {}),
+                        ...(gzip ? { gzip: true } : {}),
+                        resolveWithFullResponse: true,
+                        followAllRedirects: followAllRedirects || false,
+                        simple,
+                        ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
+                        ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
+                        ...(this.strictSSL === false ? { rejectUnauthorized: false } : {}),
+                        timeout: 10000,
+                    } as unknown) as OptionsWithUri;
 
-            const session = this.sessionList[Math.floor(Math.random() * this.sessionList.length)];
-            if (session) {
-                this.cookieJar.setCookie(session, 'https://tiktok.com');
-            }
-            /**
-             * Set tt_webid_v2 cookie to access video url
-             */
-            const cookies = this.cookieJar.getCookieString('https://tiktok.com');
-            if (cookies.indexOf('tt_webid_v2') === -1) {
-                this.cookieJar.setCookie(`tt_webid_v2=69${makeid(17)}; Domain=tiktok.com; Path=/; Secure; hostOnly=false`, 'https://tiktok.com');
-            }
+                    const session = this.sessionList[Math.floor(Math.random() * this.sessionList.length)];
+                    if (session) {
+                        this.cookieJar.setCookie(session, 'https://tiktok.com');
+                    }
+                    /**
+                     * Set tt_webid_v2 cookie to access video url
+                     */
+                    const cookies = this.cookieJar.getCookieString('https://tiktok.com');
+                    if (cookies.indexOf('tt_webid_v2') === -1) {
+                        this.cookieJar.setCookie(
+                            `tt_webid_v2=69${makeid(17)}; Domain=tiktok.com; Path=/; Secure; hostOnly=false`,
+                            'https://tiktok.com',
+                        );
+                    }
 
-            try {
-                const response = await rp(options);
-                // Extract valid csrf token
-                if (options.method === 'HEAD') {
-                    const csrf = response.headers['x-ware-csrf-token'];
-                    this.csrf = csrf.split(',')[1] as string;
-                }
-                setTimeout(() => {
-                    resolve(bodyOnly ? response.body : response);
-                }, this.timeout);
-            } catch (error) {
-                reject(error);
-            }
-        });
+                    try {
+                        const response = await rp(options);
+                        // Extract valid csrf token
+                        if (options.method === 'HEAD') {
+                            const csrf = response.headers['x-ware-csrf-token'];
+                            this.csrf = csrf.split(',')[1] as string;
+                        }
+                        setTimeout(() => {
+                            resolve(bodyOnly ? response.body : response);
+                        }, this.timeout);
+                    } catch (error) {
+                        reject(error);
+                    }
+                }),
+            { retries: this.retry },
+        );
     }
 
     private returnInitError(error) {

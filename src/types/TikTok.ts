@@ -46,6 +46,7 @@ export interface Options {
     throttleLimit?: number;
     throttleInterval?: number;
     timeout?: number;
+    retry?: number;
     hdVideo?: boolean;
     randomUa?: boolean;
     webHookUrl?: string;
@@ -77,6 +78,7 @@ export interface TikTokConstructor {
     noWaterMark?: boolean;
     fileName?: string;
     timeout?: number;
+    retry?: number;
     test?: boolean;
     hdVideo?: boolean;
     signature?: string;
