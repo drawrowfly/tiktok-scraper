@@ -39,6 +39,7 @@ const getInitOptions = () => {
         noWaterMark: false,
         hdVideo: false,
         timeout: 0,
+        retry: 3,
         tac: '',
         signature: '',
         verifyFp: makeVerifyFp(),
@@ -62,7 +63,7 @@ const proxyFromFile = async (file: string) => {
         }
         return proxyList;
     } catch (error) {
-        throw error.message;
+        throw new Error(error.message);
     }
 };
 
@@ -79,7 +80,7 @@ const sessionFromFile = async (file: string) => {
         }
         return proxyList;
     } catch (error) {
-        throw error.message;
+        throw new Error(error.message);
     }
 };
 

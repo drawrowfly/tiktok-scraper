@@ -5,6 +5,7 @@ export interface DownloaderConstructor {
     progress: boolean;
     proxy: string[] | string;
     noWaterMark: boolean;
+    retry: number;
     headers: Headers;
     filepath: string;
     bulk: boolean;

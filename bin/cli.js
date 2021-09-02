@@ -4,6 +4,7 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 
+const debug = require('debug');
 const yargs = require('yargs');
 const { tmpdir } = require('os');
 const TikTokScraper = require('../build');
@@ -26,6 +27,10 @@ const startScraper = async argv => {
 
         if (argv.historypath) {
             argv.historyPath = argv.historypath;
+        }
+        if (argv.throttleinterval || argv.throttlelimit) {
+            argv.throttleLimit = argv.throttlelimit;
+            argv.throttleInterval = argv.throttleinterval;
         }
         if (argv.file) {
             argv.input = argv.file;
@@ -66,7 +71,7 @@ const startScraper = async argv => {
                 console.log(scraper);
             }
         } catch (error) {
-            console.error(error.message ? error.message : error);
+            console.error(error.message || error);
         }
     } catch (error) {
         console.log(error);
@@ -125,6 +130,10 @@ yargs
             default: 0,
             describe: 'Set timeout between requests. Timeout is in Milliseconds: 1000 mls = 1 s',
         },
+        retry: {
+            default: 3,
+            describe: 'Set the amount of times a failing request should be retried before giving up',
+        },
         number: {
             alias: 'n',
             default: 0,
@@ -165,6 +174,11 @@ yargs
             describe:
                 'Download video in HD. Video size will be x5-x10 times larger and this will affect scraper execution speed. This option only works in combination with -w flag',
         },
+        verbose: {
+            boolean: true,
+            default: false,
+            describe: 'Display debugging information during the execution of tiktok-scraper',
+        },
         zip: {
             alias: 'z',
             boolean: true,
@@ -204,6 +218,12 @@ yargs
         historypath: {
             default: process.env.SCRAPING_FROM_DOCKER ? '' : tmpdir(),
             describe: 'Set custom path where history file/files will be stored',
+        },
+        throttlelimit: {
+            describe: 'Set custom maximum number of calls to TikTok within an interval.',
+        },
+        throttleinterval: {
+            describe: 'Set custom timespan for throttle-interval in milliseconds',
         },
         remove: {
             alias: ['r'],
@@ -249,6 +269,10 @@ yargs
 
         if (argv.hd && !argv.noWaterMark && argv._[0] !== 'video') {
             throw new Error(`--hd option won't work without -w option`);
+        }
+
+        if (argv.verbose) {
+            debug.enable('tiktok-scraper:*');
         }
 
         if (process.env.SCRAPING_FROM_DOCKER && (argv.historypath || argv.filepath)) {
