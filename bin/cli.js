@@ -4,6 +4,7 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 
+const debug = require('debug');
 const yargs = require('yargs');
 const { tmpdir } = require('os');
 const TikTokScraper = require('../build');
@@ -173,6 +174,11 @@ yargs
             describe:
                 'Download video in HD. Video size will be x5-x10 times larger and this will affect scraper execution speed. This option only works in combination with -w flag',
         },
+        verbose: {
+            boolean: true,
+            default: false,
+            describe: 'Display debugging information during the execution of tiktok-scraper',
+        },
         zip: {
             alias: 'z',
             boolean: true,
@@ -263,6 +269,10 @@ yargs
 
         if (argv.hd && !argv.noWaterMark && argv._[0] !== 'video') {
             throw new Error(`--hd option won't work without -w option`);
+        }
+
+        if (argv.verbose) {
+            debug.enable('tiktok-scraper:*');
         }
 
         if (process.env.SCRAPING_FROM_DOCKER && (argv.historypath || argv.filepath)) {

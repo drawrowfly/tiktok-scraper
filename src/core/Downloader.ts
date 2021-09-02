@@ -2,6 +2,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 /* eslint-disable no-console */
+import debug from 'debug';
 import request, { OptionsWithUri, CookieJar } from 'request';
 import rp from 'request-promise';
 import { Agent } from 'http';
@@ -94,6 +95,8 @@ export class Downloader {
      * @param {*} item
      */
     public toBuffer(item: PostCollector): Promise<Buffer> {
+        const url = item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl;
+        debug('tiktok-scraper:Downloader:toBuffer')(url);
         return pRetry(
             () =>
                 new Promise((resolve, reject) => {
@@ -109,7 +112,7 @@ export class Downloader {
                     }
 
                     r.get({
-                        url: item.videoUrlNoWaterMark ? item.videoUrlNoWaterMark : item.videoUrl,
+                        url,
                         headers: this.headers,
                         jar: this.cookieJar,
                     })
@@ -206,6 +209,8 @@ export class Downloader {
         if (!url) {
             url = post.videoUrl;
         }
+
+        debug('tiktok-scraper:Downloader:downloadSingleVideo')(url);
         const options = ({
             uri: url,
             method: 'GET',

@@ -2,6 +2,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 
+import debug from 'debug';
 import rp, { OptionsWithUri } from 'request-promise';
 import { CookieJar } from 'request';
 import { tmpdir } from 'os';
@@ -240,6 +241,7 @@ export class TikTokScraper extends EventEmitter {
             });
 
         if (this.throttle) {
+            debug('tiktok-scraper:TikTokScraper')(`Setting up a throttle limit of '${throttleLimit}' request for every ${throttleInterval}ms`);
             this.request = <TikTokScraper['request']>this.throttle(this.request);
         }
     }
@@ -340,6 +342,7 @@ export class TikTokScraper extends EventEmitter {
         { uri, method, qs, body, form, headers, json, gzip, followAllRedirects, simple = true }: OptionsWithUri,
         bodyOnly = true,
     ): Promise<T> {
+        debug('tiktok-scraper:request')(method, uri, JSON.stringify({ qs, body, form }));
         // eslint-disable-next-line no-async-promise-executor
         return pRetry(
             () =>
@@ -578,6 +581,7 @@ export class TikTokScraper extends EventEmitter {
                 taskArray,
                 this.asyncScraping(),
                 (item, cb) => {
+                    debug('tiktok-scraper:mainLoop')(`Iterating on '${this.scrapeType}' - Step #${item}`);
                     switch (this.scrapeType) {
                         case 'user':
                             this.getUserId()
@@ -623,6 +627,8 @@ export class TikTokScraper extends EventEmitter {
      * Collect received metadata
      */
     private async submitScrapingRequest(query: RequestQuery, updatedApiResponse = false): Promise<boolean> {
+        debug('tiktok-scraper:submitScrapingRequest')(query);
+
         try {
             if (!this.validHeaders) {
                 /**
@@ -641,6 +647,8 @@ export class TikTokScraper extends EventEmitter {
             if ((updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items)) {
                 throw new Error('No more posts');
             }
+
+            debug('tiktok-scraper:submitScrapingRequest')(`${(updatedApiResponse ? result.itemList : result.items).length} posts have been fetched`);
             const { done } = await this.collectPosts(updatedApiResponse ? result.itemList : result.items);
 
             if (!hasMore) {
