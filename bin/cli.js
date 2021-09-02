@@ -125,6 +125,10 @@ yargs
             default: 0,
             describe: 'Set timeout between requests. Timeout is in Milliseconds: 1000 mls = 1 s',
         },
+        retry: {
+            default: 3,
+            describe: 'Set the amount of times a failing request should be retried before giving up',
+        },
         number: {
             alias: 'n',
             default: 0,

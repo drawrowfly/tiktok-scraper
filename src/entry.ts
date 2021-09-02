@@ -39,6 +39,7 @@ const getInitOptions = () => {
         noWaterMark: false,
         hdVideo: false,
         timeout: 0,
+        retry: 3,
         tac: '',
         signature: '',
         verifyFp: makeVerifyFp(),
