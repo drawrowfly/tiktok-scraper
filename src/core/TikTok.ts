@@ -60,6 +60,8 @@ export class TikTokScraper extends EventEmitter {
 
     private since: number;
 
+    private until: number;
+
     private asyncDownload: number;
 
     private asyncScraping: () => number;
@@ -140,6 +142,7 @@ export class TikTokScraper extends EventEmitter {
         input,
         number,
         since,
+        until,
         type,
         by_user_id = false,
         store_history = false,
@@ -174,6 +177,7 @@ export class TikTokScraper extends EventEmitter {
         this.strictSSL = strictSSL;
         this.number = number;
         this.since = since;
+        this.until = until;
         this.csrf = '';
         this.zip = zip;
         // Cookie jar. Where all valid cookies will be stored
@@ -495,9 +499,8 @@ export class TikTokScraper extends EventEmitter {
                     .slice(position + 4, position + 36)
                     .toString();
 
-                return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${
-                    this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
-                }`;
+                return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
+                    }`;
             }
         } catch {
             // continue regardless of error
@@ -787,6 +790,11 @@ export class TikTokScraper extends EventEmitter {
                 break;
             }
 
+            if (this.until && posts[i].createTime > this.until) {
+                result.done = CONST.chronologicalTypes.indexOf(this.scrapeType) !== -1;
+                break;
+            }
+
             if (this.noDuplicates.indexOf(posts[i].id) === -1) {
                 this.noDuplicates.push(posts[i].id);
                 const item: PostCollector = {
@@ -810,19 +818,19 @@ export class TikTokScraper extends EventEmitter {
                     },
                     ...(posts[i].music
                         ? {
-                              musicMeta: {
-                                  musicId: posts[i].music.id,
-                                  musicName: posts[i].music.title,
-                                  musicAuthor: posts[i].music.authorName,
-                                  musicOriginal: posts[i].music.original,
-                                  musicAlbum: posts[i].music.album,
-                                  playUrl: posts[i].music.playUrl,
-                                  coverThumb: posts[i].music.coverThumb,
-                                  coverMedium: posts[i].music.coverMedium,
-                                  coverLarge: posts[i].music.coverLarge,
-                                  duration: posts[i].music.duration,
-                              },
-                          }
+                            musicMeta: {
+                                musicId: posts[i].music.id,
+                                musicName: posts[i].music.title,
+                                musicAuthor: posts[i].music.authorName,
+                                musicOriginal: posts[i].music.original,
+                                musicAlbum: posts[i].music.album,
+                                playUrl: posts[i].music.playUrl,
+                                coverThumb: posts[i].music.coverThumb,
+                                coverMedium: posts[i].music.coverMedium,
+                                coverLarge: posts[i].music.coverLarge,
+                                duration: posts[i].music.duration,
+                            },
+                        }
                         : {}),
                     covers: {
                         default: posts[i].video.cover,
@@ -846,17 +854,17 @@ export class TikTokScraper extends EventEmitter {
                     mentions: posts[i].desc.match(/(@\w+)/g) || [],
                     hashtags: posts[i].challenges
                         ? posts[i].challenges.map(({ id, title, desc, coverLarger }) => ({
-                              id,
-                              name: title,
-                              title: desc,
-                              cover: coverLarger,
-                          }))
+                            id,
+                            name: title,
+                            title: desc,
+                            cover: coverLarger,
+                        }))
                         : [],
                     effectStickers: posts[i].effectStickers
                         ? posts[i].effectStickers.map(({ ID, name }) => ({
-                              id: ID,
-                              name,
-                          }))
+                            id: ID,
+                            name,
+                        }))
                         : [],
                 };
 
@@ -881,10 +889,10 @@ export class TikTokScraper extends EventEmitter {
             method,
             ...(signUrl
                 ? {
-                      qs: {
-                          _signature: sign(url, this.headers['user-agent']),
-                      },
-                  }
+                    qs: {
+                        _signature: sign(url, this.headers['user-agent']),
+                    },
+                }
                 : {}),
             headers: {
                 'x-secsdk-csrf-request': 1,
@@ -1297,17 +1305,17 @@ export class TikTokScraper extends EventEmitter {
             mentions: videoData.desc.match(/(@\w+)/g) || [],
             hashtags: videoData.challenges
                 ? videoData.challenges.map(({ id, title, desc, profileLarger }) => ({
-                      id,
-                      name: title,
-                      title: desc,
-                      cover: profileLarger,
-                  }))
+                    id,
+                    name: title,
+                    title: desc,
+                    cover: profileLarger,
+                }))
                 : [],
             effectStickers: videoData.effectStickers
                 ? videoData.effectStickers.map(({ ID, name }) => ({
-                      id: ID,
-                      name,
-                  }))
+                    id: ID,
+                    name,
+                }))
                 : [],
         } as PostCollector;
 
