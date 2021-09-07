@@ -26,6 +26,7 @@ const getInitOptions = () => {
     return {
         number: 30,
         since: 0,
+        until: 0,
         download: false,
         zip: false,
         asyncDownload: 5,

@@ -134,6 +134,10 @@ yargs
             default: 0,
             describe: 'Scrape posts that are published after specified date (timestamp). The default value is 0 - scrape all posts',
         },
+        until: {
+            default: 0,
+            describe: 'Scrape posts that are published before specified date (timestamp). The default value is 0 - scrape all posts',
+        },
         proxy: {
             alias: 'p',
             default: '',

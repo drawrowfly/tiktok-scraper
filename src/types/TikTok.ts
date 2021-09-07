@@ -39,6 +39,7 @@ export interface Options {
     progress?: boolean;
     number?: number;
     since?: number;
+    until?: number;
     noWaterMark?: boolean;
     remove?: string;
     fileName?: string;
@@ -68,6 +69,7 @@ export interface TikTokConstructor {
     input: string;
     number: number;
     since: number;
+    until: number;
     type: ScrapeType;
     by_user_id?: boolean;
     store_history?: boolean;

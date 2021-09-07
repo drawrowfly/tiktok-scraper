@@ -136,6 +136,8 @@ Options:
                        posts will be scraped                        [default: 0]
   --since              Scrape no posts published before this date (timestamp).
                        If set to 0 the filter is deactived          [default: 0]
+  --until              Scrape no posts published after this date (timestamp).
+                       If set to 0 the filter is deactived          [default: 0]
   --proxy, -p          Set single proxy                            [default: ""]
   --proxy-file         Use proxies from a file. Scraper will use random proxies
                        from the file per each request. 1 line 1 proxy.
