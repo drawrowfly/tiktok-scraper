@@ -55,16 +55,12 @@ const getInitOptions = () => {
  * @param file
  */
 const proxyFromFile = async (file: string) => {
-    try {
-        const data = (await fromCallback(cb => readFile(file, { encoding: 'utf-8' }, cb))) as string;
-        const proxyList = data.split('\n');
-        if (!proxyList.length) {
-            throw new Error('Proxy file is empty');
-        }
-        return proxyList;
-    } catch (error) {
-        throw new Error(error.message);
+    const data = (await fromCallback(cb => readFile(file, { encoding: 'utf-8' }, cb))) as string;
+    const proxyList = data.split('\n');
+    if (!proxyList.length) {
+        throw new Error('Proxy file is empty');
     }
+    return proxyList;
 };
 
 /**
@@ -72,16 +68,12 @@ const proxyFromFile = async (file: string) => {
  * @param file
  */
 const sessionFromFile = async (file: string) => {
-    try {
-        const data = (await fromCallback(cb => readFile(file, { encoding: 'utf-8' }, cb))) as string;
-        const proxyList = data.split('\n');
-        if (!proxyList.length || proxyList[0] === '') {
-            throw new Error('Session file is empty');
-        }
-        return proxyList;
-    } catch (error) {
-        throw new Error(error.message);
+    const data = (await fromCallback(cb => readFile(file, { encoding: 'utf-8' }, cb))) as string;
+    const proxyList = data.split('\n');
+    if (!proxyList.length || proxyList[0] === '') {
+        throw new Error('Session file is empty');
     }
+    return proxyList;
 };
 
 const promiseScraper = async (input: string, type: ScrapeType, options = {} as Options): Promise<Result> => {

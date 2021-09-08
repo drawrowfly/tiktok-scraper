@@ -489,12 +489,8 @@ export class TikTokScraper extends EventEmitter {
                 this.collector,
                 5,
                 async (item: PostCollector) => {
-                    try {
-                        item.videoApiUrlNoWaterMark = await this.extractVideoId(item);
-                        item.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(item.videoApiUrlNoWaterMark!);
-                    } catch {
-                        throw new Error(`Can't extract unique video id`);
-                    }
+                    item.videoApiUrlNoWaterMark = await this.extractVideoId(item);
+                    item.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(item.videoApiUrlNoWaterMark!);
                 },
                 err => {
                     if (err) {
@@ -567,6 +563,7 @@ export class TikTokScraper extends EventEmitter {
             } = await this.request(options, false);
             return response.request.uri.href;
         } catch (err) {
+            console.error(err);
             throw new Error(`Can't extract video url without the watermark`);
         }
     }
@@ -629,42 +626,39 @@ export class TikTokScraper extends EventEmitter {
     private async submitScrapingRequest(query: RequestQuery, updatedApiResponse = false): Promise<boolean> {
         debug('tiktok-scraper:submitScrapingRequest')(query);
 
-        try {
-            if (!this.validHeaders) {
-                /**
-                 * As of August 13, 2021 the trend api endpoint requires ttwid cookie value that can be extracted by sending GET request to the tiktok trending page
-                 */
-                if (this.scrapeType === 'trend') {
-                    await this.getValidHeaders(`https://www.tiktok.com/foryou`, false, 'GET');
-                }
-                this.validHeaders = true;
+        if (!this.validHeaders) {
+            /**
+             * As of August 13, 2021 the trend api endpoint requires ttwid cookie value that can be extracted by sending GET request to the tiktok trending page
+             */
+            if (this.scrapeType === 'trend') {
+                await this.getValidHeaders(`https://www.tiktok.com/foryou`, false, 'GET');
             }
-            const result = await this.scrapeData<ItemListData>(query);
-            if (result.statusCode !== 0) {
-                throw new Error(`Can't scrape more posts`);
-            }
-            const { hasMore, maxCursor, cursor } = result;
-            if ((updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items)) {
-                throw new Error('No more posts');
-            }
-
-            debug('tiktok-scraper:submitScrapingRequest')(`${(updatedApiResponse ? result.itemList : result.items).length} posts have been fetched`);
-            const { done } = await this.collectPosts(updatedApiResponse ? result.itemList : result.items);
-
-            if (!hasMore) {
-                console.error(`Only ${this.collector.length} results could be found.`);
-                return true;
-            }
-
-            if (done) {
-                return true;
-            }
-
-            this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
-            return false;
-        } catch (error) {
-            throw error.message ? new Error(error.message) : error;
+            this.validHeaders = true;
         }
+        const result = await this.scrapeData<ItemListData>(query);
+        if (result.statusCode !== 0) {
+            console.error(result);
+            throw new Error(`Can't scrape more posts`);
+        }
+        const { hasMore, maxCursor, cursor } = result;
+        if ((updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items)) {
+            throw new Error('No more posts');
+        }
+
+        debug('tiktok-scraper:submitScrapingRequest')(`${(updatedApiResponse ? result.itemList : result.items).length} posts have been fetched`);
+        const { done } = this.collectPosts(updatedApiResponse ? result.itemList : result.items);
+
+        if (!hasMore) {
+            console.error(`Only ${this.collector.length} results could be found.`);
+            return true;
+        }
+
+        if (done) {
+            return true;
+        }
+
+        this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
+        return false;
     }
 
     /**
@@ -945,11 +939,7 @@ export class TikTokScraper extends EventEmitter {
             },
         };
 
-        try {
-            await this.request<string>(options);
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        await this.request<string>(options);
     }
 
     private async scrapeData<T>(qs: RequestQuery): Promise<T> {
@@ -968,12 +958,8 @@ export class TikTokScraper extends EventEmitter {
             json: true,
         };
 
-        try {
-            const response = await this.request<T>(options);
-            return response;
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        const response = await this.request<T>(options);
+        return response;
     }
 
     /**
@@ -1032,22 +1018,19 @@ export class TikTokScraper extends EventEmitter {
             method: 'GET',
             json: true,
         };
-        try {
-            const response = await this.request<TikTokMetadata>(query);
-            if (response.statusCode !== 0) {
-                throw new Error(`Can not find the hashtag: ${this.input}`);
-            }
-            this.idStore = response.challengeInfo.challenge.id;
-            return {
-                challengeID: this.idStore,
-                count: 30,
-                cursor: 0,
-                aid: 1988,
-                verifyFp: this.verifyFp,
-            };
-        } catch (error) {
-            throw new Error(error.message);
+
+        const response = await this.request<TikTokMetadata>(query);
+        if (response.statusCode !== 0) {
+            throw new Error(`Can not find the hashtag: ${this.input}`);
         }
+        this.idStore = response.challengeInfo.challenge.id;
+        return {
+            challengeID: this.idStore,
+            count: 30,
+            cursor: 0,
+            aid: 1988,
+            verifyFp: this.verifyFp,
+        };
     }
 
     /**
@@ -1071,27 +1054,23 @@ export class TikTokScraper extends EventEmitter {
             };
         }
 
-        try {
-            const response = await this.getUserProfileInfo();
-            this.idStore = response.user.secUid;
-            this.userIdStore = response.user.id;
-            return {
-                id: this.userIdStore,
-                aid: 1988,
-                secUid: this.idStore,
-                count: 30,
-                lang: '',
-                cursor: 0,
-                app_name: 'tiktok_web',
-                device_platform: 'web_pc',
-                cookie_enabled: true,
-                history_len: 2,
-                focus_state: true,
-                is_fullscreen: false,
-            };
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        const response = await this.getUserProfileInfo();
+        this.idStore = response.user.secUid;
+        this.userIdStore = response.user.id;
+        return {
+            id: this.userIdStore,
+            aid: 1988,
+            secUid: this.idStore,
+            count: 30,
+            lang: '',
+            cursor: 0,
+            app_name: 'tiktok_web',
+            device_platform: 'web_pc',
+            cookie_enabled: true,
+            history_len: 2,
+            focus_state: true,
+            is_fullscreen: false,
+        };
     }
 
     /**
@@ -1141,18 +1120,14 @@ export class TikTokScraper extends EventEmitter {
             json: true,
         };
 
-        try {
-            const response = await this.request<TikTokMetadata>(query);
-            if (!response) {
-                throw new Error(`Can't find hashtag: ${this.input}`);
-            }
-            if (response.statusCode !== 0) {
-                throw new Error(`Can't find hashtag: ${this.input}`);
-            }
-            return response.challengeInfo;
-        } catch (error) {
-            throw new Error(error.message);
+        const response = await this.request<TikTokMetadata>(query);
+        if (!response) {
+            throw new Error(`Can't find hashtag: ${this.input}`);
         }
+        if (response.statusCode !== 0) {
+            throw new Error(`Can't find hashtag: ${this.input}`);
+        }
+        return response.challengeInfo;
     }
 
     /**
@@ -1198,15 +1173,11 @@ export class TikTokScraper extends EventEmitter {
         // @ts-ignore
         query.qs._signature = _signature;
 
-        try {
-            const response = await this.request<TikTokMetadata>(query);
-            if (response.statusCode !== 0) {
-                throw new Error(`Can't find music data: ${this.input}`);
-            }
-            return response.musicInfo;
-        } catch (error) {
-            throw new Error(error.message);
+        const response = await this.request<TikTokMetadata>(query);
+        if (response.statusCode !== 0) {
+            throw new Error(`Can't find music data: ${this.input}`);
         }
+        return response.musicInfo;
     }
 
     /**
