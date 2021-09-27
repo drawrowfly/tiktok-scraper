@@ -20,7 +20,6 @@ import {
     MusicMetadata,
 } from './types';
 import CONST from './constant';
-import { makeVerifyFp } from './helpers';
 
 const getInitOptions = () => {
     return {
@@ -42,7 +41,6 @@ const getInitOptions = () => {
         retry: 3,
         tac: '',
         signature: '',
-        verifyFp: makeVerifyFp(),
         headers: {
             'user-agent': CONST.userAgent(),
             referer: 'https://www.tiktok.com/',

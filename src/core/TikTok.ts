@@ -126,8 +126,6 @@ export class TikTokScraper extends EventEmitter {
 
     private sessionList: string[];
 
-    private verifyFp: string;
-
     private store: string[];
 
     private throttle: ReturnType<typeof pThrottle> | false;
@@ -163,14 +161,12 @@ export class TikTokScraper extends EventEmitter {
         webHookUrl = '',
         method = 'POST',
         headers,
-        verifyFp = '',
         sessionList = [],
         throttleLimit,
         throttleInterval,
     }: TikTokConstructor) {
         super();
         this.userIdStore = '';
-        this.verifyFp = verifyFp;
         this.mainHost = useTestEndpoints ? 'https://t.tiktok.com/' : 'https://m.tiktok.com/';
         this.headers = headers;
         this.download = download;
@@ -992,7 +988,6 @@ export class TikTokScraper extends EventEmitter {
             aid: 1988,
             count: 30,
             cursor: 0,
-            verifyFp: '',
         };
     }
 
@@ -1006,7 +1001,6 @@ export class TikTokScraper extends EventEmitter {
                 count: 30,
                 cursor: 0,
                 aid: 1988,
-                verifyFp: this.verifyFp,
             };
         }
         const id = encodeURIComponent(this.input);
@@ -1029,7 +1023,6 @@ export class TikTokScraper extends EventEmitter {
             count: 30,
             cursor: 0,
             aid: 1988,
-            verifyFp: this.verifyFp,
         };
     }
 

@@ -46,7 +46,6 @@ describe('TikTok Scraper MODULE(promise): user(valid input data)', () => {
             minCursor: 0,
             secUid: '',
             sourceType: 8,
-            verifyFp: '',
         });
     });
 
@@ -235,7 +234,7 @@ describe('TikTok Scraper MODULE(promise): hashtag(valid input data)', () => {
 
     it('getHashTagId should return a valid Object', async () => {
         const hashtag: RequestQuery = await instance.getHashTagId();
-        expect(hashtag).toEqual({ aid: 1988, challengeID: '99770', count: 30, cursor: 0, user_agent: 'okhttp', verifyFp: '' });
+        expect(hashtag).toEqual({ aid: 1988, challengeID: '99770', count: 30, cursor: 0, user_agent: 'okhttp' });
     });
 
     // it('result should contain array value with the length 5', async () => {

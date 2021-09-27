@@ -99,7 +99,6 @@ export interface RequestQuery {
     minCursor?: number;
     maxCursor?: number;
     language?: string;
-    verifyFp?: string;
     device_id?: string;
     region?: string;
     'X-Bogus'?: string;

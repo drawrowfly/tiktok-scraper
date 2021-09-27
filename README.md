@@ -305,12 +305,6 @@ const options = {
     // This option will only work if {noWaterMark} is set to {true}
     hdVideo: false,
 
-    // verifyFp is used to verify the request and avoid captcha
-    // When you are using proxy then there are high chances that the request will be
-    // blocked with captcha
-    // You can set your own verifyFp value or default(hardcoded) will be used
-    verifyFp: '',
-
     // Switch main host to Tiktok test enpoint.
     // When your requests are blocked by captcha you can try to use Tiktok test endpoints.
     useTestEndpoints: false
