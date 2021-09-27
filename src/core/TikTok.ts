@@ -391,6 +391,10 @@ export class TikTokScraper extends EventEmitter {
                             this.csrf = csrf.split(',')[1] as string;
                         }
                         setTimeout(() => {
+                            if (response.statusCode === 10000 || response.body.statusCode === 10000) {
+                                return reject(new Error(`Captcha required`));
+                            }
+
                             resolve(bodyOnly ? response.body : response);
                         }, this.timeout);
                     } catch (error) {
