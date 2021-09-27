@@ -533,6 +533,7 @@ export class TikTokScraper extends EventEmitter {
         if (item.createTime > 1595808000) {
             return '';
         }
+        debug('tiktok-scraper:extractVideoId')(`Fetching video id of post ${item.id}`);
 
         try {
             const result = await rp({
@@ -564,6 +565,8 @@ export class TikTokScraper extends EventEmitter {
         if (!uri) {
             return '';
         }
+
+        debug('tiktok-scraper:getUrlWithoutTheWatermark')(`Obtaining url without watermark`);
         const options = {
             uri,
             method: 'GET',
@@ -664,7 +667,7 @@ export class TikTokScraper extends EventEmitter {
             throw new Error('No more posts');
         }
 
-        debug('tiktok-scraper:submitScrapingRequest')(`${(updatedApiResponse ? result.itemList : result.items).length} posts have been fetched`);
+        debug('tiktok-scraper:submitScrapingRequest')(`${(updatedApiResponse ? result.itemList : result.items).length} new posts have been fetched`);
         const { done } = this.collectPosts(updatedApiResponse ? result.itemList : result.items);
 
         if (!hasMore) {
@@ -673,9 +676,11 @@ export class TikTokScraper extends EventEmitter {
         }
 
         if (done) {
+            debug('tiktok-scraper:submitScrapingRequest')(`Done fetching posts`);
             return true;
         }
 
+        debug('tiktok-scraper:submitScrapingRequest')(`Not done yet`);
         this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
         return false;
     }
