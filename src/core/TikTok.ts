@@ -397,7 +397,13 @@ export class TikTokScraper extends EventEmitter {
                         reject(error);
                     }
                 }),
-            { retries: this.retry },
+            {
+                retries: this.retry,
+                onFailedAttempt: error => {
+                    console.error(error);
+                    console.log(`\nAttempt ${error.attemptNumber} (of ${error.attemptNumber + error.retriesLeft}) to fetch ${uri} has failed.`);
+                },
+            },
         );
     }
 
