@@ -179,4 +179,5 @@ export interface Headers {
     'user-agent': string;
     referer?: string;
     cookie?: string;
+    x_tt_params?: string;
 }

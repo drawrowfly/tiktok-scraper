@@ -14,10 +14,11 @@ import { EventEmitter } from 'events';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
 import { URLSearchParams } from 'url';
+import Signer from 'tiktok-signature';
 import pThrottle from 'p-throttle';
 import pRetry from 'p-retry';
 import CONST from '../constant';
-import { sign, makeid } from '../helpers';
+import { makeid } from '../helpers';
 
 import {
     PostCollector,
@@ -409,6 +410,18 @@ export class TikTokScraper extends EventEmitter {
         } else {
             throw error;
         }
+    }
+
+    private async sign(url: string) {
+        const signer = new Signer(undefined, this.headers['user-agent']);
+        await signer.init();
+
+        const auth = await signer.sign(url);
+        await signer.close();
+
+        debug('tiktok-scraper:sign')(auth.signed_url);
+        this.headers.x_tt_params = auth.x_tt_params;
+        return auth;
     }
 
     /**
@@ -922,18 +935,16 @@ export class TikTokScraper extends EventEmitter {
         const options = {
             uri: url,
             method,
-            ...(signUrl
-                ? {
-                      qs: {
-                          _signature: sign(url, this.headers['user-agent']),
-                      },
-                  }
-                : {}),
             headers: {
                 'x-secsdk-csrf-request': 1,
                 'x-secsdk-csrf-version': '1.2.5',
             },
         };
+
+        if (signUrl) {
+            const { signed_url } = await this.sign(url);
+            options.uri = signed_url;
+        }
 
         await this.request<string>(options);
     }
@@ -942,20 +953,16 @@ export class TikTokScraper extends EventEmitter {
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
         const unsignedURL = `${this.getApiEndpoint}?${new URLSearchParams(qs as any).toString()}`;
-        const _signature = sign(unsignedURL, this.headers['user-agent']);
+        const { signed_url } = await this.sign(unsignedURL);
 
         const options = {
-            uri: this.getApiEndpoint,
+            uri: signed_url,
             method: 'GET',
-            qs: {
-                ...qs,
-                _signature,
-            },
+            qs,
             json: true,
         };
 
-        const response = await this.request<T>(options);
-        return response;
+        return await this.request<T>(options);
     }
 
     /**
@@ -1004,8 +1011,9 @@ export class TikTokScraper extends EventEmitter {
             };
         }
         const id = encodeURIComponent(this.input);
+        const { signed_url } = await this.sign(`${this.mainHost}node/share/tag/${id}?uniqueId=${id}`);
         const query = {
-            uri: `${this.mainHost}node/share/tag/${id}?uniqueId=${id}`,
+            uri: signed_url,
             qs: {
                 user_agent: this.headers['user-agent'],
             },
@@ -1161,10 +1169,8 @@ export class TikTokScraper extends EventEmitter {
         };
 
         const unsignedURL = `${query.uri}?${new URLSearchParams(query.qs as any).toString()}`;
-        const _signature = sign(unsignedURL, this.headers['user-agent']);
-
-        // @ts-ignore
-        query.qs._signature = _signature;
+        const { signed_url } = await this.sign(unsignedURL);
+        query.uri = signed_url;
 
         const response = await this.request<TikTokMetadata>(query);
         if (response.statusCode !== 0) {
@@ -1181,7 +1187,9 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw new Error(`Url is missing`);
         }
-        return sign(this.input, this.headers['user-agent']);
+
+        const { signed_url } = await this.sign(this.input);
+        return signed_url;
     }
 
     /**
