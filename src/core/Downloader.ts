@@ -140,7 +140,13 @@ export class Downloader {
                             reject(new Error(`Cant download video: ${item.id}. If you were using proxy, please try without it.`));
                         });
                 }),
-            { retries: this.retry },
+            {
+                retries: this.retry,
+                onFailedAttempt: error => {
+                    console.error(error);
+                    console.log(`\nAttempt ${error.attemptNumber} (of ${error.attemptNumber + error.retriesLeft}) to download ${url} has failed.`);
+                },
+            },
         );
     }
 
@@ -221,7 +227,13 @@ export class Downloader {
             ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
         } as unknown) as OptionsWithUri;
 
-        const result = await pRetry(() => rp(options), { retries: this.retry });
+        const result = await pRetry(() => rp(options), {
+            retries: this.retry,
+            onFailedAttempt: error => {
+                console.error(error);
+                console.log(`\nAttempt ${error.attemptNumber} (of ${error.attemptNumber + error.retriesLeft}) to download ${url} has failed.`);
+            },
+        });
 
         await fromCallback(cb => writeFile(`${this.filepath}/${post.id}.mp4`, result, cb));
     }

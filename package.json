@@ -22,9 +22,10 @@
         "p-retry": "^4.6.1",
         "p-throttle": "^4.1.1",
         "progress": "^2.0.3",
-        "request": "^2.88.0",
+        "request": "^2.88.2",
         "request-promise": "^4.2.4",
         "socks-proxy-agent": "^5.0.0",
+        "tiktok-signature": "^1.5.0",
         "yargs": "^14.2.0"
     },
     "devDependencies": {
