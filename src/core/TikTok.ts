@@ -853,7 +853,7 @@ export class TikTokScraper extends EventEmitter {
                     playCount: posts[i].stats.playCount,
                     commentCount: posts[i].stats.commentCount,
                     downloaded: false,
-                    mentions: posts[i].desc.match(/(@\w+)/g) || [],
+                    mentions: posts[i].desc.match(/(@\S+)/g) || [],
                     hashtags: posts[i].challenges
                         ? posts[i].challenges.map(({ id, title, desc, coverLarger }) => ({
                               id,
@@ -960,7 +960,7 @@ export class TikTokScraper extends EventEmitter {
      * Get music feed query
      */
     private async getMusicFeedQuery(): Promise<RequestQuery> {
-        const musicIdRegex = /.com\/music\/[\w+-]+-(\d{15,22})/.exec(this.input);
+        const musicIdRegex = /.com\/music\/[\S+-]+-(\d{15,22})/.exec(this.input);
         if (musicIdRegex) {
             this.input = musicIdRegex[1] as string;
         }
@@ -1074,7 +1074,7 @@ export class TikTokScraper extends EventEmitter {
         try {
             const response = await this.request<string>(options);
             const breakResponse = response
-                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
+                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\S-]+" crossorigin="anonymous">/)[1]
                 .split(`</script>`)[0];
             if (breakResponse) {
                 const userMetadata: WebHtmlUserMetadata = JSON.parse(breakResponse);
@@ -1128,8 +1128,8 @@ export class TikTokScraper extends EventEmitter {
             throw new Error(`Music is missing`);
         }
 
-        const musicTitle = /music\/([\w-]+)-\d+/.exec(this.input);
-        const musicId = /music\/[\w-]+-(\d+)/.exec(this.input);
+        const musicTitle = /music\/([\S-]+)-\d+/.exec(this.input);
+        const musicId = /music\/[\S-]+-(\d+)/.exec(this.input);
 
         const query = {
             uri: `https://www.tiktok.com/node/share/music/${musicTitle ? musicTitle[1] : ''}-${musicId ? musicId[1] : ''}`,
@@ -1202,7 +1202,7 @@ export class TikTokScraper extends EventEmitter {
             }
 
             const rawVideoMetadata = response
-                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
+                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\S-]+" crossorigin="anonymous">/)[1]
                 .split(`</script>`)[0];
 
             const videoProps = JSON.parse(rawVideoMetadata);
@@ -1217,7 +1217,7 @@ export class TikTokScraper extends EventEmitter {
      * Get video metadata from the regular API endpoint
      */
     private async getVideoMetadata(url = ''): Promise<FeedItems> {
-        const videoData = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/.exec(url || this.input);
+        const videoData = /tiktok.com\/(@[\S.-]+)\/video\/(\d+)/.exec(url || this.input);
         if (videoData) {
             const videoUsername = videoData[1];
             const videoId = videoData[2];
@@ -1311,7 +1311,7 @@ export class TikTokScraper extends EventEmitter {
             playCount: videoData.stats.playCount,
             commentCount: videoData.stats.commentCount,
             downloaded: false,
-            mentions: videoData.desc.match(/(@\w+)/g) || [],
+            mentions: videoData.desc.match(/(@\S+)/g) || [],
             hashtags: videoData.challenges
                 ? videoData.challenges.map(({ id, title, desc, profileLarger }) => ({
                       id,
