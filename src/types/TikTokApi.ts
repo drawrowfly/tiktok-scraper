@@ -156,6 +156,7 @@ export interface ItemListData {
     statusCode: number;
     items: FeedItems[];
     itemList: FeedItems[];
+    itemListData: FeedItems[];
     hasMore: boolean;
     maxCursor: string;
     minCursor: string;
@@ -167,7 +168,9 @@ export interface VideoMetadata {
     itemInfo: { itemStruct: FeedItems };
 }
 
+
 export interface FeedItems {
+    itemInfos:{
     id: string;
     desc: string;
     createTime: number;
@@ -259,6 +262,7 @@ export interface FeedItems {
         name: string;
         ID: string;
     }[];
+}
 }
 
 /**

@@ -274,7 +274,8 @@ export class TikTokScraper extends EventEmitter {
     private get getApiEndpoint(): string {
         switch (this.scrapeType) {
             case 'user':
-                return `${this.mainHost}api/post/item_list/`;
+                // return `${this.mainHost}api/post/item_list/`;
+                return `${this.mainHost}share/item/list`;
             case 'trend':
                 return `${this.mainHost}api/recommend/item_list/`;
             case 'hashtag':
@@ -317,10 +318,11 @@ export class TikTokScraper extends EventEmitter {
      */
     private request<T>(
         { uri, method, qs, body, form, headers, json, gzip, followAllRedirects, simple = true }: OptionsWithUri,
-        bodyOnly = true,
+        bodyOnly = true, simpleOptionsFlag=false, unsignedUrl='',signature=''
     ): Promise<T> {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
+           
             const proxy = this.getProxy;
             const options = ({
                 jar: this.cookieJar,
@@ -345,6 +347,16 @@ export class TikTokScraper extends EventEmitter {
                 timeout: 10000,
             } as unknown) as OptionsWithUri;
 
+            
+            const simpleOptions = {
+                
+                uri:`${unsignedUrl}&_signature=${signature}`,
+                headers: {
+                    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
+                },
+                json:true
+            }
+
             const session = this.sessionList[Math.floor(Math.random() * this.sessionList.length)];
             if (session) {
                 this.cookieJar.setCookie(session, 'https://tiktok.com');
@@ -358,7 +370,14 @@ export class TikTokScraper extends EventEmitter {
             }
 
             try {
-                const response = await rp(options);
+                let response;
+                if(simpleOptionsFlag){
+                      response = await rp(simpleOptions);
+                }
+                else{   
+                     response = await rp(options)
+                }
+              
                 // Extract valid csrf token
                 if (options.method === 'HEAD') {
                     const csrf = response.headers['x-ware-csrf-token'];
@@ -552,8 +571,10 @@ export class TikTokScraper extends EventEmitter {
                 (item, cb) => {
                     switch (this.scrapeType) {
                         case 'user':
+                            this.maxCursor = 0;
+                            console.log(this.maxCursor)
                             this.getUserId()
-                                .then(query => this.submitScrapingRequest({ ...query, cursor: this.maxCursor }, true))
+                                .then(query => this.submitScrapingRequest({ ...query }, true)) //, cursor: this.maxCursor
                                 .then(kill => cb(kill || null))
                                 .catch(error => cb(error));
                             break;
@@ -610,10 +631,11 @@ export class TikTokScraper extends EventEmitter {
                 throw new Error(`Can't scrape more posts`);
             }
             const { hasMore, maxCursor, cursor } = result;
-            if ((updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items)) {
+            if ((!result.itemListData) && (updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items) ) {
                 throw new Error('No more posts');
             }
-            const { done } = await this.collectPosts(updatedApiResponse ? result.itemList : result.items);
+            
+            const { done } = await this.collectPosts(result.itemListData ? result.itemListData  : result.itemList );
 
             if (!hasMore) {
                 console.error(`Only ${this.collector.length} results could be found.`);
@@ -627,6 +649,7 @@ export class TikTokScraper extends EventEmitter {
             this.maxCursor = parseInt(maxCursor === undefined ? cursor : maxCursor, 10);
             return false;
         } catch (error) {
+            console.error(error)
             throw error.message ? new Error(error.message) : error;
         }
     }
@@ -774,11 +797,171 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
+    private mapItem(post){
+        let item = {}
+        console.log(this.scrapeType)
+        console.log(post)
+        if(this.scrapeType=='user')
+        {if (this.noDuplicates.indexOf(post.itemInfos.id) === -1)  {
+            this.noDuplicates.push(post.itemInfos.id);
+             item  = {
+                id: post.itemInfos.id,
+                secretID: post.itemInfos.id,
+                text: post.itemInfos.text,
+                createTime: post.itemInfos.createTime,
+                authorMeta: {
+                    id: post.authorInfos.userId,
+                    secUid: post.authorInfos.secUid,
+                    name: post.authorInfos.uniqueId,
+                    nickName: post.authorInfos.nickname,
+                    verified: post.authorInfos.verified,
+                    signature: post.authorInfos.signature,
+                    avatar: post.authorInfos.avatarLarger,
+                    following: post.authorStats.followingCount,
+                    fans: post.authorStats.followerCount,
+                    heart: post.authorStats.heartCount,
+                    video: post.authorStats.videoCount,
+                    digg: post.authorStats.diggCount,
+                },
+                ...(post.music
+                    ? {
+                          musicMeta: {
+                              musicId: post.music.id,
+                              musicName: post.music.title,
+                              musicAuthor: post.music.authorName,
+                              musicOriginal: post.music.original,
+                              musicAlbum: post.music.album,
+                              playUrl: post.music.playUrl,
+                              coverThumb: post.music.coverThumb,
+                              coverMedium: post.music.coverMedium,
+                              coverLarge: post.music.coverLarge,
+                              duration: post.music.duration,
+                          },
+                      }
+                    : {}),
+                covers: {
+                    default: post.coversOrigin,
+                    origin: post.coversOrigin,
+                    dynamic: post.coversDynamic,
+                },
+                webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.authorInfos.userId}`,
+                videoUrl: post.itemInfos.video.urls,
+                videoUrlNoWaterMark: '',
+                videoApiUrlNoWaterMark: '',
+                videoMeta: {
+                    height: post.itemInfos.video.videoMeta.height,
+                    width: post.itemInfos.video.videoMeta.width,
+                    duration: post.itemInfos.video.videoMeta.duration,
+                },
+                diggCount: post.itemInfos.diggCount,
+                shareCount: post.itemInfos.shareCount,
+                playCount: post.itemInfos.playCount,
+                commentCount: post.itemInfos.commentCount,
+                downloaded: false,
+                mentions: post.itemInfos.text.match(/(@\w+)/g) || [],
+                hashtags: post.itemInfos.challengeInfoList
+                    ? post.itemInfos.challengeInfoList.map(({ id, title, desc, coverLarger }) => ({
+                          id,
+                          name: title,
+                          title: desc,
+                          cover: coverLarger,
+                      }))
+                    : [],
+                effectStickers: post.itemInfos.stickerTextList
+                    ? post.itemInfos.stickerTextList.map(({ ID, name }) => ({
+                          id: ID,
+                          name,
+                      }))
+                    : [],
+            };
+
+        }}
+        
+if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) {
+    this.noDuplicates.push(post.id);
+     item= {
+        id: post.id,
+        secretID: post.video.id,
+        text: post.desc,
+        createTime: post.createTime,
+        authorMeta: {
+            id: post.author.id,
+            secUid: post.author.secUid,
+            name: post.author.uniqueId,
+            nickName: post.author.nickname,
+            verified: post.author.verified,
+            signature: post.author.signature,
+            avatar: post.author.avatarLarger,
+            following: post.authorStats.followingCount,
+            fans: post.authorStats.followerCount,
+            heart: post.authorStats.heartCount,
+            video: post.authorStats.videoCount,
+            digg: post.authorStats.diggCount,
+        },
+        ...(post.music
+            ? {
+                  musicMeta: {
+                      musicId: post.music.id,
+                      musicName: post.music.title,
+                      musicAuthor: post.music.authorName,
+                      musicOriginal: post.music.original,
+                      musicAlbum: post.music.album,
+                      playUrl: post.music.playUrl,
+                      coverThumb: post.music.coverThumb,
+                      coverMedium: post.music.coverMedium,
+                      coverLarge: post.music.coverLarge,
+                      duration: post.music.duration,
+                  },
+              }
+            : {}),
+        covers: {
+            default: post.video.cover,
+            origin: post.video.originCover,
+            dynamic: post.video.dynamicCover,
+        },
+        webVideoUrl: `https://www.tiktok.com/@${post.author.uniqueId}/video/${post.id}`,
+        videoUrl: post.video.downloadAddr,
+        videoUrlNoWaterMark: '',
+        videoApiUrlNoWaterMark: '',
+        videoMeta: {
+            height: post.video.height,
+            width: post.video.width,
+            duration: post.video.duration,
+        },
+        diggCount: post.stats.diggCount,
+        shareCount: post.stats.shareCount,
+        playCount: post.stats.playCount,
+        commentCount: post.stats.commentCount,
+        downloaded: false,
+        mentions: post.desc.match(/(@\w+)/g) || [],
+        hashtags: post.challenges
+            ? post.challenges.map(({ id, title, desc, coverLarger }) => ({
+                  id,
+                  name: title,
+                  title: desc,
+                  cover: coverLarger,
+              }))
+            : [],
+        effectStickers: post.effectStickers
+            ? post.effectStickers.map(({ ID, name }) => ({
+                  id: ID,
+                  name,
+              }))
+            : [],
+    };
+
+
+
+}}
+      
+
+        return item
+    }
     /**
      * Collect post data from the API response
      * @param posts
      */
-    private collectPosts(posts: FeedItems[]) {
+    private collectPosts(posts: any[]) {
         const result = {
             done: false,
         };
@@ -786,8 +969,9 @@ export class TikTokScraper extends EventEmitter {
             if (result.done) {
                 break;
             }
+            let post = posts[i]
 
-            if (this.since && posts[i].createTime < this.since) {
+            if (this.since && post.createTime < this.since) {
                 result.done = CONST.chronologicalTypes.indexOf(this.scrapeType) !== -1;
 
                 if (result.done) {
@@ -796,88 +980,16 @@ export class TikTokScraper extends EventEmitter {
                     continue;
                 }
             }
-
-            if (this.noDuplicates.indexOf(posts[i].id) === -1) {
-                this.noDuplicates.push(posts[i].id);
-                const item: PostCollector = {
-                    id: posts[i].id,
-                    secretID: posts[i].video.id,
-                    text: posts[i].desc,
-                    createTime: posts[i].createTime,
-                    authorMeta: {
-                        id: posts[i].author.id,
-                        secUid: posts[i].author.secUid,
-                        name: posts[i].author.uniqueId,
-                        nickName: posts[i].author.nickname,
-                        verified: posts[i].author.verified,
-                        signature: posts[i].author.signature,
-                        avatar: posts[i].author.avatarLarger,
-                        following: posts[i].authorStats.followingCount,
-                        fans: posts[i].authorStats.followerCount,
-                        heart: posts[i].authorStats.heartCount,
-                        video: posts[i].authorStats.videoCount,
-                        digg: posts[i].authorStats.diggCount,
-                    },
-                    ...(posts[i].music
-                        ? {
-                              musicMeta: {
-                                  musicId: posts[i].music.id,
-                                  musicName: posts[i].music.title,
-                                  musicAuthor: posts[i].music.authorName,
-                                  musicOriginal: posts[i].music.original,
-                                  musicAlbum: posts[i].music.album,
-                                  playUrl: posts[i].music.playUrl,
-                                  coverThumb: posts[i].music.coverThumb,
-                                  coverMedium: posts[i].music.coverMedium,
-                                  coverLarge: posts[i].music.coverLarge,
-                                  duration: posts[i].music.duration,
-                              },
-                          }
-                        : {}),
-                    covers: {
-                        default: posts[i].video.cover,
-                        origin: posts[i].video.originCover,
-                        dynamic: posts[i].video.dynamicCover,
-                    },
-                    webVideoUrl: `https://www.tiktok.com/@${posts[i].author.uniqueId}/video/${posts[i].id}`,
-                    videoUrl: posts[i].video.downloadAddr,
-                    videoUrlNoWaterMark: '',
-                    videoApiUrlNoWaterMark: '',
-                    videoMeta: {
-                        height: posts[i].video.height,
-                        width: posts[i].video.width,
-                        duration: posts[i].video.duration,
-                    },
-                    diggCount: posts[i].stats.diggCount,
-                    shareCount: posts[i].stats.shareCount,
-                    playCount: posts[i].stats.playCount,
-                    commentCount: posts[i].stats.commentCount,
-                    downloaded: false,
-                    mentions: posts[i].desc.match(/(@\w+)/g) || [],
-                    hashtags: posts[i].challenges
-                        ? posts[i].challenges.map(({ id, title, desc, coverLarger }) => ({
-                              id,
-                              name: title,
-                              title: desc,
-                              cover: coverLarger,
-                          }))
-                        : [],
-                    effectStickers: posts[i].effectStickers
-                        ? posts[i].effectStickers.map(({ ID, name }) => ({
-                              id: ID,
-                              name,
-                          }))
-                        : [],
-                };
-
-                if (this.event) {
-                    this.emit('data', item);
-                    this.collector.push({} as PostCollector);
-                } else {
-                    this.collector.push(item);
-                }
+            const item = this.mapItem(post)
+            if (this.event) {
+                this.emit('data', item);
+                this.collector.push({} as any);
+            } else {
+                (this.collector.push as any)(item);
             }
-
+          
+            
+          
             if (this.number) {
                 if (this.collector.length >= this.number) {
                     result.done = true;
@@ -920,7 +1032,7 @@ export class TikTokScraper extends EventEmitter {
         this.storeValue = this.scrapeType === 'trend' ? 'trend' : qs.id || qs.challengeID! || qs.musicID!;
 
         const unsignedURL = `${this.getApiEndpoint}?${new URLSearchParams(qs as any).toString()}`;
-        const _signature = sign(unsignedURL, this.headers['user-agent']);
+        const _signature = this.signGivenUrl(unsignedURL);
 
         const options = {
             uri: this.getApiEndpoint,
@@ -929,11 +1041,12 @@ export class TikTokScraper extends EventEmitter {
                 ...qs,
                 _signature,
             },
-            json: true,
+            json: true
+
         };
 
         try {
-            const response = await this.request<T>(options);
+            const response = await this.request<T>(options,true,this.scrapeType == 'user'?true:false,unsignedURL,await _signature);
             return response;
         } catch (error) {
             throw new Error(error.message);
@@ -1040,18 +1153,21 @@ export class TikTokScraper extends EventEmitter {
             this.idStore = response.user.secUid;
             this.userIdStore = response.user.id;
             return {
+                secUid: '',
                 id: this.userIdStore,
-                aid: 1988,
-                secUid: this.idStore,
+                type:1,
+                // aid: 1988,
                 count: 30,
-                lang: '',
-                cursor: 0,
-                app_name: 'tiktok_web',
-                device_platform: 'web_pc',
-                cookie_enabled: true,
-                history_len: 2,
-                focus_state: true,
-                is_fullscreen: false,
+                // lang: '',
+                minCursor: 0,
+                maxCursor:0,
+                shareUid:''
+                // app_name: 'tiktok_web',
+                // device_platform: 'web_pc',
+                // cookie_enabled: true,
+                // history_len: 2,
+                // focus_state: true,
+                // is_fullscreen: false,
             };
         } catch (error) {
             throw new Error(error.message);
@@ -1184,6 +1300,10 @@ export class TikTokScraper extends EventEmitter {
         return sign(this.input, this.headers['user-agent']);
     }
 
+    public async signGivenUrl(url) {
+        return sign(url, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36');
+    }
+
     /**
      * Get video metadata from the HTML
      * This method can be used if you aren't able to retrieve video metadata from a simple API call
@@ -1251,8 +1371,8 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw new Error(`Url is missing`);
         }
-
-        let videoData = {} as FeedItems;
+        
+        let videoData = {} as any;
         if (html) {
             videoData = await this.getVideoMetadataFromHtml();
         } else {
