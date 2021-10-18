@@ -493,8 +493,6 @@ class TikTokScraper extends events_1.EventEmitter {
     }
     mapItem(post) {
         let item = {};
-        console.log(this.scrapeType);
-        console.log(post);
         if (this.scrapeType == 'user') {
             if (this.noDuplicates.indexOf(post.itemInfos.id) === -1) {
                 this.noDuplicates.push(post.itemInfos.id);
@@ -502,7 +500,7 @@ class TikTokScraper extends events_1.EventEmitter {
                         id: post.authorInfos.userId,
                         secUid: post.authorInfos.secUid,
                         name: post.authorInfos.uniqueId,
-                        nickName: post.authorInfos.nickname,
+                        nickName: post.authorInfos.nickName,
                         verified: post.authorInfos.verified,
                         signature: post.authorInfos.signature,
                         avatar: post.authorInfos.avatarLarger,
@@ -527,10 +525,10 @@ class TikTokScraper extends events_1.EventEmitter {
                         },
                     }
                     : {})), { covers: {
-                        default: post.coversOrigin,
-                        origin: post.coversOrigin,
-                        dynamic: post.coversDynamic,
-                    }, webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.authorInfos.userId}`, videoUrl: post.itemInfos.video.urls, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
+                        default: post.itemInfos.covers,
+                        origin: post.itemInfos.coversOrigin,
+                        dynamic: post.itemInfos.coversDynamic,
+                    }, imageUrl: post.itemInfos.covers, webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.authorInfos.userId}`, videoUrl: post.itemInfos.video.urls, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
                         height: post.itemInfos.video.videoMeta.height,
                         width: post.itemInfos.video.videoMeta.width,
                         duration: post.itemInfos.video.videoMeta.duration,
@@ -556,7 +554,7 @@ class TikTokScraper extends events_1.EventEmitter {
                         id: post.author.id,
                         secUid: post.author.secUid,
                         name: post.author.uniqueId,
-                        nickName: post.author.nickname,
+                        nickName: post.author.nickName,
                         verified: post.author.verified,
                         signature: post.author.signature,
                         avatar: post.author.avatarLarger,
@@ -584,7 +582,7 @@ class TikTokScraper extends events_1.EventEmitter {
                         default: post.video.cover,
                         origin: post.video.originCover,
                         dynamic: post.video.dynamicCover,
-                    }, webVideoUrl: `https://www.tiktok.com/@${post.author.uniqueId}/video/${post.id}`, videoUrl: post.video.downloadAddr, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
+                    }, imageUrl: post.itemInfos.covers, webVideoUrl: `https://www.tiktok.com/@${post.author.uniqueId}/video/${post.id}`, videoUrl: post.video.downloadAddr, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
                         height: post.video.height,
                         width: post.video.width,
                         duration: post.video.duration,
@@ -741,18 +739,13 @@ class TikTokScraper extends events_1.EventEmitter {
     async getUserId() {
         if (this.byUserId || this.idStore) {
             return {
+                secUid: '',
                 id: this.userIdStore,
-                secUid: this.idStore ? this.idStore : this.input,
-                lang: '',
-                aid: 1988,
+                type: 1,
                 count: 30,
-                cursor: 0,
-                app_name: 'tiktok_web',
-                device_platform: 'web_pc',
-                cookie_enabled: true,
-                history_len: 2,
-                focus_state: true,
-                is_fullscreen: false,
+                minCursor: 0,
+                maxCursor: 0,
+                shareUid: ''
             };
         }
         try {
@@ -944,7 +937,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 id: videoData.author.id,
                 secUid: videoData.author.secUid,
                 name: videoData.author.uniqueId,
-                nickName: videoData.author.nickname,
+                nickName: videoData.author.nickName,
                 following: videoData.authorStats.followingCount,
                 fans: videoData.authorStats.followerCount,
                 heart: videoData.authorStats.heartCount,

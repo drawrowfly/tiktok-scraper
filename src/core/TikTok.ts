@@ -371,7 +371,10 @@ export class TikTokScraper extends EventEmitter {
 
             try {
                 let response;
+                // console.log('unsigned URL is',unsignedUrl)
+                // console.log('simpleOptionsFlag',simpleOptionsFlag)
                 if(simpleOptionsFlag){
+                    
                       response = await rp(simpleOptions);
                 }
                 else{   
@@ -384,6 +387,7 @@ export class TikTokScraper extends EventEmitter {
                     this.csrf = csrf.split(',')[1] as string;
                 }
                 setTimeout(() => {
+                    // console.log('core response',response)
                     resolve(bodyOnly ? response.body : response);
                 }, this.timeout);
             } catch (error) {
@@ -627,10 +631,12 @@ export class TikTokScraper extends EventEmitter {
                 this.validHeaders = true;
             }
             const result = await this.scrapeData<ItemListData>(query);
+            // console.log('result', result)
             if (result.statusCode !== 0) {
                 throw new Error(`Can't scrape more posts`);
             }
             const { hasMore, maxCursor, cursor } = result;
+            // console.log(result)
             if ((!result.itemListData) && (updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items) ) {
                 throw new Error('No more posts');
             }
@@ -799,8 +805,8 @@ export class TikTokScraper extends EventEmitter {
 
     private mapItem(post){
         let item = {}
-        console.log(this.scrapeType)
-        console.log(post)
+        // console.log(this.scrapeType)
+        // console.log(post)
         if(this.scrapeType=='user')
         {if (this.noDuplicates.indexOf(post.itemInfos.id) === -1)  {
             this.noDuplicates.push(post.itemInfos.id);
@@ -813,7 +819,7 @@ export class TikTokScraper extends EventEmitter {
                     id: post.authorInfos.userId,
                     secUid: post.authorInfos.secUid,
                     name: post.authorInfos.uniqueId,
-                    nickName: post.authorInfos.nickname,
+                    nickName: post.authorInfos.nickName,
                     verified: post.authorInfos.verified,
                     signature: post.authorInfos.signature,
                     avatar: post.authorInfos.avatarLarger,
@@ -840,10 +846,11 @@ export class TikTokScraper extends EventEmitter {
                       }
                     : {}),
                 covers: {
-                    default: post.coversOrigin,
-                    origin: post.coversOrigin,
-                    dynamic: post.coversDynamic,
+                    default: post.itemInfos.covers,
+                    origin: post.itemInfos.coversOrigin,
+                    dynamic: post.itemInfos.coversDynamic,
                 },
+                imageUrl :  post.itemInfos.covers,
                 webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.authorInfos.userId}`,
                 videoUrl: post.itemInfos.video.urls,
                 videoUrlNoWaterMark: '',
@@ -888,7 +895,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
             id: post.author.id,
             secUid: post.author.secUid,
             name: post.author.uniqueId,
-            nickName: post.author.nickname,
+            nickName: post.author.nickName,
             verified: post.author.verified,
             signature: post.author.signature,
             avatar: post.author.avatarLarger,
@@ -919,6 +926,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
             origin: post.video.originCover,
             dynamic: post.video.dynamicCover,
         },
+        imageUrl :  post.itemInfos.covers,
         webVideoUrl: `https://www.tiktok.com/@${post.author.uniqueId}/video/${post.id}`,
         videoUrl: post.video.downloadAddr,
         videoUrlNoWaterMark: '',
@@ -1046,7 +1054,9 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
         };
 
         try {
+            // console.log('scrapeType',this.scrapeType)
             const response = await this.request<T>(options,true,this.scrapeType == 'user'?true:false,unsignedURL,await _signature);
+            // console.log('response',response)
             return response;
         } catch (error) {
             throw new Error(error.message);
@@ -1133,18 +1143,21 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
     private async getUserId(): Promise<RequestQuery> {
         if (this.byUserId || this.idStore) {
             return {
+                secUid: '',
                 id: this.userIdStore,
-                secUid: this.idStore ? this.idStore : this.input,
-                lang: '',
-                aid: 1988,
+                type:1,
+                // aid: 1988,
                 count: 30,
-                cursor: 0,
-                app_name: 'tiktok_web',
-                device_platform: 'web_pc',
-                cookie_enabled: true,
-                history_len: 2,
-                focus_state: true,
-                is_fullscreen: false,
+                // lang: '',
+                minCursor: 0,
+                maxCursor:0,
+                shareUid:''
+                // app_name: 'tiktok_web',
+                // device_platform: 'web_pc',
+                // cookie_enabled: true,
+                // history_len: 2,
+                // focus_state: true,
+                // is_fullscreen: false,
             };
         }
 
@@ -1388,7 +1401,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
                 id: videoData.author.id,
                 secUid: videoData.author.secUid,
                 name: videoData.author.uniqueId,
-                nickName: videoData.author.nickname,
+                nickName: videoData.author.nickName,
                 following: videoData.authorStats.followingCount,
                 fans: videoData.authorStats.followerCount,
                 heart: videoData.authorStats.heartCount,
