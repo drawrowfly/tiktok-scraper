@@ -528,7 +528,7 @@ class TikTokScraper extends events_1.EventEmitter {
                         default: post.itemInfos.covers,
                         origin: post.itemInfos.coversOrigin,
                         dynamic: post.itemInfos.coversDynamic,
-                    }, imageUrl: post.itemInfos.covers, webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.authorInfos.userId}`, videoUrl: post.itemInfos.video.urls, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
+                    }, imageUrl: post.itemInfos.covers[0], webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.authorInfos.userId}`, videoUrl: post.itemInfos.video.urls, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
                         height: post.itemInfos.video.videoMeta.height,
                         width: post.itemInfos.video.videoMeta.width,
                         duration: post.itemInfos.video.videoMeta.duration,
@@ -582,7 +582,7 @@ class TikTokScraper extends events_1.EventEmitter {
                         default: post.video.cover,
                         origin: post.video.originCover,
                         dynamic: post.video.dynamicCover,
-                    }, imageUrl: post.itemInfos.covers, webVideoUrl: `https://www.tiktok.com/@${post.author.uniqueId}/video/${post.id}`, videoUrl: post.video.downloadAddr, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
+                    }, imageUrl: post.itemInfos.covers[0], webVideoUrl: `https://www.tiktok.com/@${post.author.uniqueId}/video/${post.id}`, videoUrl: post.video.downloadAddr, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
                         height: post.video.height,
                         width: post.video.width,
                         duration: post.video.duration,
