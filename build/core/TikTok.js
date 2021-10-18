@@ -528,7 +528,7 @@ class TikTokScraper extends events_1.EventEmitter {
                         default: post.itemInfos.covers,
                         origin: post.itemInfos.coversOrigin,
                         dynamic: post.itemInfos.coversDynamic,
-                    }, imageUrl: post.itemInfos.covers[0], webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.authorInfos.userId}`, videoUrl: post.itemInfos.video.urls, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
+                    }, imageUrl: post.itemInfos.covers[0], webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.itemInfos.id}`, videoUrl: post.itemInfos.video.urls, videoUrlNoWaterMark: '', videoApiUrlNoWaterMark: '', videoMeta: {
                         height: post.itemInfos.video.videoMeta.height,
                         width: post.itemInfos.video.videoMeta.width,
                         duration: post.itemInfos.video.videoMeta.duration,

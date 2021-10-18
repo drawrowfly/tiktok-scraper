@@ -851,7 +851,7 @@ export class TikTokScraper extends EventEmitter {
                     dynamic: post.itemInfos.coversDynamic,
                 },
                 imageUrl :  post.itemInfos.covers[0],
-                webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.authorInfos.userId}`,
+                webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.itemInfos.id}`,
                 videoUrl: post.itemInfos.video.urls,
                 videoUrlNoWaterMark: '',
                 videoApiUrlNoWaterMark: '',
