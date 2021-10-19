@@ -358,7 +358,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 this.validHeaders = true;
             }
             const result = await this.scrapeData(query);
-            if (result.statusCode !== 0) {
+            if (result && result.statusCode && result.statusCode !== 0) {
                 throw new Error(`Can't scrape more posts`);
             }
             const { hasMore, maxCursor, cursor } = result;
