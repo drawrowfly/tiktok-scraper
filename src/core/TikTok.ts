@@ -1051,6 +1051,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
 
         try {
             const response = await this.request<T>(options,true,this.scrapeType == 'user'?true:false,unsignedURL,await _signature);
+            console.log('version marker')
             return response;
         } catch (error) {
             throw new Error(error.message);
