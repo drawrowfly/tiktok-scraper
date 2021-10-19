@@ -31,7 +31,7 @@ export = {
         return variants[Math.floor(Math.random() * variants.length)];
     },
     /**
-     * Generate random user-agent with randon versions(fake)
+     * Generate random user-agent with random versions (fake)
      */
     userAgent: () => {
         const os = [
