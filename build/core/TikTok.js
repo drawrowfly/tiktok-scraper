@@ -668,6 +668,7 @@ class TikTokScraper extends events_1.EventEmitter {
         };
         try {
             const response = await this.request(options, true, this.scrapeType == 'user' ? true : false, unsignedURL, await _signature);
+            console.log('version marker');
             return response;
         }
         catch (error) {
