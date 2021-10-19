@@ -373,3 +373,68 @@ export interface WebHtmlUserMetadata {
         };
     };
 }
+
+export interface CommentsData {
+    status_code: number;
+    status_message: string;
+    comments: CommentMetadata[];
+    cursor: string;
+    hasMore: boolean;
+    reply_style: number;
+    total: number;
+    // log_pb:
+    // top_gifts:
+    alias_comment_deleted: boolean;
+}
+
+export interface CommentMetadata {
+    aweme_id: string;
+    cid: string;
+    create_time: number;
+    digg_count: number;
+    status: number;
+    text: string;
+    author_pin: boolean;
+    collect_stat: number;
+    is_author_digged: boolean;
+    no_show: boolean;
+    reply_comment_total: number;
+    reply_id: string;
+    reply_to_reply_id: string;
+    stick_position: number;
+    text_extra: [];
+    user_buried: boolean;
+    user_digged: number;
+    // label_list: null;
+    // reply_comment: null;
+    user: {
+        avatar_thumb: {
+            uri: string;
+            url_list: string[];
+        };
+        custom_verify: string;
+        enterprise_verify_reason: string;
+        nickname: string;
+        sec_uid: string;
+        unique_id: string;
+        uid: string;
+        // ad_cover_url: null;
+        // bold_fields: null;
+        // can_set_geofencing: null;
+        // cha_list: null;
+        // cover_url: null;
+        // events: null;
+        // followers_detail: null;
+        // geofencing: null;
+        // homepage_bottom_toast: null;
+        // item_list: null;
+        // mutual_relation_avatars: null;
+        // need_points: null;
+        // platform_sync_info: null;
+        // relative_users: null;
+        // search_highlight: null;
+        // type_label: null;
+        // user_tags: null;
+        // white_cover_url: null;
+    };
+}
