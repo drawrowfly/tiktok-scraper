@@ -355,6 +355,7 @@ export class TikTokScraper extends EventEmitter {
                     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
                 },
                 json:true
+                
             }
 
             const session = this.sessionList[Math.floor(Math.random() * this.sessionList.length)];
@@ -371,8 +372,6 @@ export class TikTokScraper extends EventEmitter {
 
             try {
                 let response;
-                // console.log('unsigned URL is',unsignedUrl)
-                // console.log('simpleOptionsFlag',simpleOptionsFlag)
                 if(simpleOptionsFlag){
                     
                       response = await rp(simpleOptions);
@@ -387,7 +386,6 @@ export class TikTokScraper extends EventEmitter {
                     this.csrf = csrf.split(',')[1] as string;
                 }
                 setTimeout(() => {
-                    // console.log('core response',response)
                     resolve(bodyOnly ? response.body : response);
                 }, this.timeout);
             } catch (error) {
@@ -631,11 +629,10 @@ export class TikTokScraper extends EventEmitter {
                 this.validHeaders = true;
             }
             const result = await this.scrapeData<ItemListData>(query);
-            if ( result && result.statusCode  && result.statusCode !== 0) {
+            if (result.statusCode !== 0) {
                 throw new Error(`Can't scrape more posts`);
             }
             const { hasMore, maxCursor, cursor } = result;
-            // console.log(result)
             if ((!result.itemListData) && (updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items) ) {
                 throw new Error('No more posts');
             }
@@ -1053,9 +1050,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
         };
 
         try {
-            // console.log('scrapeType',this.scrapeType)
             const response = await this.request<T>(options,true,this.scrapeType == 'user'?true:false,unsignedURL,await _signature);
-            // console.log('response',response)
             return response;
         } catch (error) {
             throw new Error(error.message);
