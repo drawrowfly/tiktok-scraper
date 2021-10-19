@@ -222,6 +222,7 @@ class TikTokScraper extends events_1.EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
+        console.log('versionmarker4');
         await this.mainLoop();
         if (this.event) {
             return this.emit('done', 'completed');
@@ -313,10 +314,8 @@ class TikTokScraper extends events_1.EventEmitter {
             async_1.forEachLimit(taskArray, this.asyncScraping(), (item, cb) => {
                 switch (this.scrapeType) {
                     case 'user':
-                        this.maxCursor = 0;
-                        console.log(this.maxCursor);
                         this.getUserId()
-                            .then(query => this.submitScrapingRequest(Object.assign({}, query), true))
+                            .then(query => this.submitScrapingRequest(Object.assign(Object.assign({}, query), { cursor: this.maxCursor }), true))
                             .then(kill => cb(kill || null))
                             .catch(error => cb(error));
                         break;
@@ -668,7 +667,6 @@ class TikTokScraper extends events_1.EventEmitter {
         };
         try {
             const response = await this.request(options, true, this.scrapeType == 'user' ? true : false, unsignedURL, await _signature);
-            console.log('version marker');
             return response;
         }
         catch (error) {

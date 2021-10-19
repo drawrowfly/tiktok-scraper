@@ -11,7 +11,7 @@
         "noImplicitAny": false,
         "moduleResolution": "node",
         "declaration": true,
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
         "outDir": "./build",
         "baseUrl": "src",
         "strict": true
