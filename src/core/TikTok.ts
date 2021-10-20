@@ -637,6 +637,7 @@ export class TikTokScraper extends EventEmitter {
             }
             
             const { done } = await this.collectPosts(result.itemListData ? result.itemListData  : result.itemList );
+            this.collector = _.reject(this.collector , _.isEmpty);
 
             if (!hasMore) {
                 console.error(`Only ${this.collector.length} results could be found.`);
@@ -988,10 +989,8 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
                 this.emit('data', item);
                 this.collector.push({} as any);
             } else {
-              !_.isEmpty(item) ?(this.collector.push as any)(item):{};
+                (this.collector.push as any)(item)
             }
-          
-            
           
             if (this.number) {
                 if (this.collector.length >= this.number) {

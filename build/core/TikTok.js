@@ -373,6 +373,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 throw new Error('No more posts');
             }
             const { done } = await this.collectPosts(result.itemListData ? result.itemListData : result.itemList);
+            this.collector = _.reject(this.collector, _.isEmpty);
             if (!hasMore) {
                 console.error(`Only ${this.collector.length} results could be found.`);
                 return true;
@@ -634,7 +635,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 this.collector.push({});
             }
             else {
-                !_.isEmpty(item) ? this.collector.push(item) : {};
+                this.collector.push(item);
             }
             if (this.number) {
                 if (this.collector.length >= this.number) {
