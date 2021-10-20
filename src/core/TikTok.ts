@@ -1263,13 +1263,21 @@ export class TikTokScraper extends EventEmitter {
 
         // get *all* comments of a video (paginated)
         let commentData: CommentsData | undefined;
-        for (let paginationStepSize = 30, currentPage = 0; currentPage < videoData.stats.commentCount; currentPage += paginationStepSize) {
-            const data = await this.getCommentMetadata('', currentPage, paginationStepSize);
-            if (commentData === undefined) {
-                commentData = data;
-            } else if (data.comments !== null) {
-                commentData.comments = commentData.comments.concat(data.comments);
+        try {
+            for (let paginationStepSize = 30, currentPage = 0; currentPage < videoData.stats.commentCount; currentPage += paginationStepSize) {
+                const data = await this.getCommentMetadata('', currentPage, paginationStepSize);
+                // no data could be retrieved: possibly no valid session; skip comment scraping
+                if (data === undefined) {
+                    break;
+                }
+                if (commentData === undefined) {
+                    commentData = data;
+                } else if (data.comments !== null) {
+                    commentData.comments = commentData.comments.concat(data.comments);
+                }
             }
+        } catch {
+            // continue regardless of error
         }
 
         const videoItem = {
@@ -1394,6 +1402,11 @@ export class TikTokScraper extends EventEmitter {
      * (only works with a valid session!)
      */
     private async getCommentMetadata(url = '', _cursor = 0, _count = 30): Promise<CommentsData> {
+        // abort, if no session is set
+        if (this.cookieJar.getCookieString('https://tiktok.com').indexOf('sid_tt') === -1) {
+            throw Error(`No valid session given. Can't download comments.`);
+        }
+
         // get username and videoId from url/parameter
         const videoData = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/.exec(url || this.input);
         if (videoData) {
