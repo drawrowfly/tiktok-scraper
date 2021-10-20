@@ -83,6 +83,7 @@ export interface TikTokConstructor {
     headers: Headers;
     verifyFp?: string;
     sessionList?: string[];
+    includeComments?: boolean;
 }
 
 export interface Hashtags {

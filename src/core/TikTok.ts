@@ -128,6 +128,8 @@ export class TikTokScraper extends EventEmitter {
 
     public cookieJar: CookieJar;
 
+    private includeComments: boolean;
+
     constructor({
         download,
         filepath,
@@ -158,6 +160,7 @@ export class TikTokScraper extends EventEmitter {
         headers,
         verifyFp = '',
         sessionList = [],
+        includeComments = false,
     }: TikTokConstructor) {
         super();
         this.userIdStore = '';
@@ -222,6 +225,7 @@ export class TikTokScraper extends EventEmitter {
             bad: 0,
         };
         this.store = [];
+        this.includeComments = includeComments;
     }
 
     /**
@@ -1263,21 +1267,23 @@ export class TikTokScraper extends EventEmitter {
 
         // get *all* comments of a video (paginated)
         let commentData: CommentsData | undefined;
-        try {
-            for (let paginationStepSize = 30, currentPage = 0; currentPage < videoData.stats.commentCount; currentPage += paginationStepSize) {
-                const data = await this.getCommentMetadata('', currentPage, paginationStepSize);
-                // no data could be retrieved: possibly no valid session; skip comment scraping
-                if (data === undefined) {
-                    break;
+        if (this.includeComments) {
+            try {
+                for (let paginationStepSize = 30, currentPage = 0; currentPage < videoData.stats.commentCount; currentPage += paginationStepSize) {
+                    const data = await this.getCommentMetadata('', currentPage, paginationStepSize);
+                    // no data could be retrieved: possibly no valid session; skip comment scraping
+                    if (data === undefined) {
+                        break;
+                    }
+                    if (commentData === undefined) {
+                        commentData = data;
+                    } else if (data.comments !== null) {
+                        commentData.comments = commentData.comments.concat(data.comments);
+                    }
                 }
-                if (commentData === undefined) {
-                    commentData = data;
-                } else if (data.comments !== null) {
-                    commentData.comments = commentData.comments.concat(data.comments);
-                }
+            } catch {
+                // continue regardless of error
             }
-        } catch {
-            // continue regardless of error
         }
 
         const videoItem = {

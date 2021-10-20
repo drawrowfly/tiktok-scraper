@@ -219,6 +219,11 @@ yargs
             choices: ['GET', 'POST'],
             describe: 'Receive data to your webhook url as POST or GET request',
         },
+        includeComments: {
+            boolean: true,
+            default: false,
+            describe: 'Also save all comments when downloading a video. Needs a valid session to work.',
+        },
     })
     .check(argv => {
         if (CONST.scrape.indexOf(argv._[0]) === -1) {
