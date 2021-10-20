@@ -15,6 +15,7 @@ import { forEachLimit } from 'async';
 import { URLSearchParams } from 'url';
 import CONST from '../constant';
 import { sign, makeid } from '../helpers';
+import * as _ from "lodash";
 
 import {
     PostCollector,
@@ -987,7 +988,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
                 this.emit('data', item);
                 this.collector.push({} as any);
             } else {
-                (this.collector.push as any)(item);
+              !_.isEmpty(item) ?(this.collector.push as any)(item):{};
             }
           
             

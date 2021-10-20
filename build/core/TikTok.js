@@ -2,6 +2,13 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const request_promise_1 = __importDefault(require("request-promise"));
 const os_1 = require("os");
@@ -15,6 +22,7 @@ const async_1 = require("async");
 const url_1 = require("url");
 const constant_1 = __importDefault(require("../constant"));
 const helpers_1 = require("../helpers");
+const _ = __importStar(require("lodash"));
 const core_1 = require("../core");
 class TikTokScraper extends events_1.EventEmitter {
     constructor({ download, filepath, filetype, proxy, strictSSL = true, asyncDownload, cli = false, event = false, progress = false, input, number, since, type, by_user_id = false, store_history = false, historyPath = '', noWaterMark = false, useTestEndpoints = false, fileName = '', timeout = 0, bulk = false, zip = false, test = false, hdVideo = false, webHookUrl = '', method = 'POST', headers, verifyFp = '', sessionList = [], }) {
@@ -626,7 +634,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 this.collector.push({});
             }
             else {
-                this.collector.push(item);
+                !_.isEmpty(item) ? this.collector.push(item) : {};
             }
             if (this.number) {
                 if (this.collector.length >= this.number) {
