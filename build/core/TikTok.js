@@ -166,6 +166,7 @@ class TikTokScraper extends events_1.EventEmitter {
             const options = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ jar: this.cookieJar, uri,
                 method }, (qs ? { qs } : {})), (body ? { body } : {})), (form ? { form } : {})), { headers: Object.assign(Object.assign(Object.assign({}, this.headers), headers), (this.csrf ? { 'x-secsdk-csrf-token': this.csrf } : {})) }), (json ? { json: true } : {})), (gzip ? { gzip: true } : {})), { resolveWithFullResponse: true, followAllRedirects: followAllRedirects || false, simple }), (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {})), (this.strictSSL === false ? { rejectUnauthorized: false } : {})), { timeout: 10000 });
             const simpleOptions = {
+                jar: this.cookieJar,
                 uri: `${unsignedUrl}&_signature=${signature}`,
                 headers: {
                     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',

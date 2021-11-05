@@ -350,7 +350,7 @@ export class TikTokScraper extends EventEmitter {
 
             
             const simpleOptions = {
-                
+                jar: this.cookieJar,
                 uri:`${unsignedUrl}&_signature=${signature}`,
                 headers: {
                     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
