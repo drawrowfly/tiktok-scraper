@@ -1187,24 +1187,23 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
+        let url = `https://m.tiktok.com/node/share/user/@${this.input}?`
+        let signature = await this.signGivenUrl(url)
         const options = {
             method: 'GET',
-            uri: `https://www.tiktok.com/@${encodeURIComponent(this.input)}`,
-            json: true,
+            uri: `${url}&_signature=${signature}`
         };
         try {
             const response = await this.request<string>(options);
-            const breakResponse = response
-                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
-                .split(`</script>`)[0];
-            if (breakResponse) {
-                const userMetadata: WebHtmlUserMetadata = JSON.parse(breakResponse);
-                return userMetadata.props.pageProps.userInfo;
+            if (response) {
+                const userMetadata = JSON.parse(response);
+                return userMetadata.userInfo;
             }
         } catch (err) {
             if (err.statusCode === 404) {
                 throw new Error('User does not exist');
             }
+            console.log(`API fork threw ${err}`)
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }

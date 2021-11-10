@@ -779,25 +779,25 @@ class TikTokScraper extends events_1.EventEmitter {
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
+        let url = `https://m.tiktok.com/node/share/user/@${this.input}?`;
+        let signature = await this.signGivenUrl(url);
         const options = {
             method: 'GET',
-            uri: `https://www.tiktok.com/@${encodeURIComponent(this.input)}`,
-            json: true,
+            uri: `${url}&_signature=${signature}`
         };
         try {
             const response = await this.request(options);
-            const breakResponse = response
-                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
-                .split(`</script>`)[0];
-            if (breakResponse) {
-                const userMetadata = JSON.parse(breakResponse);
-                return userMetadata.props.pageProps.userInfo;
+            console.log('response is', response);
+            if (response) {
+                const userMetadata = JSON.parse(response);
+                return userMetadata.userInfo;
             }
         }
         catch (err) {
             if (err.statusCode === 404) {
                 throw new Error('User does not exist');
             }
+            console.log(err);
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }
