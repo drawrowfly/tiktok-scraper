@@ -787,7 +787,6 @@ class TikTokScraper extends events_1.EventEmitter {
         };
         try {
             const response = await this.request(options);
-            console.log('response is', response);
             if (response) {
                 const userMetadata = JSON.parse(response);
                 return userMetadata.userInfo;
@@ -797,7 +796,7 @@ class TikTokScraper extends events_1.EventEmitter {
             if (err.statusCode === 404) {
                 throw new Error('User does not exist');
             }
-            console.log(err);
+            console.log(`API fork threw ${err}`);
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }
