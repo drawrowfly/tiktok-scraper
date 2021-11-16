@@ -2,6 +2,13 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const request_promise_1 = __importDefault(require("request-promise"));
 const os_1 = require("os");
@@ -15,6 +22,7 @@ const async_1 = require("async");
 const url_1 = require("url");
 const constant_1 = __importDefault(require("../constant"));
 const helpers_1 = require("../helpers");
+const _ = __importStar(require("lodash"));
 const core_1 = require("../core");
 class TikTokScraper extends events_1.EventEmitter {
     constructor({ download, filepath, filetype, proxy, strictSSL = true, asyncDownload, cli = false, event = false, progress = false, input, number, since, type, by_user_id = false, store_history = false, historyPath = '', noWaterMark = false, useTestEndpoints = false, fileName = '', timeout = 0, bulk = false, zip = false, test = false, hdVideo = false, webHookUrl = '', method = 'POST', headers, verifyFp = '', sessionList = [], }) {
@@ -158,6 +166,7 @@ class TikTokScraper extends events_1.EventEmitter {
             const options = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ jar: this.cookieJar, uri,
                 method }, (qs ? { qs } : {})), (body ? { body } : {})), (form ? { form } : {})), { headers: Object.assign(Object.assign(Object.assign({}, this.headers), headers), (this.csrf ? { 'x-secsdk-csrf-token': this.csrf } : {})) }), (json ? { json: true } : {})), (gzip ? { gzip: true } : {})), { resolveWithFullResponse: true, followAllRedirects: followAllRedirects || false, simple }), (proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {})), (proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {})), (this.strictSSL === false ? { rejectUnauthorized: false } : {})), { timeout: 10000 });
             const simpleOptions = {
+                jar: this.cookieJar,
                 uri: `${unsignedUrl}&_signature=${signature}`,
                 headers: {
                     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
@@ -222,6 +231,7 @@ class TikTokScraper extends events_1.EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
+        console.log('version marker 3');
         await this.mainLoop();
         if (this.event) {
             return this.emit('done', 'completed');
@@ -313,10 +323,8 @@ class TikTokScraper extends events_1.EventEmitter {
             async_1.forEachLimit(taskArray, this.asyncScraping(), (item, cb) => {
                 switch (this.scrapeType) {
                     case 'user':
-                        this.maxCursor = 0;
-                        console.log(this.maxCursor);
                         this.getUserId()
-                            .then(query => this.submitScrapingRequest(Object.assign({}, query), true))
+                            .then(query => this.submitScrapingRequest(Object.assign(Object.assign({}, query), { cursor: this.maxCursor }), true))
                             .then(kill => cb(kill || null))
                             .catch(error => cb(error));
                         break;
@@ -366,6 +374,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 throw new Error('No more posts');
             }
             const { done } = await this.collectPosts(result.itemListData ? result.itemListData : result.itemList);
+            this.collector = _.reject(this.collector, _.isEmpty);
             if (!hasMore) {
                 console.error(`Only ${this.collector.length} results could be found.`);
                 return true;
@@ -770,25 +779,24 @@ class TikTokScraper extends events_1.EventEmitter {
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
+        let url = `https://m.tiktok.com/node/share/user/@${this.input}?`;
+        let signature = await this.signGivenUrl(url);
         const options = {
             method: 'GET',
-            uri: `https://www.tiktok.com/@${encodeURIComponent(this.input)}`,
-            json: true,
+            uri: `${url}&_signature=${signature}`
         };
         try {
             const response = await this.request(options);
-            const breakResponse = response
-                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
-                .split(`</script>`)[0];
-            if (breakResponse) {
-                const userMetadata = JSON.parse(breakResponse);
-                return userMetadata.props.pageProps.userInfo;
+            if (response) {
+                const userMetadata = JSON.parse(response);
+                return userMetadata.userInfo;
             }
         }
         catch (err) {
             if (err.statusCode === 404) {
                 throw new Error('User does not exist');
             }
+            console.log(`API fork threw ${err}`);
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }

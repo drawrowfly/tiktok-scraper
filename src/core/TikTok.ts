@@ -15,6 +15,7 @@ import { forEachLimit } from 'async';
 import { URLSearchParams } from 'url';
 import CONST from '../constant';
 import { sign, makeid } from '../helpers';
+import * as _ from "lodash";
 
 import {
     PostCollector,
@@ -349,7 +350,7 @@ export class TikTokScraper extends EventEmitter {
 
             
             const simpleOptions = {
-                
+                jar: this.cookieJar,
                 uri:`${unsignedUrl}&_signature=${signature}`,
                 headers: {
                     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
@@ -428,7 +429,6 @@ export class TikTokScraper extends EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-
         await this.mainLoop();
 
         if (this.event) {
@@ -573,10 +573,8 @@ export class TikTokScraper extends EventEmitter {
                 (item, cb) => {
                     switch (this.scrapeType) {
                         case 'user':
-                            this.maxCursor = 0;
-                            console.log(this.maxCursor)
                             this.getUserId()
-                                .then(query => this.submitScrapingRequest({ ...query }, true)) //, cursor: this.maxCursor
+                                .then(query => this.submitScrapingRequest({ ...query,  cursor: this.maxCursor }, true)) //, cursor: this.maxCursor
                                 .then(kill => cb(kill || null))
                                 .catch(error => cb(error));
                             break;
@@ -638,6 +636,7 @@ export class TikTokScraper extends EventEmitter {
             }
             
             const { done } = await this.collectPosts(result.itemListData ? result.itemListData  : result.itemList );
+            this.collector = _.reject(this.collector , _.isEmpty);
 
             if (!hasMore) {
                 console.error(`Only ${this.collector.length} results could be found.`);
@@ -989,10 +988,8 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
                 this.emit('data', item);
                 this.collector.push({} as any);
             } else {
-                (this.collector.push as any)(item);
+                (this.collector.push as any)(item)
             }
-          
-            
           
             if (this.number) {
                 if (this.collector.length >= this.number) {
@@ -1051,7 +1048,6 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
 
         try {
             const response = await this.request<T>(options,true,this.scrapeType == 'user'?true:false,unsignedURL,await _signature);
-            console.log('version marker')
             return response;
         } catch (error) {
             throw new Error(error.message);
@@ -1190,24 +1186,23 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
+        let url = `https://m.tiktok.com/node/share/user/@${this.input}?`
+        let signature = await this.signGivenUrl(url)
         const options = {
             method: 'GET',
-            uri: `https://www.tiktok.com/@${encodeURIComponent(this.input)}`,
-            json: true,
+            uri: `${url}&_signature=${signature}`
         };
         try {
             const response = await this.request<string>(options);
-            const breakResponse = response
-                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
-                .split(`</script>`)[0];
-            if (breakResponse) {
-                const userMetadata: WebHtmlUserMetadata = JSON.parse(breakResponse);
-                return userMetadata.props.pageProps.userInfo;
+            if (response) {
+                const userMetadata = JSON.parse(response);
+                return userMetadata.userInfo;
             }
         } catch (err) {
             if (err.statusCode === 404) {
                 throw new Error('User does not exist');
             }
+            console.log(`API fork threw ${err}`)
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }
