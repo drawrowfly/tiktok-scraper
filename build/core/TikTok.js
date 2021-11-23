@@ -231,7 +231,7 @@ class TikTokScraper extends events_1.EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version marker 4 | v2.0.2');
+        console.log('version marker 5 | v2.0.4');
         await this.mainLoop();
         if (this.event) {
             return this.emit('done', 'completed');
@@ -785,18 +785,14 @@ class TikTokScraper extends events_1.EventEmitter {
             method: 'GET',
             uri: `${url}&_signature=${signature}`
         };
-        try {
-            const response = await this.request(options);
-            if (response) {
-                const userMetadata = JSON.parse(response);
-                return userMetadata.userInfo;
-            }
+        const response = await this.request(options);
+        let emptyResponse = _.isEmpty(_.get(response, 'response.userInfo'));
+        if (!emptyResponse && response) {
+            const userMetadata = JSON.parse(response);
+            return userMetadata.userInfo;
         }
-        catch (err) {
-            if (err.statusCode === 404) {
-                throw new Error('User does not exist');
-            }
-            console.log(`API fork threw ${err}`);
+        if (emptyResponse) {
+            throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }
