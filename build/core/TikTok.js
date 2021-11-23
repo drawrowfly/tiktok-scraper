@@ -231,7 +231,7 @@ class TikTokScraper extends events_1.EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version marker 4 | v2.0.2');
+        console.log('version marker 5 | v2.0.2');
         await this.mainLoop();
         if (this.event) {
             return this.emit('done', 'completed');
@@ -787,9 +787,13 @@ class TikTokScraper extends events_1.EventEmitter {
         };
         try {
             const response = await this.request(options);
-            if (response) {
+            let emptyResponse = _.isEmpty(_.get(response, 'response.userInfo'));
+            if (!emptyResponse && response) {
                 const userMetadata = JSON.parse(response);
                 return userMetadata.userInfo;
+            }
+            if (emptyResponse) {
+                throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
             }
         }
         catch (err) {

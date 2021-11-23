@@ -429,7 +429,7 @@ export class TikTokScraper extends EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version marker 4 | v2.0.2')
+        console.log('version marker 5 | v2.0.2')
         await this.mainLoop();
 
         if (this.event) {
@@ -1183,7 +1183,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
      * Get user profile information
      * @param {} username
      */
-    public async getUserProfileInfo(): Promise<UserMetadata> {
+     public async getUserProfileInfo(): Promise<UserMetadata> {
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
@@ -1195,10 +1195,15 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
         };
         try {
             const response = await this.request<string>(options);
-            if (response) {
+            let emptyResponse =_.isEmpty(_.get(response,'response.userInfo')) 
+            if (!emptyResponse && response) {
                 const userMetadata = JSON.parse(response);
                 return userMetadata.userInfo;
             }
+            if(emptyResponse){
+                throw new Error(`User does not exist [userInfo]`);
+            }
+
         } catch (err) {
             if (err.statusCode === 404) {
                 throw new Error('User does not exist');
