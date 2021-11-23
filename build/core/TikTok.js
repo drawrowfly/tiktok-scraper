@@ -785,22 +785,14 @@ class TikTokScraper extends events_1.EventEmitter {
             method: 'GET',
             uri: `${url}&_signature=${signature}`
         };
-        try {
-            const response = await this.request(options);
-            let emptyResponse = _.isEmpty(_.get(response, 'response.userInfo'));
-            if (!emptyResponse && response) {
-                const userMetadata = JSON.parse(response);
-                return userMetadata.userInfo;
-            }
-            if (emptyResponse) {
-                throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
-            }
+        const response = await this.request(options);
+        let emptyResponse = _.isEmpty(_.get(response, 'response.userInfo'));
+        if (!emptyResponse && response) {
+            const userMetadata = JSON.parse(response);
+            return userMetadata.userInfo;
         }
-        catch (err) {
-            if (err.statusCode === 404) {
-                throw new Error('User does not exist');
-            }
-            console.log(`API fork threw ${err}`);
+        if (emptyResponse) {
+            throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }
