@@ -1200,8 +1200,8 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
                 const userMetadata = JSON.parse(response);
                 return userMetadata.userInfo;
             }
-            if(emptyResponse){
-                throw new Error(`User does not exist [userInfo]`);
+            if (emptyResponse) {
+                throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
             }
 
         } catch (err) {
