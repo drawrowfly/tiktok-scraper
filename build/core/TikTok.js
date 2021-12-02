@@ -231,7 +231,7 @@ class TikTokScraper extends events_1.EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version marker 5 | v2.0.4');
+        console.log('version marker 6 | v2.0.5');
         await this.mainLoop();
         if (this.event) {
             return this.emit('done', 'completed');
@@ -781,14 +781,16 @@ class TikTokScraper extends events_1.EventEmitter {
         }
         let url = `https://m.tiktok.com/node/share/user/@${this.input}?`;
         let signature = await this.signGivenUrl(url);
+        let signedUrl = `${url}&_signature=${signature}`;
         const options = {
             method: 'GET',
-            uri: `${url}&_signature=${signature}`
+            uri: signedUrl
         };
         const response = await this.request(options);
-        let emptyResponse = _.isEmpty(_.get(response, 'response.userInfo'));
-        if (!emptyResponse && response) {
-            const userMetadata = JSON.parse(response);
+        let parsedResponse = JSON.parse(response);
+        let emptyResponse = _.isEmpty(_.get(parsedResponse, 'userInfo'));
+        if (!emptyResponse) {
+            const userMetadata = parsedResponse;
             return userMetadata.userInfo;
         }
         if (emptyResponse) {
