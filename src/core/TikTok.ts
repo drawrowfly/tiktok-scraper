@@ -429,7 +429,7 @@ export class TikTokScraper extends EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version v2.1.0')
+        console.log('version v2.1.1')
         await this.mainLoop();
 
         if (this.event) {
@@ -628,7 +628,7 @@ export class TikTokScraper extends EventEmitter {
                 this.validHeaders = true;
             }
             const result = await this.scrapeData<ItemListData>(query);
-            if (result.statusCode !== 0) {
+            if (result && result.statusCode !== 0) {
                 throw new Error(`Can't scrape more posts`);
             }
             const { hasMore, maxCursor, cursor } = result;
@@ -999,6 +999,9 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
                 }
             }
         }
+
+        result.done = true; // added to eliminate inifinte loop caused by hasMore flag
+
         return result;
     }
 
