@@ -231,7 +231,7 @@ class TikTokScraper extends events_1.EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version v2.1.0');
+        console.log('version v2.1.1');
         await this.mainLoop();
         if (this.event) {
             return this.emit('done', 'completed');
@@ -366,7 +366,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 this.validHeaders = true;
             }
             const result = await this.scrapeData(query);
-            if (result.statusCode !== 0) {
+            if (result && result.statusCode !== 0) {
                 throw new Error(`Can't scrape more posts`);
             }
             const { hasMore, maxCursor, cursor } = result;
@@ -645,6 +645,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 }
             }
         }
+        result.done = true;
         return result;
     }
     async getValidHeaders(url = '', signUrl = true, method = 'HEAD') {
