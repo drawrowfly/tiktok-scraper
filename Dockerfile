@@ -1,5 +1,5 @@
 #Building Scraper
-FROM alpine:latest AS tiktok_scraper.build
+FROM alpine:3.13.5 AS tiktok_scraper.build
 
 WORKDIR /usr/app
 
@@ -15,7 +15,7 @@ RUN rm -rf src node_modules
 
 
 #Using Scraper
-FROM alpine:latest AS tiktok_scraper.use
+FROM alpine:3.13.5 AS tiktok_scraper.use
 
 WORKDIR /usr/app
 
