@@ -1206,8 +1206,8 @@ export class TikTokScraper extends EventEmitter {
 
             if (response.includes("__NEXT_DATA__")){
                 const rawVideoMetadata = response
-                .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
-                .split(`</script>`)[0];
+                    .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
+                    .split(`</script>`)[0];
 
                 const videoProps = JSON.parse(rawVideoMetadata);
                 const videoData = videoProps.props.pageProps.itemInfo.itemStruct;
