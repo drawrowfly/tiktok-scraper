@@ -1220,7 +1220,7 @@ export class TikTokScraper extends EventEmitter {
 
                 const videoProps = JSON.parse(rawVideoMetadata);
                 const videoData = Object.values(videoProps.ItemModule)[0];
-                return <FeedItems>videoData;
+                return videoData as FeedItems;
             }
 
             throw new Error('No available parser for html page')
