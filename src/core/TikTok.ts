@@ -1072,9 +1072,7 @@ export class TikTokScraper extends EventEmitter {
             json: true,
         };
         try {
-
             const response = await this.request<string>(options);
-
             const breakResponse = response
                 .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
                 .split(`</script>`)[0];
@@ -1082,7 +1080,6 @@ export class TikTokScraper extends EventEmitter {
                 const userMetadata: WebHtmlUserMetadata = JSON.parse(breakResponse);
                 return userMetadata.props.pageProps.userInfo;
             }
-
         } catch (err) {
             if (err.statusCode === 404) {
                 throw new Error('User does not exist');
