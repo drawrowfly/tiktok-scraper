@@ -340,7 +340,7 @@ export class TikTokScraper extends EventEmitter {
                 followAllRedirects: followAllRedirects || false,
                 simple,
                 ...(proxy.proxy && proxy.socks ? { agent: proxy.proxy } : {}),
-                ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}/` } : {}),
+                ...(proxy.proxy && !proxy.socks ? { proxy: `http://${proxy.proxy}` } : {}),
                 ...(this.strictSSL === false ? { rejectUnauthorized: false } : {}),
                 timeout: 10000,
             } as unknown) as OptionsWithUri;
