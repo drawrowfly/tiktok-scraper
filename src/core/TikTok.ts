@@ -3,12 +3,13 @@
 /* eslint-disable no-underscore-dangle */
 
 import rp, { OptionsWithUri } from 'request-promise';
+import * as rr from 'request'
 import { CookieJar } from 'request';
 import { tmpdir } from 'os';
 import { writeFile, readFile, mkdir } from 'fs';
 import { Parser } from 'json2csv';
 import ora, { Ora } from 'ora';
-import { fromCallback } from 'bluebird';
+import { fromCallback, resolve } from 'bluebird';
 import { EventEmitter } from 'events';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { forEachLimit } from 'async';
@@ -319,11 +320,11 @@ export class TikTokScraper extends EventEmitter {
      */
     private request<T>(
         { uri, method, qs, body, form, headers, json, gzip, followAllRedirects, simple = true }: OptionsWithUri,
-        bodyOnly = true, simpleOptionsFlag=false, unsignedUrl='',signature=''
+        bodyOnly = true, simpleOptionsFlag = false, unsignedUrl = '', signature = ''
     ): Promise<T> {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
-           
+
             const proxy = this.getProxy;
             const options = ({
                 jar: this.cookieJar,
@@ -348,15 +349,15 @@ export class TikTokScraper extends EventEmitter {
                 timeout: 10000,
             } as unknown) as OptionsWithUri;
 
-            
+
             const simpleOptions = {
                 jar: this.cookieJar,
-                uri:`${unsignedUrl}&_signature=${signature}`,
+                uri: `${unsignedUrl}&_signature=${signature}`,
                 headers: {
                     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
                 },
-                json:true
-                
+                json: true
+
             }
 
             const session = this.sessionList[Math.floor(Math.random() * this.sessionList.length)];
@@ -373,14 +374,14 @@ export class TikTokScraper extends EventEmitter {
 
             try {
                 let response;
-                if(simpleOptionsFlag){
-                    
-                      response = await rp(simpleOptions);
+                if (simpleOptionsFlag) {
+
+                    response = await rp(simpleOptions);
                 }
-                else{   
-                     response = await rp(options)
+                else {
+                    response = await rp(options)
                 }
-              
+
                 // Extract valid csrf token
                 if (options.method === 'HEAD') {
                     const csrf = response.headers['x-ware-csrf-token'];
@@ -521,9 +522,8 @@ export class TikTokScraper extends EventEmitter {
                     .slice(position + 4, position + 36)
                     .toString();
 
-                return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${
-                    this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
-                }`;
+                return `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${id}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4${this.hdVideo ? `&ratio=default&improve_bitrate=1` : ''
+                    }`;
             }
         } catch {
             // continue regardless of error
@@ -575,7 +575,7 @@ export class TikTokScraper extends EventEmitter {
                     switch (this.scrapeType) {
                         case 'user':
                             this.getUserId()
-                                .then(query => this.submitScrapingRequest({ ...query,  cursor: this.maxCursor }, true)) //, cursor: this.maxCursor
+                                .then(query => this.submitScrapingRequest({ ...query, cursor: this.maxCursor }, true)) //, cursor: this.maxCursor
                                 .then(kill => cb(kill || null))
                                 .catch(error => cb(error));
                             break;
@@ -632,12 +632,12 @@ export class TikTokScraper extends EventEmitter {
                 throw new Error(`Can't scrape more posts`);
             }
             const { hasMore, maxCursor, cursor } = result;
-            if ((!result.itemListData) && (updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items) ) {
+            if ((!result.itemListData) && (updatedApiResponse && !result.itemList) || (!updatedApiResponse && !result.items)) {
                 throw new Error('No more posts');
             }
-            
-            const { done } = await this.collectPosts(result.itemListData ? result.itemListData  : result.itemList );
-            this.collector = _.reject(this.collector , _.isEmpty);
+
+            const { done } = await this.collectPosts(result.itemListData ? result.itemListData : result.itemList);
+            this.collector = _.reject(this.collector, _.isEmpty);
 
             if (!hasMore) {
                 console.error(`Only ${this.collector.length} results could be found.`);
@@ -799,165 +799,168 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
-    private mapItem(post){
+    private mapItem(post) {
         let item = {}
         // console.log(this.scrapeType)
         // console.log(post)
-        if(this.scrapeType=='user')
-        {if (this.noDuplicates.indexOf(post.itemInfos.id) === -1)  {
-            this.noDuplicates.push(post.itemInfos.id);
-             item  = {
-                id: post.itemInfos.id,
-                secretID: post.itemInfos.id,
-                text: post.itemInfos.text,
-                createTime: post.itemInfos.createTime,
-                authorMeta: {
-                    id: post.authorInfos.userId,
-                    secUid: post.authorInfos.secUid,
-                    name: post.authorInfos.uniqueId,
-                    nickName: post.authorInfos.nickName,
-                    verified: post.authorInfos.verified,
-                    signature: post.authorInfos.signature,
-                    avatar: post.authorInfos.avatarLarger,
-                    following: post.authorStats.followingCount,
-                    fans: post.authorStats.followerCount,
-                    heart: post.authorStats.heartCount,
-                    video: post.authorStats.videoCount,
-                    digg: post.authorStats.diggCount,
-                },
-                ...(post.music
-                    ? {
-                          musicMeta: {
-                              musicId: post.music.id,
-                              musicName: post.music.title,
-                              musicAuthor: post.music.authorName,
-                              musicOriginal: post.music.original,
-                              musicAlbum: post.music.album,
-                              playUrl: post.music.playUrl,
-                              coverThumb: post.music.coverThumb,
-                              coverMedium: post.music.coverMedium,
-                              coverLarge: post.music.coverLarge,
-                              duration: post.music.duration,
-                          },
-                      }
-                    : {}),
-                covers: {
-                    default: post.itemInfos.covers,
-                    origin: post.itemInfos.coversOrigin,
-                    dynamic: post.itemInfos.coversDynamic,
-                },
-                imageUrl :  post.itemInfos.covers[0],
-                webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.itemInfos.id}`,
-                videoUrl: post.itemInfos.video.urls,
-                videoUrlNoWaterMark: '',
-                videoApiUrlNoWaterMark: '',
-                videoMeta: {
-                    height: post.itemInfos.video.videoMeta.height,
-                    width: post.itemInfos.video.videoMeta.width,
-                    duration: post.itemInfos.video.videoMeta.duration,
-                },
-                diggCount: post.itemInfos.diggCount,
-                shareCount: post.itemInfos.shareCount,
-                playCount: post.itemInfos.playCount,
-                commentCount: post.itemInfos.commentCount,
-                downloaded: false,
-                mentions: post.itemInfos.text.match(/(@\w+)/g) || [],
-                hashtags: post.itemInfos.challengeInfoList
-                    ? post.itemInfos.challengeInfoList.map(({ id, title, desc, coverLarger }) => ({
-                          id,
-                          name: title,
-                          title: desc,
-                          cover: coverLarger,
-                      }))
-                    : [],
-                effectStickers: post.itemInfos.stickerTextList
-                    ? post.itemInfos.stickerTextList.map(({ ID, name }) => ({
-                          id: ID,
-                          name,
-                      }))
-                    : [],
-            };
+        if (this.scrapeType == 'user') {
+            if (this.noDuplicates.indexOf(post.itemInfos.id) === -1) {
+                this.noDuplicates.push(post.itemInfos.id);
+                item = {
+                    id: post.itemInfos.id,
+                    secretID: post.itemInfos.id,
+                    text: post.itemInfos.text,
+                    createTime: post.itemInfos.createTime,
+                    authorMeta: {
+                        id: post.authorInfos.userId,
+                        secUid: post.authorInfos.secUid,
+                        name: post.authorInfos.uniqueId,
+                        nickName: post.authorInfos.nickName,
+                        verified: post.authorInfos.verified,
+                        signature: post.authorInfos.signature,
+                        avatar: post.authorInfos.avatarLarger,
+                        following: post.authorStats.followingCount,
+                        fans: post.authorStats.followerCount,
+                        heart: post.authorStats.heartCount,
+                        video: post.authorStats.videoCount,
+                        digg: post.authorStats.diggCount,
+                    },
+                    ...(post.music
+                        ? {
+                            musicMeta: {
+                                musicId: post.music.id,
+                                musicName: post.music.title,
+                                musicAuthor: post.music.authorName,
+                                musicOriginal: post.music.original,
+                                musicAlbum: post.music.album,
+                                playUrl: post.music.playUrl,
+                                coverThumb: post.music.coverThumb,
+                                coverMedium: post.music.coverMedium,
+                                coverLarge: post.music.coverLarge,
+                                duration: post.music.duration,
+                            },
+                        }
+                        : {}),
+                    covers: {
+                        default: post.itemInfos.covers,
+                        origin: post.itemInfos.coversOrigin,
+                        dynamic: post.itemInfos.coversDynamic,
+                    },
+                    imageUrl: post.itemInfos.covers[0],
+                    webVideoUrl: `https://www.tiktok.com/@${post.authorInfos.uniqueId}/video/${post.itemInfos.id}`,
+                    videoUrl: post.itemInfos.video.urls,
+                    videoUrlNoWaterMark: '',
+                    videoApiUrlNoWaterMark: '',
+                    videoMeta: {
+                        height: post.itemInfos.video.videoMeta.height,
+                        width: post.itemInfos.video.videoMeta.width,
+                        duration: post.itemInfos.video.videoMeta.duration,
+                    },
+                    diggCount: post.itemInfos.diggCount,
+                    shareCount: post.itemInfos.shareCount,
+                    playCount: post.itemInfos.playCount,
+                    commentCount: post.itemInfos.commentCount,
+                    downloaded: false,
+                    mentions: post.itemInfos.text.match(/(@\w+)/g) || [],
+                    hashtags: post.itemInfos.challengeInfoList
+                        ? post.itemInfos.challengeInfoList.map(({ id, title, desc, coverLarger }) => ({
+                            id,
+                            name: title,
+                            title: desc,
+                            cover: coverLarger,
+                        }))
+                        : [],
+                    effectStickers: post.itemInfos.stickerTextList
+                        ? post.itemInfos.stickerTextList.map(({ ID, name }) => ({
+                            id: ID,
+                            name,
+                        }))
+                        : [],
+                };
 
-        }}
-        
-if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) {
-    this.noDuplicates.push(post.id);
-     item= {
-        id: post.id,
-        secretID: post.video.id,
-        text: post.desc,
-        createTime: post.createTime,
-        authorMeta: {
-            id: post.author.id,
-            secUid: post.author.secUid,
-            name: post.author.uniqueId,
-            nickName: post.author.nickName,
-            verified: post.author.verified,
-            signature: post.author.signature,
-            avatar: post.author.avatarLarger,
-            following: post.authorStats.followingCount,
-            fans: post.authorStats.followerCount,
-            heart: post.authorStats.heartCount,
-            video: post.authorStats.videoCount,
-            digg: post.authorStats.diggCount,
-        },
-        ...(post.music
-            ? {
-                  musicMeta: {
-                      musicId: post.music.id,
-                      musicName: post.music.title,
-                      musicAuthor: post.music.authorName,
-                      musicOriginal: post.music.original,
-                      musicAlbum: post.music.album,
-                      playUrl: post.music.playUrl,
-                      coverThumb: post.music.coverThumb,
-                      coverMedium: post.music.coverMedium,
-                      coverLarge: post.music.coverLarge,
-                      duration: post.music.duration,
-                  },
-              }
-            : {}),
-        covers: {
-            default: post.video.cover,
-            origin: post.video.originCover,
-            dynamic: post.video.dynamicCover,
-        },
-        imageUrl :  post.itemInfos.covers[0],
-        webVideoUrl: `https://www.tiktok.com/@${post.author.uniqueId}/video/${post.id}`,
-        videoUrl: post.video.downloadAddr,
-        videoUrlNoWaterMark: '',
-        videoApiUrlNoWaterMark: '',
-        videoMeta: {
-            height: post.video.height,
-            width: post.video.width,
-            duration: post.video.duration,
-        },
-        diggCount: post.stats.diggCount,
-        shareCount: post.stats.shareCount,
-        playCount: post.stats.playCount,
-        commentCount: post.stats.commentCount,
-        downloaded: false,
-        mentions: post.desc.match(/(@\w+)/g) || [],
-        hashtags: post.challenges
-            ? post.challenges.map(({ id, title, desc, coverLarger }) => ({
-                  id,
-                  name: title,
-                  title: desc,
-                  cover: coverLarger,
-              }))
-            : [],
-        effectStickers: post.effectStickers
-            ? post.effectStickers.map(({ ID, name }) => ({
-                  id: ID,
-                  name,
-              }))
-            : [],
-    };
+            }
+        }
+
+        if (this.scrapeType == 'trend') {
+            if (this.noDuplicates.indexOf(post.id) === -1) {
+                this.noDuplicates.push(post.id);
+                item = {
+                    id: post.id,
+                    secretID: post.video.id,
+                    text: post.desc,
+                    createTime: post.createTime,
+                    authorMeta: {
+                        id: post.author.id,
+                        secUid: post.author.secUid,
+                        name: post.author.uniqueId,
+                        nickName: post.author.nickName,
+                        verified: post.author.verified,
+                        signature: post.author.signature,
+                        avatar: post.author.avatarLarger,
+                        following: post.authorStats.followingCount,
+                        fans: post.authorStats.followerCount,
+                        heart: post.authorStats.heartCount,
+                        video: post.authorStats.videoCount,
+                        digg: post.authorStats.diggCount,
+                    },
+                    ...(post.music
+                        ? {
+                            musicMeta: {
+                                musicId: post.music.id,
+                                musicName: post.music.title,
+                                musicAuthor: post.music.authorName,
+                                musicOriginal: post.music.original,
+                                musicAlbum: post.music.album,
+                                playUrl: post.music.playUrl,
+                                coverThumb: post.music.coverThumb,
+                                coverMedium: post.music.coverMedium,
+                                coverLarge: post.music.coverLarge,
+                                duration: post.music.duration,
+                            },
+                        }
+                        : {}),
+                    covers: {
+                        default: post.video.cover,
+                        origin: post.video.originCover,
+                        dynamic: post.video.dynamicCover,
+                    },
+                    imageUrl: post.itemInfos.covers[0],
+                    webVideoUrl: `https://www.tiktok.com/@${post.author.uniqueId}/video/${post.id}`,
+                    videoUrl: post.video.downloadAddr,
+                    videoUrlNoWaterMark: '',
+                    videoApiUrlNoWaterMark: '',
+                    videoMeta: {
+                        height: post.video.height,
+                        width: post.video.width,
+                        duration: post.video.duration,
+                    },
+                    diggCount: post.stats.diggCount,
+                    shareCount: post.stats.shareCount,
+                    playCount: post.stats.playCount,
+                    commentCount: post.stats.commentCount,
+                    downloaded: false,
+                    mentions: post.desc.match(/(@\w+)/g) || [],
+                    hashtags: post.challenges
+                        ? post.challenges.map(({ id, title, desc, coverLarger }) => ({
+                            id,
+                            name: title,
+                            title: desc,
+                            cover: coverLarger,
+                        }))
+                        : [],
+                    effectStickers: post.effectStickers
+                        ? post.effectStickers.map(({ ID, name }) => ({
+                            id: ID,
+                            name,
+                        }))
+                        : [],
+                };
 
 
 
-}}
-      
+            }
+        }
+
 
         return item
     }
@@ -991,7 +994,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
             } else {
                 (this.collector.push as any)(item)
             }
-          
+
             if (this.number) {
                 if (this.collector.length >= this.number) {
                     result.done = true;
@@ -1015,10 +1018,10 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
             method,
             ...(signUrl
                 ? {
-                      qs: {
-                          _signature: sign(url, this.headers['user-agent']),
-                      },
-                  }
+                    qs: {
+                        _signature: sign(url, this.headers['user-agent']),
+                    },
+                }
                 : {}),
             headers: {
                 'x-secsdk-csrf-request': 1,
@@ -1051,7 +1054,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
         };
 
         try {
-            const response = await this.request<T>(options,true,this.scrapeType == 'user'?true:false,unsignedURL,await _signature);
+            const response = await this.request<T>(options, true, this.scrapeType == 'user' ? true : false, unsignedURL, await _signature);
             return response;
         } catch (error) {
             throw new Error(error.message);
@@ -1140,13 +1143,13 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
             return {
                 secUid: '',
                 id: this.userIdStore,
-                type:1,
+                type: 1,
                 // aid: 1988,
                 count: 30,
                 // lang: '',
                 minCursor: 0,
-                maxCursor:0,
-                shareUid:''
+                maxCursor: 0,
+                shareUid: ''
                 // app_name: 'tiktok_web',
                 // device_platform: 'web_pc',
                 // cookie_enabled: true,
@@ -1163,13 +1166,13 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
             return {
                 secUid: '',
                 id: this.userIdStore,
-                type:1,
+                type: 1,
                 // aid: 1988,
                 count: 30,
                 // lang: '',
                 minCursor: 0,
-                maxCursor:0,
-                shareUid:''
+                maxCursor: 0,
+                shareUid: ''
                 // app_name: 'tiktok_web',
                 // device_platform: 'web_pc',
                 // cookie_enabled: true,
@@ -1186,7 +1189,7 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
      * Get user profile information
      * @param {} username
      */
-     public async getUserProfileInfo(): Promise<UserMetadata> {
+    public async getUserProfileInfo(): Promise<UserMetadata> {
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
@@ -1197,15 +1200,15 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
             method: 'GET',
             uri: signedUrl
         };
-        const response =  await this.request<string>(options);
+        const response = await this.request<string>(options);
         let parsedResponse = JSON.parse(response)
-        let emptyResponse =_.isEmpty(_.get(parsedResponse,'userInfo')) 
+        let emptyResponse = _.isEmpty(_.get(parsedResponse, 'userInfo'))
         if (!emptyResponse) {
             const userMetadata = parsedResponse;
             return userMetadata.userInfo;
         }
         if (emptyResponse) {
-            throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`) ;
+            throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }
@@ -1339,10 +1342,51 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
         }
     }
 
+    private async getVideoLink(url: string, regex: RegExp) {
+
+       let  headers = {
+            'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36',
+            'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'accept-encoding' : 'gzip, deflate, br',
+            'accept-language' : 'en-US,en;q=0.9,ar;q=0.8,de;q=0.7',
+            'cookie':null
+        }
+
+        let isShortLinkLvl = regex.exec(url || this.input);
+        if (isShortLinkLvl) {
+            var response:any = null
+            await rp({
+                url: url,
+                headers:headers,
+                followAllRedirects: true,
+                followOriginalHttpMethod: true,
+                resolveWithFullResponse: true
+
+            }, function (err, res, body) {
+                response = res.request.uri.href
+
+            });
+            return response
+        }
+    }
+
     /**
      * Get video metadata from the regular API endpoint
      */
     private async getVideoMetadata(url = ''): Promise<FeedItems> {
+
+        // test new tiktok post shortlinks
+        console.log('matching short link level 1')
+        let shortLinkLvl1 = /vm.tiktok.com\/([\w.-]+)/
+        let shortLinkLvl2 = /m.tiktok.com\/([\w.-]+)\/(\d+)/
+        let response = await this.getVideoLink(url || this.input, shortLinkLvl1)
+        // console.log('received', response)
+        // url = await this.getVideoLink(response, shortLinkLvl2)
+        // console.log('level 2 url is',url)
+        url = response
+
+
+
         const videoData = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/.exec(url || this.input);
         if (videoData) {
             const videoUsername = videoData[1];
@@ -1377,11 +1421,13 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
         if (!this.input) {
             throw new Error(`Url is missing`);
         }
-        
+
         let videoData = {} as any;
-        if (html) {
+        if (false) {
+            console.log('getting getVideoMetadataFromHtml')
             videoData = await this.getVideoMetadataFromHtml();
         } else {
+            console.log('getting getVideoMetadataFromAPI')
             videoData = await this.getVideoMetadata();
         }
 
@@ -1440,17 +1486,17 @@ if( this.scrapeType=='trend'){  if (this.noDuplicates.indexOf(post.id) === -1 ) 
             mentions: videoData.desc.match(/(@\w+)/g) || [],
             hashtags: videoData.challenges
                 ? videoData.challenges.map(({ id, title, desc, profileLarger }) => ({
-                      id,
-                      name: title,
-                      title: desc,
-                      cover: profileLarger,
-                  }))
+                    id,
+                    name: title,
+                    title: desc,
+                    cover: profileLarger,
+                }))
                 : [],
             effectStickers: videoData.effectStickers
                 ? videoData.effectStickers.map(({ ID, name }) => ({
-                      id: ID,
-                      name,
-                  }))
+                    id: ID,
+                    name,
+                }))
                 : [],
         } as PostCollector;
 
