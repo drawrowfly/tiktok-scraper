@@ -1342,7 +1342,12 @@ export class TikTokScraper extends EventEmitter {
         }
     }
 
-    private async getVideoLink(url: string, regex: RegExp) {
+    private async getVideoLink(url: string, regex: RegExp, targetRegex :RegExp) {
+
+        // return immediately if url matchs target regex
+       if (targetRegex.exec(url)){
+           return url
+       }
 
        let  headers = {
             'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36',
@@ -1352,7 +1357,7 @@ export class TikTokScraper extends EventEmitter {
             'cookie':null
         }
 
-        let isShortLinkLvl = regex.exec(url || this.input);
+        let isShortLinkLvl = regex.exec(url);
         if (isShortLinkLvl) {
             var response:any = null
             await rp({
@@ -1376,18 +1381,14 @@ export class TikTokScraper extends EventEmitter {
     private async getVideoMetadata(url = ''): Promise<FeedItems> {
 
         // test new tiktok post shortlinks
-        console.log('matching short link level 1')
         let shortLinkLvl1 = /vm.tiktok.com\/([\w.-]+)/
         let shortLinkLvl2 = /m.tiktok.com\/([\w.-]+)\/(\d+)/
-        let response = await this.getVideoLink(url || this.input, shortLinkLvl1)
-        // console.log('received', response)
-        // url = await this.getVideoLink(response, shortLinkLvl2)
-        // console.log('level 2 url is',url)
-        url = response
+        let targetLinkregex = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/ 
 
-
-
-        const videoData = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/.exec(url || this.input);
+        // test and solve for short and long URLs
+        url = await this.getVideoLink(url || this.input, shortLinkLvl1, targetLinkregex)
+        
+        const videoData = targetLinkregex.exec(url);
         if (videoData) {
             const videoUsername = videoData[1];
             const videoId = videoData[2];
