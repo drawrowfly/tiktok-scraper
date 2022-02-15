@@ -81,6 +81,7 @@ export declare class TikTokScraper extends EventEmitter {
     signUrl(): Promise<any>;
     signGivenUrl(url: any): Promise<any>;
     private getVideoMetadataFromHtml;
+    private getVideoLink;
     private getVideoMetadata;
     getVideoMeta(html?: boolean): Promise<PostCollector>;
     private sendDataToWebHookUrl;
