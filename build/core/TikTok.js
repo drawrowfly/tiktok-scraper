@@ -1008,6 +1008,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 duration: videoData.music.duration,
             },
             imageUrl: videoData.video.cover,
+            longUrl: videoData.longUrl,
             videoUrl: videoData.video.playAddr,
             videoUrlNoWaterMark: '',
             videoApiUrlNoWaterMark: '',
