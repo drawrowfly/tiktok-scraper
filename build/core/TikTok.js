@@ -900,29 +900,32 @@ class TikTokScraper extends events_1.EventEmitter {
             throw new Error(`Can't extract video metadata: ${this.input}`);
         }
     }
-    async getVideoLink(url, regex, targetRegex) {
+    async getVideoLink(url, regex, regexlvl2, targetRegex) {
+        console.log(`getVideoLink received ${url}`);
         if (targetRegex.exec(url)) {
             return url;
         }
-        let headers = {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36',
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9,ar;q=0.8,de;q=0.7',
-            'cookie': null
-        };
-        let isShortLinkLvl = regex.exec(url);
+        let isShortLinkLvl = regex.exec(url) || regexlvl2.exec(url);
         if (isShortLinkLvl) {
+            const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
+            let headers = {
+                'User-Agent': userAgent,
+            };
             var response = null;
+            console.log('requesting long url ...');
             await request_promise_1.default({
                 url: url,
                 headers: headers,
-                followAllRedirects: true,
+                method: 'GET',
+                followAllRedirects: false,
                 followOriginalHttpMethod: true,
-                resolveWithFullResponse: true
-            }, function (err, res, body) {
+                followRedirect: false,
+            }).then(res => {
                 response = res.request.uri.href;
+            }).catch(e => {
+                response = e.response['headers'].location;
             });
+            console.log(`getVideoLink responding with ${response}`);
             return response;
         }
     }
@@ -930,7 +933,9 @@ class TikTokScraper extends events_1.EventEmitter {
         let shortLinkLvl1 = /vm.tiktok.com\/([\w.-]+)/;
         let shortLinkLvl2 = /m.tiktok.com\/([\w.-]+)\/(\d+)/;
         let targetLinkregex = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/;
-        url = await this.getVideoLink(url || this.input, shortLinkLvl1, targetLinkregex);
+        while (!targetLinkregex.exec(url)) {
+            url = await this.getVideoLink(url || this.input, shortLinkLvl1, shortLinkLvl2, targetLinkregex);
+        }
         const videoData = targetLinkregex.exec(url);
         if (videoData) {
             const videoUsername = videoData[1];
