@@ -1344,7 +1344,6 @@ export class TikTokScraper extends EventEmitter {
 
     private async getVideoLink(url: string, regex: RegExp, regexlvl2:RegExp, targetRegex :RegExp) {
 
-        console.log(`getVideoLink received ${url}`)
         // return immediately if url matchs target regex
        if (targetRegex.exec(url)){
            return url
@@ -1353,13 +1352,10 @@ export class TikTokScraper extends EventEmitter {
         let isShortLinkLvl = regex.exec(url) || regexlvl2.exec(url);
         if (isShortLinkLvl) {
             const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-
             let headers = {
                 'User-Agent' : userAgent,
-        
             }
             var response:any = null
-            console.log('requesting long url ...')
             await rp({
                 url: url,
                 headers:headers,
@@ -1373,7 +1369,8 @@ export class TikTokScraper extends EventEmitter {
             }).catch(e=>{
                 response =  e.response['headers'].location
             });
-            console.log(`getVideoLink responding with ${response}`)
+            
+            response = response.split('?')[0]
             return response
         }
     }
@@ -1383,6 +1380,8 @@ export class TikTokScraper extends EventEmitter {
      */
     private async getVideoMetadata(url = ''): Promise<FeedItems> {
 
+        let count = 0
+
         // test new tiktok post shortlinks
         let shortLinkLvl1 = /vm.tiktok.com\/([\w.-]+)/
         let shortLinkLvl2 = /m.tiktok.com\/([\w.-]+)\/(\d+)/
@@ -1391,7 +1390,15 @@ export class TikTokScraper extends EventEmitter {
         // test and solve for short and long URLs
         while(!targetLinkregex.exec(url)){
             url = await this.getVideoLink(url || this.input, shortLinkLvl1,shortLinkLvl2, targetLinkregex)
+            count +=1
+
+            //infinite loop safe guard
+            if(count > 3){
+                break;
+            }
         }
+
+        
         
         const videoData = targetLinkregex.exec(url);
         if (videoData) {
