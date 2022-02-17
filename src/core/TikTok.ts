@@ -1415,6 +1415,8 @@ export class TikTokScraper extends EventEmitter {
             try {
                 const response = await this.request<VideoMetadata>(options);
                 if (response.statusCode === 0) {
+                    // adding the generated url in the response item
+                    response.itemInfo.itemStruct['longUrl']=url
                     return response.itemInfo.itemStruct;
                 }
             } catch (err) {
