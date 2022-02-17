@@ -914,14 +914,13 @@ class TikTokScraper extends events_1.EventEmitter {
             await request_promise_1.default({
                 url: url,
                 headers: headers,
-                method: 'GET',
+                method: 'HEAD',
                 followAllRedirects: false,
-                followOriginalHttpMethod: true,
                 followRedirect: false,
             }).then(res => {
                 response = res.request.uri.href;
             }).catch(e => {
-                response = e.response['headers'].location;
+                response = e.response.location;
             });
             response = response.split('?')[0];
             return response;
