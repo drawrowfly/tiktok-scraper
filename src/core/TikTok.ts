@@ -1369,7 +1369,7 @@ export class TikTokScraper extends EventEmitter {
             }).catch(e=>{
                 response =  e.response['headers'].location
             });
-            
+
             response = response.split('?')[0]
             return response
         }
@@ -1391,6 +1391,7 @@ export class TikTokScraper extends EventEmitter {
         while(!targetLinkregex.exec(url)){
             url = await this.getVideoLink(url || this.input, shortLinkLvl1,shortLinkLvl2, targetLinkregex)
             count +=1
+            console.log('url is', url)
 
             //infinite loop safe guard
             if(count > 3){
