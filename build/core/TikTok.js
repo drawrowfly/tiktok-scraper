@@ -901,7 +901,6 @@ class TikTokScraper extends events_1.EventEmitter {
         }
     }
     async getVideoLink(url, regex, regexlvl2, targetRegex) {
-        console.log(`getVideoLink received ${url}`);
         if (targetRegex.exec(url)) {
             return url;
         }
@@ -912,7 +911,6 @@ class TikTokScraper extends events_1.EventEmitter {
                 'User-Agent': userAgent,
             };
             var response = null;
-            console.log('requesting long url ...');
             await request_promise_1.default({
                 url: url,
                 headers: headers,
@@ -925,16 +923,22 @@ class TikTokScraper extends events_1.EventEmitter {
             }).catch(e => {
                 response = e.response['headers'].location;
             });
-            console.log(`getVideoLink responding with ${response}`);
+            response = response.split('?')[0];
             return response;
         }
     }
     async getVideoMetadata(url = '') {
+        let count = 0;
         let shortLinkLvl1 = /vm.tiktok.com\/([\w.-]+)/;
         let shortLinkLvl2 = /m.tiktok.com\/([\w.-]+)\/(\d+)/;
         let targetLinkregex = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/;
         while (!targetLinkregex.exec(url)) {
             url = await this.getVideoLink(url || this.input, shortLinkLvl1, shortLinkLvl2, targetLinkregex);
+            count += 1;
+            console.log('url is', url);
+            if (count > 3) {
+                break;
+            }
         }
         const videoData = targetLinkregex.exec(url);
         if (videoData) {
@@ -948,6 +952,7 @@ class TikTokScraper extends events_1.EventEmitter {
             try {
                 const response = await this.request(options);
                 if (response.statusCode === 0) {
+                    response.itemInfo.itemStruct['longUrl'] = url;
                     return response.itemInfo.itemStruct;
                 }
             }
@@ -1003,6 +1008,7 @@ class TikTokScraper extends events_1.EventEmitter {
                 duration: videoData.music.duration,
             },
             imageUrl: videoData.video.cover,
+            longUrl: videoData.longUrl,
             videoUrl: videoData.video.playAddr,
             videoUrlNoWaterMark: '',
             videoApiUrlNoWaterMark: '',

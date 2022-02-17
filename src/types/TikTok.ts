@@ -139,6 +139,7 @@ export interface PostCollector {
         dynamic: string;
     };
     imageUrl?: string;
+    longUrl?: string;
     webVideoUrl?: string;
     videoUrl: string;
     videoUrlNoWaterMark?: string;
