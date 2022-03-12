@@ -17,7 +17,6 @@ import {
     PostCollector,
     History,
     HistoryItem,
-    MusicMetadata,
 } from './types';
 import CONST from './constant';
 import { makeVerifyFp } from './helpers';
@@ -140,7 +139,7 @@ export const getHashtagInfo = async (input: string, options = {} as Options): Pr
     return result;
 };
 
-export const getMusicInfo = async (input: string, options = {} as Options): Promise<MusicMetadata> => {
+export const getMusicInfo = async (input: string, options = {} as Options): Promise<string> => {
     if (options && typeof options !== 'object') {
         throw new TypeError('Object is expected');
     }

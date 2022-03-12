@@ -21,7 +21,6 @@ import {
     ScrapeType,
     TikTokConstructor,
     Result,
-    MusicMetadata,
     RequestQuery,
     History,
     Proxy,
@@ -1123,7 +1122,7 @@ export class TikTokScraper extends EventEmitter {
      * Get music information
      * @param {} music link
      */
-    public async getMusicInfo(): Promise<MusicMetadata> {
+    public async getMusicInfo(): Promise<string> {
         if (!this.input) {
             throw new Error(`Music is missing`);
         }
@@ -1131,7 +1130,7 @@ export class TikTokScraper extends EventEmitter {
         const musicTitle = /music\/([\w-]+)-\d+/.exec(this.input);
         const musicId = /music\/[\w-]+-(\d+)/.exec(this.input);
 
-        const query = {
+        /* const query = {
             uri: `https://www.tiktok.com/node/share/music/${musicTitle ? musicTitle[1] : ''}-${musicId ? musicId[1] : ''}`,
             qs: {
                 screen_width: 1792,
@@ -1154,22 +1153,38 @@ export class TikTokScraper extends EventEmitter {
             },
             method: 'GET',
             json: true,
+        }; */
+
+        const options = {
+            method: 'GET',
+            uri: `https://www.tiktok.com/music/${musicTitle ? musicTitle[1] : ''}-${musicId ? musicId[1] : ''}`,
+            json: true,
         };
 
-        const unsignedURL = `${query.uri}?${new URLSearchParams(query.qs as any).toString()}`;
-        const _signature = sign(unsignedURL, this.headers['user-agent']);
-
-        // @ts-ignore
-        query.qs._signature = _signature;
-
-        try {
-            const response = await this.request<TikTokMetadata>(query);
+        /* try {
+            const response = await this.request(options);
+            const breakResponse = response
+                .split(/<script id="sigi-persisted-data">/)[1]
+                .split(`</script>`)[0];
+            if (breakResponse) {
+                const musicMetadata = JSON.parse(breakResponse);
+                return musicMetadata.props.pageProps.musicInfo;
+            }
+        } */ /* try {
+            const response = await this.request<TikTokMetadata>(options);
             if (response.statusCode !== 0) {
                 throw new Error(`Can't find music data: ${this.input}`);
             }
             return response.musicInfo;
-        } catch (error) {
-            throw new Error(error.message);
+        } */try {
+            const response = await this.request<string>(options);
+            const breakResponse = response
+                .split(/<script id="sigi-persisted-data">/)[1]
+                .split(`</script>`)[0];
+            const musicMetadata = JSON.parse(breakResponse);
+            return musicMetadata.props.pageProps.musicInfo;
+        }catch (error) {
+            throw new Error();
         }
     }
 
@@ -1189,7 +1204,7 @@ export class TikTokScraper extends EventEmitter {
      * This method can be used if you aren't able to retrieve video metadata from a simple API call
      * Can be slow
      */
-    private async getVideoMetadataFromHtml(): Promise<FeedItems> {
+    /* private async getVideoMetadataFromHtml(): Promise<FeedItems> {
         const options = {
             uri: this.input,
             method: 'GET',
@@ -1201,7 +1216,7 @@ export class TikTokScraper extends EventEmitter {
                 throw new Error(`Can't extract video meta data`);
             }
 
-            if (response.includes("__NEXT_DATA__")){
+            if (response.includes('__NEXT_DATA__')) {
                 const rawVideoMetadata = response
                     .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
                     .split(`</script>`)[0];
@@ -1211,23 +1226,21 @@ export class TikTokScraper extends EventEmitter {
                 return videoData as FeedItems;
             }
 
-            if (response.includes("SIGI_STATE")) {
+            if (response.includes('SIGI_STATE')) {
                 // Sometimes you may receive a state in different format, so we should parse it too
                 // New format - https://pastebin.com/WLUpL0ei
-                const rawVideoMetadata = response
-                    .split("window['SIGI_STATE']=")[1]
-                    .split(";window['SIGI_RETRY']=")[0];
+                const rawVideoMetadata = response.split("window['SIGI_STATE']=")[1].split(";window['SIGI_RETRY']=")[0];
 
                 const videoProps = JSON.parse(rawVideoMetadata);
                 const videoData = Object.values(videoProps.ItemModule)[0];
                 return videoData as FeedItems;
             }
 
-            throw new Error('No available parser for html page')
+            throw new Error('No available parser for html page');
         } catch (error) {
             throw new Error(`Can't extract video metadata: ${this.input}`);
         }
-    }
+    } */
 
     /**
      * Get video metadata from the regular API endpoint
@@ -1270,8 +1283,6 @@ export class TikTokScraper extends EventEmitter {
 
         let videoData = {} as FeedItems;
         if (html) {
-            videoData = await this.getVideoMetadataFromHtml();
-        } else {
             videoData = await this.getVideoMetadata();
         }
 
