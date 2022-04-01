@@ -1203,12 +1203,59 @@ export class TikTokScraper extends EventEmitter {
         const response = await this.request<string>(options);
         let parsedResponse = JSON.parse(response)
         let emptyResponse = _.isEmpty(_.get(parsedResponse, 'userInfo'))
+        let statusCode = _.get(parsedResponse, 'statusCode')
         if (!emptyResponse) {
             const userMetadata = parsedResponse;
             return userMetadata.userInfo;
         }
         if (emptyResponse) {
-            throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
+            /**
+             * {
+  "0": "OK",
+  "450": "CLIENT_PAGE_ERROR",
+  "10000": "VERIFY_CODE",
+  "10101": "SERVER_ERROR_NOT_500",
+  "10102": "USER_NOT_LOGIN",
+  "10111": "NET_ERROR",
+  "10113": "SHARK_SLIDE",
+  "10114": "SHARK_BLOCK",
+  "10119": "LIVE_NEED_LOGIN",
+  "10202": "USER_NOT_EXIST",
+  "10203": "MUSIC_NOT_EXIST",
+  "10204": "VIDEO_NOT_EXIST",
+  "10205": "HASHTAG_NOT_EXIST",
+  "10208": "EFFECT_NOT_EXIST",
+  "10209": "HASHTAG_BLACK_LIST",
+  "10210": "LIVE_NOT_EXIST",
+  "10211": "HASHTAG_SENSITIVITY_WORD",
+  "10212": "HASHTAG_UNSHELVE",
+  "10213": "VIDEO_LOW_AGE_M",
+  "10214": "VIDEO_LOW_AGE_T",
+  "10215": "VIDEO_ABNORMAL",
+  "10216": "VIDEO_PRIVATE_BY_USER",
+  "10217": "VIDEO_FIRST_REVIEW_UNSHELVE",
+  "10218": "MUSIC_UNSHELVE",
+  "10219": "MUSIC_NO_COPYRIGHT",
+  "10220": "VIDEO_UNSHELVE_BY_MUSIC",
+  "10221": "USER_BAN",
+  "10222": "USER_PRIVATE",
+  "10223": "USER_FTC",
+  "10224": "GAME_NOT_EXIST",
+  "10225": "USER_UNIQUE_SENSITIVITY",
+  "10227": "VIDEO_NEED_RECHECK",
+  "10228": "VIDEO_RISK",
+  "10229": "VIDEO_R_MASK",
+  "10230": "VIDEO_RISK_MASK",
+  "10231": "VIDEO_GEOFENCE_BLOCK",
+  "10404": "FYP_VIDEO_LIST_LIMIT",
+  "undefined": "MEDIA_ERROR"
+}
+             */
+            switch(statusCode){
+                case 10202 :  throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
+                default : throw new Error(`Error code  ${statusCode}`);
+
+            }  
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }

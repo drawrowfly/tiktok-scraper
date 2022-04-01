@@ -1,15 +1,28 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TikTokScraper = void 0;
 const request_promise_1 = __importDefault(require("request-promise"));
 const os_1 = require("os");
 const fs_1 = require("fs");
@@ -790,12 +803,16 @@ class TikTokScraper extends events_1.EventEmitter {
         const response = await this.request(options);
         let parsedResponse = JSON.parse(response);
         let emptyResponse = _.isEmpty(_.get(parsedResponse, 'userInfo'));
+        let statusCode = _.get(parsedResponse, 'statusCode');
         if (!emptyResponse) {
             const userMetadata = parsedResponse;
             return userMetadata.userInfo;
         }
         if (emptyResponse) {
-            throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
+            switch (statusCode) {
+                case 10202: throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
+                default: throw new Error(`Error code  ${statusCode}`);
+            }
         }
         throw new Error(`Can't extract user metadata from the html page. Make sure that user does exist and try to use proxy`);
     }
