@@ -1263,10 +1263,10 @@ export class TikTokScraper extends EventEmitter {
 }
              */
             switch(statusCode){
-                case 10202 :  throw new Error(`10202 User Profile [userInfo] returned empty, probably User does not exist`);
-                case 404 :  throw new Error(`404 User Profile [userInfo] returned empty, probably User does not exist`);
-                case 200 : throw new Error(`transient error`);
-                default : throw new Error(`Error code  ${statusCode}`);
+                case 10202 :  
+                case 404 :  throw new Error(`${statusCode} User does not exist`);
+                case 200 :
+                default : throw new Error(`${statusCode} transient error`);
 
             }  
         }
