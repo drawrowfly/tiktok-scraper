@@ -809,8 +809,20 @@ class TikTokScraper extends events_1.EventEmitter {
             return userMetadata.userInfo;
         }
         if (emptyResponse) {
+            options['uri'] = `http://tiktok.com/@${this.input}`;
+            options['method'] = 'head';
+            options['resolveWithFullResponse'] = true;
+            try {
+                let headResponse = await request_promise_1.default(options);
+                statusCode = headResponse.statusCode;
+            }
+            catch (e) {
+                statusCode = Object(e)['statusCode'];
+            }
             switch (statusCode) {
-                case 10202: throw new Error(`User Profile [userInfo] returned empty, probably User does not exist`);
+                case 10202: throw new Error(`10202 User Profile [userInfo] returned empty, probably User does not exist`);
+                case 404: throw new Error(`404 User Profile [userInfo] returned empty, probably User does not exist`);
+                case 200: throw new Error(`transient error`);
                 default: throw new Error(`Error code  ${statusCode}`);
             }
         }
