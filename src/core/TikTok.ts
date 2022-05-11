@@ -457,7 +457,8 @@ export class TikTokScraper extends EventEmitter {
             forEachLimit(
                 this.collector,
                 5,
-                async (item: PostCollector) => {
+                async (post: PostCollector) => {
+                    const item = post;
                     try {
                         item.videoApiUrlNoWaterMark = await this.extractVideoId(item);
                         item.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(item.videoApiUrlNoWaterMark!);
@@ -467,7 +468,7 @@ export class TikTokScraper extends EventEmitter {
                 },
                 err => {
                     if (err) {
-                        return reject(err);
+                        reject(err);
                     }
 
                     resolve(null);
@@ -581,7 +582,7 @@ export class TikTokScraper extends EventEmitter {
                 },
                 err => {
                     if (err && err !== true) {
-                        return reject(err);
+                        reject(err);
                     }
 
                     resolve(null);
@@ -705,7 +706,8 @@ export class TikTokScraper extends EventEmitter {
             // continue regardless of error
         }
 
-        this.collector = this.collector.map(item => {
+        this.collector = this.collector.map(video => {
+            const item = video;
             if (this.store.indexOf(item.id) !== -1) {
                 item.repeated = true;
             }
@@ -782,106 +784,96 @@ export class TikTokScraper extends EventEmitter {
         const result = {
             done: false,
         };
-        for (let i = 0; i < posts.length; i += 1) {
-            if (result.done) {
-                break;
-            }
-
+        for (let i = 0; i < posts.length && !result.done; i += 1) {
             if (this.since && posts[i].createTime < this.since) {
                 result.done = CONST.chronologicalTypes.indexOf(this.scrapeType) !== -1;
+            } else {
+                if (this.noDuplicates.indexOf(posts[i].id) === -1) {
+                    this.noDuplicates.push(posts[i].id);
+                    const item: PostCollector = {
+                        id: posts[i].id,
+                        secretID: posts[i].video.id,
+                        text: posts[i].desc,
+                        createTime: posts[i].createTime,
+                        authorMeta: {
+                            id: posts[i].author.id,
+                            secUid: posts[i].author.secUid,
+                            name: posts[i].author.uniqueId,
+                            nickName: posts[i].author.nickname,
+                            verified: posts[i].author.verified,
+                            signature: posts[i].author.signature,
+                            avatar: posts[i].author.avatarLarger,
+                            following: posts[i].authorStats.followingCount,
+                            fans: posts[i].authorStats.followerCount,
+                            heart: posts[i].authorStats.heartCount,
+                            video: posts[i].authorStats.videoCount,
+                            digg: posts[i].authorStats.diggCount,
+                        },
+                        ...(posts[i].music
+                            ? {
+                                  musicMeta: {
+                                      musicId: posts[i].music.id,
+                                      musicName: posts[i].music.title,
+                                      musicAuthor: posts[i].music.authorName,
+                                      musicOriginal: posts[i].music.original,
+                                      musicAlbum: posts[i].music.album,
+                                      playUrl: posts[i].music.playUrl,
+                                      coverThumb: posts[i].music.coverThumb,
+                                      coverMedium: posts[i].music.coverMedium,
+                                      coverLarge: posts[i].music.coverLarge,
+                                      duration: posts[i].music.duration,
+                                  },
+                              }
+                            : {}),
+                        covers: {
+                            default: posts[i].video.cover,
+                            origin: posts[i].video.originCover,
+                            dynamic: posts[i].video.dynamicCover,
+                        },
+                        webVideoUrl: `https://www.tiktok.com/@${posts[i].author.uniqueId}/video/${posts[i].id}`,
+                        videoUrl: posts[i].video.downloadAddr,
+                        videoUrlNoWaterMark: '',
+                        videoApiUrlNoWaterMark: '',
+                        videoMeta: {
+                            height: posts[i].video.height,
+                            width: posts[i].video.width,
+                            duration: posts[i].video.duration,
+                        },
+                        diggCount: posts[i].stats.diggCount,
+                        shareCount: posts[i].stats.shareCount,
+                        playCount: posts[i].stats.playCount,
+                        commentCount: posts[i].stats.commentCount,
+                        downloaded: false,
+                        mentions: posts[i].desc.match(/(@\w+)/g) || [],
+                        hashtags: posts[i].challenges
+                            ? posts[i].challenges.map(({ id, title, desc, coverLarger }) => ({
+                                  id,
+                                  name: title,
+                                  title: desc,
+                                  cover: coverLarger,
+                              }))
+                            : [],
+                        effectStickers: posts[i].effectStickers
+                            ? posts[i].effectStickers.map(({ ID, name }) => ({
+                                  id: ID,
+                                  name,
+                              }))
+                            : [],
+                    };
 
-                if (result.done) {
-                    break;
-                } else {
-                    continue;
+                    if (this.event) {
+                        this.emit('data', item);
+                        this.collector.push({} as PostCollector);
+                    } else {
+                        this.collector.push(item);
+                    }
                 }
-            }
 
-            if (this.noDuplicates.indexOf(posts[i].id) === -1) {
-                this.noDuplicates.push(posts[i].id);
-                const item: PostCollector = {
-                    id: posts[i].id,
-                    secretID: posts[i].video.id,
-                    text: posts[i].desc,
-                    createTime: posts[i].createTime,
-                    authorMeta: {
-                        id: posts[i].author.id,
-                        secUid: posts[i].author.secUid,
-                        name: posts[i].author.uniqueId,
-                        nickName: posts[i].author.nickname,
-                        verified: posts[i].author.verified,
-                        signature: posts[i].author.signature,
-                        avatar: posts[i].author.avatarLarger,
-                        following: posts[i].authorStats.followingCount,
-                        fans: posts[i].authorStats.followerCount,
-                        heart: posts[i].authorStats.heartCount,
-                        video: posts[i].authorStats.videoCount,
-                        digg: posts[i].authorStats.diggCount,
-                    },
-                    ...(posts[i].music
-                        ? {
-                              musicMeta: {
-                                  musicId: posts[i].music.id,
-                                  musicName: posts[i].music.title,
-                                  musicAuthor: posts[i].music.authorName,
-                                  musicOriginal: posts[i].music.original,
-                                  musicAlbum: posts[i].music.album,
-                                  playUrl: posts[i].music.playUrl,
-                                  coverThumb: posts[i].music.coverThumb,
-                                  coverMedium: posts[i].music.coverMedium,
-                                  coverLarge: posts[i].music.coverLarge,
-                                  duration: posts[i].music.duration,
-                              },
-                          }
-                        : {}),
-                    covers: {
-                        default: posts[i].video.cover,
-                        origin: posts[i].video.originCover,
-                        dynamic: posts[i].video.dynamicCover,
-                    },
-                    webVideoUrl: `https://www.tiktok.com/@${posts[i].author.uniqueId}/video/${posts[i].id}`,
-                    videoUrl: posts[i].video.downloadAddr,
-                    videoUrlNoWaterMark: '',
-                    videoApiUrlNoWaterMark: '',
-                    videoMeta: {
-                        height: posts[i].video.height,
-                        width: posts[i].video.width,
-                        duration: posts[i].video.duration,
-                    },
-                    diggCount: posts[i].stats.diggCount,
-                    shareCount: posts[i].stats.shareCount,
-                    playCount: posts[i].stats.playCount,
-                    commentCount: posts[i].stats.commentCount,
-                    downloaded: false,
-                    mentions: posts[i].desc.match(/(@\w+)/g) || [],
-                    hashtags: posts[i].challenges
-                        ? posts[i].challenges.map(({ id, title, desc, coverLarger }) => ({
-                              id,
-                              name: title,
-                              title: desc,
-                              cover: coverLarger,
-                          }))
-                        : [],
-                    effectStickers: posts[i].effectStickers
-                        ? posts[i].effectStickers.map(({ ID, name }) => ({
-                              id: ID,
-                              name,
-                          }))
-                        : [],
-                };
-
-                if (this.event) {
-                    this.emit('data', item);
-                    this.collector.push({} as PostCollector);
-                } else {
-                    this.collector.push(item);
-                }
-            }
-
-            if (this.number) {
-                if (this.collector.length >= this.number) {
-                    result.done = true;
-                    break;
+                if (this.number) {
+                    if (this.collector.length >= this.number) {
+                        result.done = true;
+                        break;
+                    }
                 }
             }
         }
@@ -1201,7 +1193,7 @@ export class TikTokScraper extends EventEmitter {
                 throw new Error(`Can't extract video meta data`);
             }
 
-            if (response.includes("__NEXT_DATA__")){
+            if (response.includes('__NEXT_DATA__')) {
                 const rawVideoMetadata = response
                     .split(/<script id="__NEXT_DATA__" type="application\/json" nonce="[\w-]+" crossorigin="anonymous">/)[1]
                     .split(`</script>`)[0];
@@ -1219,7 +1211,7 @@ export class TikTokScraper extends EventEmitter {
                 return videoData as FeedItems;
             }
 
-            throw new Error('No available parser for html page')
+            throw new Error('No available parser for html page');
         } catch (error) {
             throw new Error(`Can't extract video metadata: ${this.input}`);
         }
