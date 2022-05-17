@@ -431,7 +431,7 @@ export class TikTokScraper extends EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version v2.1.1')
+        console.log('version v2.3')
         await this.mainLoop();
 
         if (this.event) {
