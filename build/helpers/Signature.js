@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sign = void 0;
 const jsdom_1 = require("jsdom");
 function sign(url, userAgent) {
     const resourceLoader = new jsdom_1.ResourceLoader({

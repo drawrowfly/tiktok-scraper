@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeVerifyFp = exports.makeidHex = exports.makeid = void 0;
 exports.makeid = (len) => {
     let text = '';
     const char_list = '0123456789';

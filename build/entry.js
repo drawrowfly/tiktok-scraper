@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromfile = exports.history = exports.video = exports.getVideoMeta = exports.signUrl = exports.getUserProfileInfo = exports.getMusicInfo = exports.getHashtagInfo = exports.trendEvent = exports.musicEvent = exports.userEvent = exports.hashtagEvent = exports.music = exports.trend = exports.user = exports.hashtag = void 0;
 const os_1 = require("os");
 const fs_1 = require("fs");
 const bluebird_1 = require("bluebird");

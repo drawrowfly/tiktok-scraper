@@ -17,6 +17,7 @@ import { URLSearchParams } from 'url';
 import CONST from '../constant';
 import { sign, makeid } from '../helpers';
 import * as _ from "lodash";
+import * as HTMLParser from 'node-html-parser';
 
 import {
     PostCollector,
@@ -430,7 +431,7 @@ export class TikTokScraper extends EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version v2.1.1')
+        console.log('version v2.3')
         await this.mainLoop();
 
         if (this.event) {
@@ -1193,14 +1194,42 @@ export class TikTokScraper extends EventEmitter {
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
-        let url = `https://m.tiktok.com/node/share/user/@${this.input}?`
-        let signature = await this.signGivenUrl(url)
-        let signedUrl = `${url}&_signature=${signature}`
+        let userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'
+        let url = `https://www.tiktok.com/@${this.input}?`
         const options = {
+            url:url,
             method: 'GET',
-            uri: signedUrl
+        'headers':{
+            'User-Agent':userAgent,
+            'Connection': 'keep-alive',
+            "accept": "*/*",
+            "accept-language": "en-US,en;q=0.9",}
+        
         };
-        const response = await this.request<string>(options);
+
+        console.log('firing request')
+        const response = await rp(url,options);
+
+        console.log('received response', resolve)
+        // Get data from HTML content
+        let root = HTMLParser.parse(response);
+        let appContext = root.querySelector('#SIGI_STATE') 
+
+        if(appContext && appContext.text) 
+        {
+            let _json = JSON.parse(appContext.text).UserModule
+
+            let profileData = Object.values(_.get(_json,`users`))[0]
+            let statsData = Object.values(_.get(_json,`stats`))[0]
+            let data:any  = {user:{}, stats:{}, shareMeta:{}}
+            _.assign(data, { user: profileData })
+            _.assign(data, { stats: statsData })
+            return data
+        }  
+
+
+
+
         let parsedResponse = JSON.parse(response)
         let emptyResponse = _.isEmpty(_.get(parsedResponse, 'userInfo'))
         let statusCode = _.get(parsedResponse, 'statusCode')
