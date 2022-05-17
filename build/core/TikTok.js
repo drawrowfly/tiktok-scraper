@@ -1,28 +1,15 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TikTokScraper = void 0;
 const request_promise_1 = __importDefault(require("request-promise"));
 const os_1 = require("os");
 const fs_1 = require("fs");
@@ -36,6 +23,7 @@ const url_1 = require("url");
 const constant_1 = __importDefault(require("../constant"));
 const helpers_1 = require("../helpers");
 const _ = __importStar(require("lodash"));
+const HTMLParser = __importStar(require("node-html-parser"));
 const core_1 = require("../core");
 class TikTokScraper extends events_1.EventEmitter {
     constructor({ download, filepath, filetype, proxy, strictSSL = true, asyncDownload, cli = false, event = false, progress = false, input, number, since, type, by_user_id = false, store_history = false, historyPath = '', noWaterMark = false, useTestEndpoints = false, fileName = '', timeout = 0, bulk = false, zip = false, test = false, hdVideo = false, webHookUrl = '', method = 'POST', headers, verifyFp = '', sessionList = [], }) {
@@ -793,14 +781,32 @@ class TikTokScraper extends events_1.EventEmitter {
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
-        let url = `https://m.tiktok.com/node/share/user/@${this.input}?`;
-        let signature = await this.signGivenUrl(url);
-        let signedUrl = `${url}&_signature=${signature}`;
+        let userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36';
+        let url = `https://www.tiktok.com/@${this.input}?`;
         const options = {
+            url: url,
             method: 'GET',
-            uri: signedUrl
+            'headers': {
+                'User-Agent': userAgent,
+                'Connection': 'keep-alive',
+                "accept": "*/*",
+                "accept-language": "en-US,en;q=0.9",
+            }
         };
-        const response = await this.request(options);
+        console.log('firing request');
+        const response = await request_promise_1.default(url, options);
+        console.log('received response', bluebird_1.resolve);
+        let root = HTMLParser.parse(response);
+        let appContext = root.querySelector('#SIGI_STATE');
+        if (appContext && appContext.text) {
+            let _json = JSON.parse(appContext.text).UserModule;
+            let profileData = Object.values(_.get(_json, `users`))[0];
+            let statsData = Object.values(_.get(_json, `stats`))[0];
+            let data = { user: {}, stats: {}, shareMeta: {} };
+            _.assign(data, { user: profileData });
+            _.assign(data, { stats: statsData });
+            return data;
+        }
         let parsedResponse = JSON.parse(response);
         let emptyResponse = _.isEmpty(_.get(parsedResponse, 'userInfo'));
         let statusCode = _.get(parsedResponse, 'statusCode');
