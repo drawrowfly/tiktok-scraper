@@ -1210,6 +1210,7 @@ export class TikTokScraper extends EventEmitter {
         };
 
         !_.isNil(this.proxy) ? _.extend(options,{proxy:this.proxy}) : ''
+        console.log('using proxy', this.proxy)
 
 
         const response = await rp(url,options);
