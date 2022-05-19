@@ -431,7 +431,7 @@ export class TikTokScraper extends EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version v2.3')
+        console.log('version v2.4')
         await this.mainLoop();
 
         if (this.event) {
@@ -1199,18 +1199,20 @@ export class TikTokScraper extends EventEmitter {
         const options = {
             url:url,
             method: 'GET',
+            "rejectUnauthorized": false,
+
         'headers':{
             'User-Agent':userAgent,
             'Connection': 'keep-alive',
             "accept": "*/*",
-            "accept-language": "en-US,en;q=0.9",}
-        
+            "accept-language": "en-US,en;q=0.9",
+        }
         };
 
-        console.log('firing request')
-        const response = await rp(url,options);
+        !_.isNil(this.proxy) ? _.extend(options,{proxy:this.proxy}) : ''
 
-        console.log('received response', resolve)
+
+        const response = await rp(url,options);
         // Get data from HTML content
         let root = HTMLParser.parse(response);
         let appContext = root.querySelector('#SIGI_STATE') 
