@@ -431,7 +431,7 @@ export class TikTokScraper extends EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version v2.4')
+        console.log('version v2.6')
         await this.mainLoop();
 
         if (this.event) {
@@ -1210,7 +1210,7 @@ export class TikTokScraper extends EventEmitter {
         };
 
         !_.isNil(this.proxy) ? _.extend(options,{proxy:this.proxy}) : ''
-        console.log('using proxy', this.proxy)
+        console.log('using proxy ...', this.proxy)
 
 
         const response = await rp(url,options);
