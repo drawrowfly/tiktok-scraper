@@ -232,7 +232,7 @@ class TikTokScraper extends events_1.EventEmitter {
         if (this.scrapeType !== 'trend' && !this.input) {
             return this.returnInitError('Missing input');
         }
-        console.log('version v2.4');
+        console.log('version v2.6');
         await this.mainLoop();
         if (this.event) {
             return this.emit('done', 'completed');
@@ -795,6 +795,7 @@ class TikTokScraper extends events_1.EventEmitter {
             }
         };
         !_.isNil(this.proxy) ? _.extend(options, { proxy: this.proxy }) : '';
+        console.log('using proxy ...', this.proxy);
         const response = await request_promise_1.default(url, options);
         let root = HTMLParser.parse(response);
         let appContext = root.querySelector('#SIGI_STATE');
