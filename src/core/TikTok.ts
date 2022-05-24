@@ -1143,7 +1143,7 @@ export class TikTokScraper extends EventEmitter {
         if (this.byUserId || this.idStore) {
             return {
                 secUid: '',
-                id: this.userIdStore,
+                id: this.input,
                 type: 1,
                 // aid: 1988,
                 count: 30,

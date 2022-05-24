@@ -751,7 +751,7 @@ class TikTokScraper extends events_1.EventEmitter {
         if (this.byUserId || this.idStore) {
             return {
                 secUid: '',
-                id: this.userIdStore,
+                id: this.input,
                 type: 1,
                 count: 30,
                 minCursor: 0,
