@@ -777,6 +777,7 @@ class TikTokScraper extends events_1.EventEmitter {
         }
     }
     async getUserProfileInfo() {
+        console.log('running version -- v2.8');
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
