@@ -1191,6 +1191,7 @@ export class TikTokScraper extends EventEmitter {
      * @param {} username
      */
     public async getUserProfileInfo(): Promise<UserMetadata> {
+        console.log('branch -- v2.8')
         if (!this.input) {
             throw new Error(`Username is missing`);
         }
