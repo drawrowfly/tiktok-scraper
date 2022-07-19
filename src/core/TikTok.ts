@@ -1538,7 +1538,7 @@ export class TikTokScraper extends EventEmitter {
                 id: videoData.author.id,
                 secUid: videoData.author.secUid,
                 name: videoData.author.uniqueId,
-                nickName: videoData.author.nickName,
+                nickName: videoData.author.nickname,
                 following: videoData.authorStats.followingCount,
                 fans: videoData.authorStats.followerCount,
                 heart: videoData.authorStats.heartCount,
