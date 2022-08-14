@@ -512,29 +512,25 @@ export class TikTokScraper extends EventEmitter {
     /**
      * Get temporary url to the video without the watermark
      * The url has expiration time (between 5-20 minutes+-)
-     * @param uri
+     * @param id
      */
-    private async getUrlWithoutTheWatermark(uri: string): Promise<string> {
-        if (!uri) {
+    private async getUrlWithoutTheWatermark(id: string): Promise<string> {
+        if (!id) {
             return '';
-        }
+        };
+        
         const options = {
-            uri,
+            uri: `https://api2.musical.ly/aweme/v1/aweme/detail/?aweme_id=${id}`,
             method: 'GET',
-            headers: {
-                'user-agent':
-                    'com.zhiliaoapp.musically/2021600040 (Linux; U; Android 5.0; en_US; SM-N900T; Build/LRX21V; Cronet/TTNetVersion:6c7b701a 2020-04-23 QuicVersion:0144d358 2020-03-24)',
-                'sec-fetch-mode': 'navigate',
-            },
-            followAllRedirects: true,
-            simple: false,
         };
 
         try {
-            const response: {
-                request: { uri: { href: string } };
-            } = await this.request(options, false);
-            return response.request.uri.href;
+            const response = await this.request(options, false);
+            const responseJson = JSON.parse(response);
+
+            return responseJson.aweme_detail.video.bit_rate[0].play_addr.url_list[2] || 
+                responseJson.aweme_detail.video.bit_rate[0].play_addr.url_list[1] ||
+                responseJson.aweme_detail.video.bit_rate[0].play_addr.url_list[0];
         } catch (err) {
             throw new Error(`Can't extract video url without the watermark`);
         }
@@ -1342,8 +1338,8 @@ export class TikTokScraper extends EventEmitter {
 
         try {
             if (this.noWaterMark) {
-                videoItem.videoApiUrlNoWaterMark = await this.extractVideoId(videoItem);
-                videoItem.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(videoItem.videoApiUrlNoWaterMark);
+                videoItem.videoApiUrlNoWaterMark = ""; // no needed, we only need videoData.id
+                videoItem.videoUrlNoWaterMark = await this.getUrlWithoutTheWatermark(videoData.id);
             }
         } catch {
             // continue regardless of error
