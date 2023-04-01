@@ -1,9 +1,9 @@
 #Building Scraper
-FROM alpine:latest AS tiktok_scraper.build
+FROM node:12.22-alpine AS tiktok_scraper.build
 
 WORKDIR /usr/app
 
-RUN apk update && apk add --update nodejs nodejs-npm python3 pkgconfig pixman-dev 
+RUN apk update && apk add --update python3 pkgconfig pixman-dev 
 RUN apk add --update cairo-dev pango-dev make g++
 
 COPY package*.json tsconfig.json .prettierrc.js bin ./
@@ -15,11 +15,11 @@ RUN rm -rf src node_modules
 
 
 #Using Scraper
-FROM alpine:latest AS tiktok_scraper.use
+FROM node:12.22-alpine AS tiktok_scraper.use
 
 WORKDIR /usr/app
 
-RUN apk update && apk add --update nodejs nodejs-npm python3 pkgconfig pixman-dev
+RUN apk update && apk add --update python3 pkgconfig pixman-dev
 RUN apk add --update cairo-dev pango-dev make g++
 
 COPY --from=tiktok_scraper.build ./usr/app ./
