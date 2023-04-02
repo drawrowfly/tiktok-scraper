@@ -1,7 +1,4 @@
-/* eslint-disable no-underscore-dangle */
-
 import { DuetInfo } from '.';
-
 export interface ItemInfos {
     id: string;
     text: string;
@@ -29,7 +26,6 @@ export interface ItemInfos {
     isActivityItem: boolean;
     warnInfo: any[];
 }
-
 export interface AuthorInfos {
     secUid: string;
     userId: string;
@@ -42,7 +38,6 @@ export interface AuthorInfos {
     coversLarger: string[];
     isSecret: boolean;
 }
-
 export interface MusicInfos {
     musicId: string;
     musicName: string;
@@ -54,7 +49,6 @@ export interface MusicInfos {
     coversLarger: string[];
     posts: number;
 }
-
 export interface Challenge {
     challengeId: string;
     challengeName: string;
@@ -67,7 +61,6 @@ export interface Challenge {
     views: string;
     splitTitle: string;
 }
-
 export interface AuthorStats {
     followingCount: number;
     followerCount: number;
@@ -75,7 +68,6 @@ export interface AuthorStats {
     videoCount: number;
     diggCount: number;
 }
-
 export interface Item {
     itemInfos: ItemInfos;
     authorInfos: AuthorInfos;
@@ -83,7 +75,6 @@ export interface Item {
     challengeInfoList: Challenge[];
     authorStats: AuthorStats;
 }
-
 export interface RequestQuery {
     id?: string;
     musicID?: string;
@@ -140,7 +131,6 @@ export interface RequestQuery {
     device_platform?: string;
     _signature?: string;
 }
-
 export interface VideoProps {
     props: {
         pageProps: {
@@ -148,10 +138,6 @@ export interface VideoProps {
         };
     };
 }
-
-/**
- * New API
- */
 export interface ItemListData {
     statusCode: number;
     items: FeedItems[];
@@ -162,119 +148,113 @@ export interface ItemListData {
     minCursor: string;
     cursor: string;
 }
-
 export interface VideoMetadata {
     statusCode: number;
-    itemInfo: { itemStruct: FeedItems };
+    itemInfo: {
+        itemStruct: FeedItems;
+    };
 }
-
-
 export interface FeedItems {
-    itemInfos:{
-    id: string;
-    desc: string;
-    createTime: number;
-    video: {
+    itemInfos: {
         id: string;
-        height: number;
-        width: number;
-        duration: number;
-        ratio: string;
-        cover: string;
-        originCover: string;
-        dynamicCover: string;
-        playAddr: string;
-        downloadAddr: string;
-        shareCover: string[];
-    };
-    author: {
-        id: string;
-        uniqueId: string;
-        nickname: string;
-        avatarThumb: string;
-        avatarMedium: string;
-        avatarLarger: string;
-        signature: string;
-        verified: boolean;
-        secUid: string;
-        relation: number;
-        openFavorite: boolean;
-        secret: boolean;
-    };
-    music: {
-        id: string;
-        title: string;
-        playUrl: string;
-        coverThumb: string;
-        coverMedium: string;
-        coverLarge: string;
-        authorName: string;
-        original: boolean;
-        duration: number;
-        album: string;
-    };
-    challenges: {
-        id: string;
-        title: string;
         desc: string;
-        profileThumb: string;
-        profileMedium: string;
-        profileLarger: string;
-        coverThumb: string;
-        coverMedium: string;
-        coverLarger: string;
-    }[];
-    stats: {
-        diggCount: number;
-        shareCount: number;
-        commentCount: number;
-        playCount: number;
+        createTime: number;
+        video: {
+            id: string;
+            height: number;
+            width: number;
+            duration: number;
+            ratio: string;
+            cover: string;
+            originCover: string;
+            dynamicCover: string;
+            playAddr: string;
+            downloadAddr: string;
+            shareCover: string[];
+        };
+        author: {
+            id: string;
+            uniqueId: string;
+            nickname: string;
+            avatarThumb: string;
+            avatarMedium: string;
+            avatarLarger: string;
+            signature: string;
+            verified: boolean;
+            secUid: string;
+            relation: number;
+            openFavorite: boolean;
+            secret: boolean;
+        };
+        music: {
+            id: string;
+            title: string;
+            playUrl: string;
+            coverThumb: string;
+            coverMedium: string;
+            coverLarge: string;
+            authorName: string;
+            original: boolean;
+            duration: number;
+            album: string;
+        };
+        challenges: {
+            id: string;
+            title: string;
+            desc: string;
+            profileThumb: string;
+            profileMedium: string;
+            profileLarger: string;
+            coverThumb: string;
+            coverMedium: string;
+            coverLarger: string;
+        }[];
+        stats: {
+            diggCount: number;
+            shareCount: number;
+            commentCount: number;
+            playCount: number;
+        };
+        originalItem: boolean;
+        officalItem: boolean;
+        textExtra: {
+            awemeId: string;
+            start: number;
+            end: number;
+            hashtagName: string;
+            hashtagId: string;
+            type: number;
+            userId: string;
+            isCommerce: boolean;
+        }[];
+        secret: boolean;
+        forFriend: boolean;
+        digged: boolean;
+        itemCommentStatus: number;
+        showNotPass: boolean;
+        vl1: boolean;
+        authorStats: {
+            followingCount: number;
+            followerCount: number;
+            heartCount: number;
+            videoCount: number;
+            diggCount: number;
+        };
+        duetEnabled: boolean;
+        stitchEnabled: boolean;
+        duetInfo: DuetInfo;
+        effectStickers: {
+            name: string;
+            ID: string;
+        }[];
     };
-    originalItem: boolean;
-    officalItem: boolean;
-    textExtra: {
-        awemeId: string;
-        start: number;
-        end: number;
-        hashtagName: string;
-        hashtagId: string;
-        type: number;
-        userId: string;
-        isCommerce: boolean;
-    }[];
-    secret: boolean;
-    forFriend: boolean;
-    digged: boolean;
-    itemCommentStatus: number;
-    showNotPass: boolean;
-    vl1: boolean;
-    authorStats: {
-        followingCount: number;
-        followerCount: number;
-        heartCount: number;
-        videoCount: number;
-        diggCount: number;
-    };
-    duetEnabled: boolean;
-    stitchEnabled: boolean;
-    duetInfo: DuetInfo;
-    effectStickers: {
-        name: string;
-        ID: string;
-    }[];
 }
-}
-
-/**
- * __
- */
 export interface TikTokMetadata {
     statusCode: number;
     userInfo: UserMetadata;
     challengeInfo: HashtagMetadata;
     musicInfo: MusicMetadata;
 }
-
 export interface MusicMetadata {
     music: {
         id: string;
@@ -319,7 +299,6 @@ export interface MusicMetadata {
         desc: string;
     };
 }
-
 export interface UserMetadata {
     user: {
         id: string;
@@ -353,7 +332,6 @@ export interface UserMetadata {
         desc: string;
     };
 }
-
 export interface HashtagMetadata {
     challenge: {
         id: string;
@@ -367,9 +345,11 @@ export interface HashtagMetadata {
         coverLarger: string;
         isCommerce: boolean;
     };
-    stats: { videoCount: number; viewCount: number };
+    stats: {
+        videoCount: number;
+        viewCount: number;
+    };
 }
-
 export interface WebHtmlUserMetadata {
     props: {
         pageProps: {

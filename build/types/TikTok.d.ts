@@ -1,25 +1,9 @@
 import { SocksProxyAgent } from 'socks-proxy-agent';
-
-export type ScrapeType =
-    | 'user'
-    | 'hashtag'
-    | 'trend'
-    | 'music'
-    | 'discover_user'
-    | 'discover_hashtag'
-    | 'discover_music'
-    | 'single_user'
-    | 'single_hashtag'
-    | 'single_music'
-    | 'signature'
-    | 'video_meta'
-    | 'video';
-
+export declare type ScrapeType = 'user' | 'hashtag' | 'trend' | 'music' | 'discover_user' | 'discover_hashtag' | 'discover_music' | 'single_user' | 'single_hashtag' | 'single_music' | 'signature' | 'video_meta' | 'video';
 export interface Proxy {
     socks: boolean;
     proxy: string | SocksProxyAgent;
 }
-
 export interface Options {
     proxy?: string[] | string;
     sessionList?: string[];
@@ -84,23 +68,19 @@ export interface TikTokConstructor {
     verifyFp?: string;
     sessionList?: string[];
 }
-
 export interface Hashtags {
     id: string;
     name: string;
     title: string;
     cover: string[] | string;
 }
-
 export interface DuetInfo {
     duetFromId: string;
 }
-
 export interface EffectStickers {
     id: string;
     name: string;
 }
-
 export interface PostCollector {
     id: string;
     secretID: string;
@@ -163,7 +143,6 @@ export interface PostCollector {
     downloaded: boolean;
     effectStickers: EffectStickers[];
 }
-
 export interface Result {
     headers: Headers;
     collector: PostCollector[];
@@ -171,7 +150,6 @@ export interface Result {
     json?: string;
     csv?: string;
 }
-
 export interface Headers {
     'user-agent': string;
     referer?: string;
