@@ -33,6 +33,7 @@ import {
     Headers,
     WebHtmlUserMetadata,
     VideoMetadata,
+    CommentsData,
 } from '../types';
 
 import { Downloader } from '../core';
@@ -127,6 +128,8 @@ export class TikTokScraper extends EventEmitter {
 
     public cookieJar: CookieJar;
 
+    private includeComments: boolean;
+
     constructor({
         download,
         filepath,
@@ -157,6 +160,7 @@ export class TikTokScraper extends EventEmitter {
         headers,
         verifyFp = '',
         sessionList = [],
+        includeComments = false,
     }: TikTokConstructor) {
         super();
         this.userIdStore = '';
@@ -221,6 +225,7 @@ export class TikTokScraper extends EventEmitter {
             bad: 0,
         };
         this.store = [];
+        this.includeComments = includeComments;
     }
 
     /**
@@ -868,6 +873,7 @@ export class TikTokScraper extends EventEmitter {
                               name,
                           }))
                         : [],
+                    comments: [],
                 };
 
                 if (this.event) {
@@ -1271,6 +1277,27 @@ export class TikTokScraper extends EventEmitter {
             videoData = await this.getVideoMetadata();
         }
 
+        // get *all* comments of a video (paginated)
+        let commentData: CommentsData | undefined;
+        if (this.includeComments) {
+            try {
+                for (let paginationStepSize = 30, currentPage = 0; currentPage < videoData.stats.commentCount; currentPage += paginationStepSize) {
+                    const data = await this.getCommentMetadata('', currentPage, paginationStepSize);
+                    // no data could be retrieved: possibly no valid session; skip comment scraping
+                    if (data === undefined) {
+                        break;
+                    }
+                    if (commentData === undefined) {
+                        commentData = data;
+                    } else if (data.comments !== null) {
+                        commentData.comments = commentData.comments.concat(data.comments);
+                    }
+                }
+            } catch {
+                // continue regardless of error
+            }
+        }
+
         const videoItem = {
             id: videoData.id,
             secretID: videoData.video.id,
@@ -1338,6 +1365,7 @@ export class TikTokScraper extends EventEmitter {
                       name,
                   }))
                 : [],
+            comments: commentData?.comments,
         } as PostCollector;
 
         try {
@@ -1385,5 +1413,61 @@ export class TikTokScraper extends EventEmitter {
                 },
             );
         });
+    }
+
+    /**
+     * Get comment metadata from the API endpoint
+     * (only works with a valid session!)
+     */
+    private async getCommentMetadata(url = '', _cursor = 0, _count = 30): Promise<CommentsData> {
+        // abort, if no session is set
+        if (this.cookieJar.getCookieString('https://tiktok.com').indexOf('sid_tt') === -1) {
+            throw Error(`No valid session given. Can't download comments.`);
+        }
+
+        // get username and videoId from url/parameter
+        const videoData = /tiktok.com\/(@[\w.-]+)\/video\/(\d+)/.exec(url || this.input);
+        if (videoData) {
+            // const videoUsername = videoData[1];
+            const videoId = videoData[2];
+
+            // prepare api call
+            const query = {
+                method: 'GET',
+                uri: `https://www.tiktok.com/api/comment/list/`,
+                json: true,
+                followAllRedirects: true,
+                headers: {
+                    // referer: this.input ? this.input : `https://www.tiktok.com/@${videoUsername}/video/${videoId}`,
+                    cookie: this.cookieJar.getCookieString(`https://tiktok.com/`),
+                },
+                qs: {
+                    aweme_id: videoId,
+                    aid: 1988,
+                    history_len: 6,
+                    cursor: _cursor,
+                    count: _count,
+                },
+            };
+
+            // generate signature and add it to query
+            const unsignedURL = `${query.uri}?${new URLSearchParams(query.qs as any).toString()}`;
+            const _signature = sign(unsignedURL, this.headers['user-agent']);
+            // @ts-ignore
+            query.qs._signature = _signature;
+
+            // call api
+            try {
+                const response = await this.request<CommentsData>(query);
+                if (response.status_code === 0) {
+                    return response;
+                }
+            } catch (err) {
+                if (err.statusCode === 404) {
+                    throw new Error(err.string);
+                }
+            }
+        }
+        throw new Error(`Can't extract comment metadata of ${this.input}`);
     }
 }

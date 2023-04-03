@@ -171,6 +171,8 @@ Options:
                        requests. For example to your own API       [default: ""]
   --method             Receive data to your webhook url as POST or GET request
                                       [choices: "GET", "POST"] [default: "POST"]
+  --includeComments    Also save all comments when downloading a video. Needs a
+                       valid session to work.         [boolean] [default: false]
   --help               Show help                                       [boolean]
 
 Examples:
