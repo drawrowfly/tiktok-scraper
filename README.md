@@ -208,14 +208,14 @@ docker build . -t tiktok-scraper
 All files including history file will be saved in the directory(\$pwd) where you running the docker from
 
 ```sh
-docker run -v $(pwd):/usr/app/files tiktok-scraper user tiktok -d -n 5 -s
+docker run --rm -it -v $(pwd):/usr/app/files tiktok-scraper user tiktok -d -n 5 -s
 ```
 
 **Example 2:**
 All files including history file will be saved in /User/blah/downloads
 
 ```sh
-docker run -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d -n 5 -s
+docker run --rm -it -v /User/blah/downloads:/usr/app/files tiktok-scraper user tiktok -d -n 5 -s
 ```
 
 ## Module
