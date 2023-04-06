@@ -123,6 +123,7 @@ Commands:
   tiktok-scraper history       View previous download history
   tiktok-scraper from-file [file] [async]  Scrape users, hashtags, music, videos mentioned
                                 in a file. 1 value per 1 line
+  tiktok-scraper userprofile [id]          Show user metadata
 
 Options:
   --version            Show version number                             [boolean]
