@@ -17,6 +17,8 @@
         "canvas": "^2.7.0",
         "jsdom": "^16.5.3",
         "json2csv": "4.5.1",
+        "lodash": "^4.17.21",
+        "node-html-parser": "^5.3.3",
         "ora": "^4.0.2",
         "progress": "^2.0.3",
         "request": "^2.88.0",
@@ -30,6 +32,7 @@
         "@types/jest": "^25.1.4",
         "@types/jsdom": "^16.2.10",
         "@types/json2csv": "^4.5.1",
+        "@types/lodash": "^4.14.175",
         "@types/ora": "^3.2.0",
         "@types/progress": "^2.0.3",
         "@types/request": "^2.48.4",
@@ -75,7 +78,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/drawrowfly/tiktok-scraper.git"
+        "url": "git+https://github.com/fadytaher/tiktok-scraper.git"
     },
     "keywords": [
         "TikTok",
