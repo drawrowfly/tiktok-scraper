@@ -44,6 +44,7 @@ export interface Options {
     fileName?: string;
     historyPath?: string;
     timeout?: number;
+    retry?: number;
     hdVideo?: boolean;
     randomUa?: boolean;
     webHookUrl?: string;
@@ -75,6 +76,7 @@ export interface TikTokConstructor {
     noWaterMark?: boolean;
     fileName?: string;
     timeout?: number;
+    retry?: number;
     test?: boolean;
     hdVideo?: boolean;
     signature?: string;
