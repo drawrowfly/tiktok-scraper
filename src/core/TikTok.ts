@@ -212,6 +212,7 @@ export class TikTokScraper extends EventEmitter {
             noWaterMark,
             headers,
             filepath: process.env.SCRAPING_FROM_DOCKER ? '/usr/app/files' : filepath || '',
+            fileName: fileName,
             bulk,
         });
         this.webHookUrl = webHookUrl;

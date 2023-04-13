@@ -251,7 +251,7 @@ export const video = async (input: string, options = {} as Options): Promise<any
     }
 
     return {
-        ...(options?.download ? { message: `Video location: ${contructor.filepath}/${result.id}.mp4` } : {}),
+        ...(options?.download ? { message: `Video location: ${path}.mp4` } : {}),
         ...outputMessage,
     };
 };
